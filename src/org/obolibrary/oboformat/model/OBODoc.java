@@ -9,6 +9,10 @@ import java.util.Vector;
 
 import org.obolibrary.oboformat.model.Frame.FrameType;
 
+/**
+ * An OBODoc is a container for a header frame and zero or more entity frames
+ *
+ */
 public class OBODoc {
 	protected Frame headerFrame;
 	protected Map<String,Frame> termFrameMap = new HashMap<String,Frame>();
@@ -91,11 +95,20 @@ public class OBODoc {
 		}
 	}
 
+	/**
+	 * 
+	 * Looks up the ID prefix to IRI prefix mapping.
+	 * Header-Tag: idspace
+	 * 
+	 * @param obo prefix
+	 * @return IRI prefix as string
+	 */
 	public String getIDSpace(String prefix) {
 		// built-in
 		if (prefix.equals("RO")) {
 			return "http://purl.obolibrary.org/obo/RO_";
 		}
+		// TODO
 		return null;
 	}
 

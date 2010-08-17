@@ -17,8 +17,11 @@ import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 
+/**
+ * implements the OBO Format 1.4 specification
+ *
+ */
 public class OBOFormatParser {
-	//BufferedReader reader;
 	
 	final String DATA_VERSION = "data-version";
 	final String ID = "id";
@@ -168,12 +171,26 @@ public class OBOFormatParser {
 		this.s.reader = r;
 	}
 
+	/**
+	 * Parses a local file to an OBODoc
+	 * 
+	 * @param filename
+	 * @return parsed obo document
+	 * @throws IOException
+	 */
 	public OBODoc parse(String fn) throws IOException {
 		 BufferedReader in
 		   = new BufferedReader(new FileReader(fn));
 		 return parse(in);
 	}	
 	
+	/**
+	 * Parses a remote URL to an OBODoc
+	 * 
+	 * @param filename
+	 * @return parsed obo document
+	 * @throws IOException
+	 */
 	public OBODoc parseURL(String urlstr) throws IOException {
 		URL url = new URL(urlstr);
 	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -181,6 +198,13 @@ public class OBOFormatParser {
 	}	
 
 	
+	/**
+	 * 
+	 * 
+	 * @param reader
+	 * @returnparsed obo document
+	 * @throws IOException
+	 */
 	public OBODoc parse(BufferedReader reader) throws IOException {
 		setReader(reader);
 
@@ -531,6 +555,15 @@ public class OBOFormatParser {
 
 		return false;
 	}
+	
+	// ----------------------------------------
+	// [Instance] Frames - TODO 
+	// ----------------------------------------
+
+	// ----------------------------------------
+	// [Annotation] Frames - TODO 
+	// ----------------------------------------
+
 
 	// ----------------------------------------
 	// TVP
@@ -613,8 +646,14 @@ public class OBOFormatParser {
 	}
 	
 	private boolean parseTypedefIntersectionOf(Clause cl) {
+		// single values only
 		return parseIdRef(cl);
 	}
+	
+	// ----------------------------------------
+	// Synonyms
+	// ----------------------------------------
+
 
 	private boolean parseSynonym(Clause cl) {
 		if (s.consume("\"")) {
@@ -646,6 +685,10 @@ public class OBOFormatParser {
 		return parseIdRef(cl);
 	}
 
+	// ----------------------------------------
+	// Definitions
+	// ----------------------------------------
+
 	private boolean parseDef(Clause cl) {
 		if (s.consume("\"")) {
 			String def = getParseUntilAdv("\"");
@@ -666,7 +709,9 @@ public class OBOFormatParser {
 		return false;
 	}
 
-
+	// ----------------------------------------
+	// XrefLists - e.g. [A:1, B:2, ... ]
+	// ----------------------------------------
 
 	private boolean parseXrefList(Clause cl) {
 		if (s.consume("[")) {
@@ -705,6 +750,10 @@ public class OBOFormatParser {
 		}
 		return false;
 	}
+
+	// ----------------------------------------
+	// Qualifier Value blocks - e.g. {a="1",b="foo", ...}
+	// ----------------------------------------
 
 	private boolean parseQualifierBlock(Clause cl) {
 		if (s.consume("{")) {
@@ -746,6 +795,10 @@ public class OBOFormatParser {
 		return false;
 	}
 
+	// ----------------------------------------
+	// Other
+	// ----------------------------------------
+
 
 	private boolean parseBoolean(Clause cl) {
 		if (s.consume("true")) {
@@ -779,6 +832,11 @@ public class OBOFormatParser {
 		f.setId(id);
 		return parseEOL(cl);
 	}
+	
+	// ----------------------------------------
+	// End-of-line matter
+	// ----------------------------------------
+
 	
 	private boolean parseEOL(Clause cl) {
 		while (parseWs()) {
