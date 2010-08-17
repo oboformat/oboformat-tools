@@ -1,4 +1,4 @@
-package org.obolibrary.oboparser.test;
+package org.obolibrary.oboformat.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
