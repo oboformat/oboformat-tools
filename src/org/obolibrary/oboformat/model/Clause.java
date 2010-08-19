@@ -8,6 +8,7 @@ public class Clause {
 	protected String tag;
 
 	protected Collection<Object> values;
+	protected Collection<Xref> xrefs;
 	protected Collection<QualifierValue> qualifierValues =
 		 new ArrayList<QualifierValue>();
 
@@ -52,6 +53,21 @@ public class Clause {
 		return values.toArray()[1];
 	}
 	
+	public Collection<Xref> getXrefs() {
+		return xrefs;
+	}
+
+	public void setXrefs(Collection<Xref> xrefs) {
+		this.xrefs = xrefs;
+	}
+	
+	public void addXref(Xref xref) {
+		if (xrefs == null)
+			xrefs = new Vector<Xref>();
+		xrefs.add(xref);
+	}
+
+
 	public Collection<QualifierValue> getQualifierValues() {
 		return qualifierValues;
 	}
@@ -81,6 +97,7 @@ public class Clause {
 		}
 		return tag+"("+sb.toString()+")";
 	}
+
 
 
 

@@ -183,7 +183,19 @@ public class OBOFormatParser {
 		   = new BufferedReader(new FileReader(fn));
 		 return parse(in);
 	}	
-	
+
+	/**
+	 * Parses a remote URL to an OBODoc
+	 * 
+	 * @param filename
+	 * @return parsed obo document
+	 * @throws IOException
+	 */
+	public OBODoc parse(URL url) throws IOException {
+	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+	    return parse(in);
+	}	
+
 	/**
 	 * Parses a remote URL to an OBODoc
 	 * 
@@ -355,7 +367,8 @@ public class OBOFormatParser {
 			return parseSynonym(cl);
 		}
 		if (tag.equals("xref")) {
-			return parseXref(cl);
+			//return parseXref(cl);
+			return parseIdRef(cl);
 		}
 		if (tag.equals("is_a")) {
 			return parseIdRef(cl);
@@ -461,7 +474,8 @@ public class OBOFormatParser {
 			return parseSynonym(cl);
 		}
 		if (tag.equals("xref")) {
-			return parseXref(cl);
+			//return parseXref(cl);
+			return parseIdRef(cl);
 		}
 		if (tag.equals("domain")) {
 			return parseIdRef(cl);
@@ -740,7 +754,7 @@ public class OBOFormatParser {
 				System.out.println("accepting bad xref with spaces:"+id);
 			}
 			Xref xref = new Xref(id);
-			cl.addValue(xref);
+			cl.addXref(xref);
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('"')) {
 				s.consume("\"");

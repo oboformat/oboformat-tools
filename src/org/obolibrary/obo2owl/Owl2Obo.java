@@ -1,11 +1,8 @@
 package org.obolibrary.obo2owl;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,10 +11,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.obolibrary.oboformat.model.*;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -30,24 +24,26 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
+import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.OWLPropertyRange;
+import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLRestriction;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
-public class Obo2Owl {
+public class Owl2Obo {
 
 	private static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
-	OWLOntologyManager manager;
+	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
 	OBODoc obodoc;
@@ -55,13 +51,29 @@ public class Obo2Owl {
 	Map<String,IRI> annotationPropertyMap;
 	Set<OWLAnnotationProperty> apToDeclare;
 	
-	
+	public class NoTranslation extends Exception {
 
-	public Obo2Owl() {
-		init();
+		public NoTranslation() {
+			super();
+			// TODO Auto-generated constructor stub
+		}
+
+		public NoTranslation(String message, Throwable cause) {
+			super(message, cause);
+			// TODO Auto-generated constructor stub
+		}
+
+		public NoTranslation(String message) {
+			super(message);
+			// TODO Auto-generated constructor stub
+		}
+
+		public NoTranslation(Throwable cause) {
+			super(cause);
+			// TODO Auto-generated constructor stub
+		}
+		
 	}
-
-
 
 	private void init() {
 		idSpaceMap = new HashMap<String,String>();
@@ -70,21 +82,7 @@ public class Obo2Owl {
 		initAnnotationPropertyMap();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 	}
-
-
-	public static void convertURL(String iri, String outFile) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		Obo2Owl bridge = new Obo2Owl();
-		OWLOntologyManager manager = bridge.getManager();
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse(new URL(iri));
-		OWLOntology ontology = bridge.convert(obodoc);
-		IRI outputStream = IRI.create(outFile);
-		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		System.out.println("saving to "+outputStream+" fmt="+format);
-		manager.saveOntology(ontology, format, outputStream);
-
-	}
-
+	
 	private void initAnnotationPropertyMap() {
 		annotationPropertyMap = new HashMap<String,IRI>();
 		map("name",OWLRDFVocabulary.RDFS_LABEL);
@@ -129,21 +127,82 @@ public class Obo2Owl {
 
 
 
-	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
-		this.obodoc = obodoc;
+	public OBODoc convert(OWLOntology ont) throws OWLOntologyCreationException {
+		this.owlOntology = ont;
 		init();
 		return tr();
 	}
 
-	private OWLOntology tr() throws OWLOntologyCreationException {
-		owlOntology = manager.createOntology();
-		for (Frame f : obodoc.getTermFrames()) {
-			trTermFrame(f);
+	private OBODoc tr() throws OWLOntologyCreationException {
+		obodoc = new OBODoc();
+		for (OWLAxiom ax : owlOntology.getAxioms()) {
+			tr(ax);
 		}
-		for (Frame f : obodoc.getTypedefFrames()) {
-			trTypedefFrame(f);
+		return obodoc;
+	}
+	
+	
+	private Clause tr(OWLAxiom ax) {
+		Clause c = null;
+		String tag = null;
+		if (ax instanceof OWLSubClassOfAxiom) {
+			OWLSubClassOfAxiom a = (OWLSubClassOfAxiom)ax;
+			OWLClassExpression sub = a.getSubClass();
+			OWLClassExpression sup = a.getSuperClass();
+			if (sub instanceof OWLClass) {
+				if (sup instanceof OWLClass) {
+					tag = "is_a";
+				}
+				else {
+					if (sup instanceof OWLRestriction) {
+						OWLRestriction r = (OWLRestriction)sup;
+						c = tr(r);
+						tag = "relationship";
+					}
+				}
+			}
+			else {
+				// cannot do anything with GCIs yet
+			}
 		}
-		return owlOntology;
+		if (c == null) {
+			return null;
+		}
+		if (tag == null) {
+			return null;
+		}
+		c.setTag(tag);
+		return c;
+	}
+	
+	private Clause tr(OWLRestriction r) {
+		Clause c = new Clause();
+		String relId = trId(r.getProperty());
+		if (relId == null) {
+			return null;
+		}
+		c.addValue(relId);
+
+		if (r instanceof OWLObjectSomeValuesFrom) {
+			String tgtId = trId(((OWLObjectSomeValuesFrom)r).getFiller());
+			if (tgtId != null) {
+				c.addValue(tgtId);
+			}
+		}
+		else if (r instanceof OWLObjectAllValuesFrom) {
+			String tgtId = trId(((OWLObjectAllValuesFrom)r).getFiller());			
+		}
+		return c;
+	}
+
+	private String trId(OWLClassExpression filler) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String trId(OWLPropertyExpression property) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public OWLClassExpression trTermFrame(Frame termFrame) {
@@ -583,15 +642,6 @@ public class Obo2Owl {
 		if (value instanceof Xref) {
 			value = ((Xref)value).getIdref();
 		}
-		else if (value instanceof Date) {
-			// TODO
-			value = ((Date)value).toString();
-		}
-		else if (! (value instanceof String)) {
-			// TODO
-			// e.g. boolean
-			value = value.toString();
-		}
 		System.out.println("v="+value);
 		return fac.getOWLTypedLiteral((String)value); // TODO
 	}
@@ -663,8 +713,6 @@ public class Obo2Owl {
 		// TODO Auto-generated method stub
 		return "TODO";
 	}
-
-
 
 
 }
