@@ -126,6 +126,10 @@ public class OBORunner {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					fails.add(ont);
+				}catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					fails.add(ont);
 				}
 			}
 			else {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="OBOParser" default="all">
+<project name="oboformat" default="all">
 
 	<!-- project variables -->
-	<property name="projectname" value="oboparser" />
+	<property name="projectname" value="oboformat" />
 	<property name="runtimedir_name" value="lib" />
 	<property name="runtimedir" location="${runtimedir_name}" />
 	<property name="release_path" location="releases" />

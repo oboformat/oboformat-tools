@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set the classname of the Java class to execute
-CLASSNAME=org.obolibrary.oboparser.OBORunner
+CLASSNAME=org.obolibrary.cli.OBORunner
 
 # Give a space-separated list of classpath items RELATIVE TO THE CURRENT SCRIPT
 # These will be resolved into absolute pathnames
