@@ -390,6 +390,10 @@ public class Obo2Owl {
 		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
 		
 		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
+		
+		if (clause.getValue() == null) {
+			System.out.println("Problem:"+clause);
+		}
 
 		OWLAxiom ax = null;
 		if (tag.equals("name")) {
@@ -409,12 +413,14 @@ public class Obo2Owl {
 		}
 		else {
 			// generic
+			System.out.println("generic clause:"+clause);
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
+		// TODO synonyms
 		return ax;
 	}
 

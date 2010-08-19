@@ -373,8 +373,17 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref") || tag.equals("xref_analog") || tag.equals("xref_unknown")) {
+		if (parseDeprecatedSynonym(tag,cl)) {
+			return true;
+		}
+		if (tag.equals("xref")) {
 			return parseDirectXref(cl);
+		}
+		if (tag.equals("builtin")) {
+			return parseBoolean(cl);
+		}
+		if (tag.equals("property_value")) {
+			return parsePropertyValue(cl);
 		}
 		if (tag.equals("is_a")) {
 			return parseIdRef(cl);
@@ -483,14 +492,23 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref") || tag.equals("xref_analog") || tag.equals("xref_unknown")) {
+		if (parseDeprecatedSynonym(tag,cl)) {
+			return true;
+		}
+		if (tag.equals("xref")) {
 			return parseDirectXref(cl);
+		}
+		if (tag.equals("property_value")) {
+			return parsePropertyValue(cl);
 		}
 		if (tag.equals("domain")) {
 			return parseIdRef(cl);
 		}
 		if (tag.equals("range")) {
 			return parseIdRef(cl);
+		}
+		if (tag.equals("builtin")) {
+			return parseBoolean(cl);
 		}
 		if (tag.equals("is_anti_symmetric")) {
 			return parseBoolean(cl);
@@ -602,7 +620,7 @@ public class OBOFormatParser {
 		s.advance(i+1);
 		parseWs();
 		parseZeroOrMoreWs();
-		return tag;
+		return mapDeprecatedTag(tag);
 	}
 	
 	private boolean parseId(Clause cl) {
@@ -651,6 +669,10 @@ public class OBOFormatParser {
 		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
 	}
 
+	private boolean parsePropertyValue(Clause cl) {
+		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
+	}
+
 	/**
 	 * intersection_of-Tag Class-ID | intersection_of-Tag Relation-ID Class-ID 
 	 */
@@ -677,6 +699,32 @@ public class OBOFormatParser {
 	// Synonyms
 	// ----------------------------------------
 
+	private boolean parseDeprecatedSynonym(String tag, Clause cl) {
+		String scope = null;
+		if (tag.equals("exact_synonym")) {
+			scope = "EXACT";
+		}
+		else if (tag.equals("narrow_synonym")) {
+			scope = "NARROW";		
+		}
+		else if (tag.equals("broad_synonym")) {
+			scope = "BROAD";
+		}
+		else if (tag.equals("related_synonym")) {
+			scope = "RELATED";
+		}
+		else {
+			return false;
+		}
+		cl.setTag("synonym");
+		if (s.consume("\"")) {
+			String syn = getParseUntilAdv("\"");
+			cl.setValue(syn);
+			parseZeroOrMoreWs();
+			return parseXrefList(cl);
+		}
+		return false;
+	}
 
 	private boolean parseSynonym(Clause cl) {
 		if (s.consume("\"")) {
@@ -684,6 +732,7 @@ public class OBOFormatParser {
 			cl.setValue(syn);
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('[')) {
+				// neither scope nor type specified
 				return parseXrefList(cl);
 			}
 			else if (parseSynonymScope(cl)) {
@@ -1015,11 +1064,27 @@ public class OBOFormatParser {
 			i++;
 		}
 		if (i==0)
-			return null;
+			return "";
 		String ret = r.substring(0, i);
 		// TODO - replace escaped characters
 		s.advance(i);
 		return ret;
+	}
+	
+	private String mapDeprecatedTag(String tag) {
+		if (tag.equals("inverse_of_on_instance_level")) {
+			return "inverse_of";
+		}
+		if (tag.equals("xref_analog")) {
+			return "xref";
+		}
+		if (tag.equals("xref_unknown")) {
+			return "xref";
+		}
+		if (tag.equals("instance_level_is_transitive")) {
+			return "is_transitive";
+		}
+		return tag;
 	}
 
 }

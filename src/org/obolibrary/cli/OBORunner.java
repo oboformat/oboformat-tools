@@ -7,7 +7,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -31,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 public class OBORunner {
 
 	protected final static Logger logger = Logger.getLogger(OBORunner.class);
+	static Set<String> ontsToDownload = new HashSet<String>();
+	static Set<String> omitOntsToDownload = new HashSet<String>();
 
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 
@@ -54,6 +58,14 @@ public class OBORunner {
 				outFile = args[i];
 				i++;
 			}
+			else if (opt.equals("--download")) {
+				ontsToDownload.add(args[i]);
+				i++;
+			}
+			else if (opt.equals("--omit-download")) {
+				omitOntsToDownload.add(args[i]);
+				i++;
+			}
 			else if (opt.equals("-b") || opt.equals("--build")) {
 				buildObo = true;
 				buildDir = args[i];
@@ -73,6 +85,11 @@ public class OBORunner {
 			else {
 				paths.add(opt);
 			}
+		}
+		
+		if (ontsToDownload.size() > 0 && !buildObo) {
+			System.err.println("must specify dir with -b DIR");
+			System.exit(1);
 		}
 
 		if (buildObo) {
@@ -115,11 +132,16 @@ public class OBORunner {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
 		for (String ont : ontmap.keySet()) {
+			if (ontsToDownload.size() > 0 && !ontsToDownload.contains(ont))
+				continue;
+			if (omitOntsToDownload.size() > 0 && omitOntsToDownload.contains(ont))
+				continue;
 			if (ontmap.containsKey(ont)) {
 				try {
-					System.out.println("converting: "+ont);
+					String url = ontmap.get(ont);
+					System.out.println("converting: "+ont+" from: "+url);
 					long initTime = System.nanoTime();
-					Obo2Owl.convertURL(ontmap.get(ont),dir+"/"+ont+".owl");
+					Obo2Owl.convertURL(url,dir+"/"+ont+".owl");
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
 					
@@ -203,6 +225,11 @@ public class OBORunner {
 				if (urlmap.containsKey(ns))
 					urlmap.remove(ns);
 				ns = null;
+			}
+			else if (tag.equals("format")) {
+				// danger or circularity, just for testing now
+				if (!parts[1].equals("obo"))
+					urlmap.put(ns, "http://purl.org/obo/obo/"+ns+".obo");
 			}
 			
 		}

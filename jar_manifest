@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Class-Path: junit.jar log4j-1.2.15.jar oboformat.jar owlapi-bin.jar
+Main-Class: oboparser.Main
+Specification-Title: oboparser
+Sealed: true
+Specification-Version: $VERSION$
+Specification-Vendor: OBO Foundry
+Implementation-Title: oboparser
+Implementation-Version: build70_${build_date}
+Implementation-Vendor: OBO Foundry
