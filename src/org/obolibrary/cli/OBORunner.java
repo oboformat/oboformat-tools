@@ -103,13 +103,32 @@ public class OBORunner {
 		// TODO Auto-generated method stub
 	}
 	
+	public static void showMemory() {
+		System.gc();
+		System.gc();
+		System.gc();
+		long tm = Runtime.getRuntime().totalMemory();
+		long fm = Runtime.getRuntime().freeMemory();
+		long mem = tm-fm;
+		System.out.println("Memory total:"+tm+" free:"+fm+" diff:"+mem+" (bytes) diff:"+(mem/1000000)+" (mb)");
+	}
+
+	
 	private static void buildAllOboOwlFiles(String dir) throws IOException {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
 		for (String ont : ontmap.keySet()) {
 			if (ontmap.containsKey(ont)) {
 				try {
+					System.out.println("converting: "+ont);
+					long initTime = System.nanoTime();
 					Obo2Owl.convertURL(ontmap.get(ont),dir+"/"+ont+".owl");
+					long totalTime = System.nanoTime() - initTime;
+					showMemory(); // useless
+					
+					System.out.println("TIME_TO_CONVERT "+ont+" "+
+							+ (totalTime / 1000000d) + " ms");
+
 				} catch (OWLOntologyCreationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -139,7 +158,7 @@ public class OBORunner {
 		}
 		System.out.println("DONE!");
 		for (String fail : fails)
-			System.out.println(fail);
+			System.out.println("FAIL:"+fail);
 	}
 
 	private static Map<String,String> getOntDownloadMap() throws IOException {

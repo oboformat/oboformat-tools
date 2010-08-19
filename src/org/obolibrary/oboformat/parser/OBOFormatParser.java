@@ -179,6 +179,8 @@ public class OBOFormatParser {
 	 * @throws IOException
 	 */
 	public OBODoc parse(String fn) throws IOException {
+		if (fn.startsWith("http:"))
+			return parse(new URL(fn));
 		 BufferedReader in
 		   = new BufferedReader(new FileReader(fn));
 		 return parse(in);
