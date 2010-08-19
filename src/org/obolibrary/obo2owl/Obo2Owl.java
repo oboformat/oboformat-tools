@@ -248,7 +248,12 @@ public class Obo2Owl {
 		//System.out.println(axiom);
 		AddAxiom addAx = new AddAxiom(owlOntology, axiom);
 		//System.out.println(addAx);
-		manager.applyChange(addAx);
+		try {
+			manager.applyChange(addAx);
+		}
+		catch (Exception e) {			
+			System.out.println(e+"\nCOULD NOT TRANSLATE AXIOM");
+		}
 	}
 
 	private OWLAxiom trTermClause(OWLClass cls, String tag, Clause clause) {
@@ -351,9 +356,10 @@ public class Obo2Owl {
 		else if (tag.equals("holds_over_chain") || tag.equals("equivalent_to_chain")) {
 			List<OWLObjectPropertyExpression> chain =
 				new Vector<OWLObjectPropertyExpression>();
-			chain.add(getObjectProp(v));
-			chain.add(getObjectProp(clause.getValue2()));
+			chain.add(trObjectProp(v));
+			chain.add(trObjectProp(clause.getValue2()));
 			ax = fac.getOWLSubPropertyChainOfAxiom(chain , p, annotations);
+			//System.out.println("chain:"+ax);
 			// TODO - annotations for equivalent to
 		}
 		else if (tag.equals("is_transitive")) {
@@ -378,10 +384,6 @@ public class Obo2Owl {
 		return ax;
 	}
 
-	private OWLObjectPropertyExpression getObjectProp(Object v) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	private OWLAxiom trGenericClause(OWLNamedObject e, String tag, Clause clause) {
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
@@ -578,6 +580,12 @@ public class Obo2Owl {
 		IRI iri = oboIdToIRI(mapPropId(relId));
 		return fac.getOWLObjectProperty(iri);	
 	}
+	
+	private OWLObjectPropertyExpression trObjectProp(Object v) {
+		IRI iri = oboIdToIRI(mapPropId((String) v));
+		return fac.getOWLObjectProperty(iri);	
+	}
+
 
 	
 	private OWLAnnotationValue trLiteral(Object value) {

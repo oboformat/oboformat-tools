@@ -136,7 +136,6 @@
 		<delete file="${main_jar_manifest}" />
 		<delete file="docs/toc.html" />
 		<delete dir="${apidoc_dest}" />
-		<delete dir="${runtimedir}" />
 		<delete dir="${release_path}" />
 		<delete file="release_resources/README" />
 	</target>

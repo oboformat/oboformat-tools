@@ -76,6 +76,8 @@ public class OBOFormatParser {
 			prepare();
 			if (line == null)
 				return null;
+			if (pos >= line.length())
+				return "";
 			return line.substring(pos);
 		}
 		
@@ -111,7 +113,7 @@ public class OBOFormatParser {
 			if (line == null) {
 				return false;
 			}
-			return pos == line.length();
+			return pos >= line.length();
 		}
 		
 		public boolean eof() {
@@ -325,6 +327,9 @@ public class OBOFormatParser {
 	 * 
 	 */
 	protected boolean parseTermFrameClauseEOL(Frame f) {
+		// comment line:
+		if (s.peekCharIs('!'))
+			return parseHiddenComment() && forceParseNlOrEof();
 		Clause cl = new Clause();
 		if (parseTermFrameClause(cl)) {
 			f.addClause(cl);
@@ -368,7 +373,7 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref") || tag.equals("xref_analog")) {
+		if (tag.equals("xref") || tag.equals("xref_analog") || tag.equals("xref_unknown")) {
 			return parseDirectXref(cl);
 		}
 		if (tag.equals("is_a")) {
@@ -436,6 +441,10 @@ public class OBOFormatParser {
 	 * 
 	 */
 	protected boolean parseTypedefFrameClauseEOL(Frame f) {
+		// comment line:
+		if (s.peekCharIs('!'))
+			return parseHiddenComment() && forceParseNlOrEof();
+
 		Clause cl = new Clause();
 	
 		if (parseTypedefFrameClause(cl)) {
@@ -474,7 +483,7 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref") || tag.equals("xref_analog")) {
+		if (tag.equals("xref") || tag.equals("xref_analog") || tag.equals("xref_unknown")) {
 			return parseDirectXref(cl);
 		}
 		if (tag.equals("domain")) {
@@ -770,8 +779,9 @@ public class OBOFormatParser {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{");
 		if (id != null) {
+			id = id.replaceAll(" +\\Z", "");
 			if (id.contains(" ")) {
-				System.out.println("accepting bad xref with spaces:"+id);
+				System.out.println("accepting bad xref with spaces:<"+id+">");
 			}
 			Xref xref = new Xref(id);
 			//cl.addXref(xref);
@@ -815,10 +825,12 @@ public class OBOFormatParser {
 		if (q != null) {
 			parseZeroOrMoreWs();
 			String v;
+			
 			if (s.consume("\"")) {
 				 v = getParseUntilAdv("\"");
 			}
 			else {
+				System.out.println("qualifier values should be enclosed in quotes. You have: "+q+"="+s.rest());
 				// TODO - warn
 				v = getParseUntil(" ,}");
 			}
@@ -918,7 +930,7 @@ public class OBOFormatParser {
 			return true;
 		if (s.eof())
 			return true;
-		throw new Error("expected newline");
+		throw new Error("expected newline instead of: "+s.rest());
 	}
 	
 	protected boolean parseZeroOrMoreWsOptCmtNl() {
@@ -954,7 +966,7 @@ public class OBOFormatParser {
 			return false;
 		}
 		int n = 0;
-		while (s.peekChar() == ' ') {
+		while (s.peekCharIs(' ')) {
 			s.advance(1);
 			n++;
 		}
