@@ -30,6 +30,22 @@ synonym: "O-Acetylcholine" RELATED [KEGG COMPOUND:]
 is_a: CHEBI:35287 ! acylcholine
 is_a: CHEBI:47622 ! acetate ester
 
+[Term]
+id: CHEBI:30151
+name: aluminide(1-)
+def: "A monoatomic aluminium that has formula Al." []
+synonym: "Aluminum anion" RELATED [NIST Chemistry WebBook:]
+synonym: "Al(-)" RELATED [IUPAC:]
+synonym: "aluminide(1-)" EXACT IUPAC_NAME [IUPAC:]
+synonym: "aluminide(-I)" EXACT IUPAC_NAME [IUPAC:]
+synonym: "Al" RELATED FORMULA [ChEBI:]
+synonym: "[Al-]" RELATED SMILES [ChEBI:]
+synonym: "InChI=1/Al/q-1" RELATED InChI [ChEBI:]
+synonym: "InChIKey=SBLSYFIUPXRQRY-UHFFFAOYAW" RELATED InChIKey [ChEBI:]
+xref: NIST Chemistry WebBook:22325-47-9 "CAS Registry Number"
+is_a: CHEBI:33429
+is_a: CHEBI:33627
+
 [Typedef]
 id: R:1
 name: r1
