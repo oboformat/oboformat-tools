@@ -87,6 +87,7 @@ public class Obo2Owl {
 
 	private void initAnnotationPropertyMap() {
 		annotationPropertyMap = new HashMap<String,IRI>();
+		map("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED);
 		map("name",OWLRDFVocabulary.RDFS_LABEL);
 		map("comment",OWLRDFVocabulary.RDFS_COMMENT);
 		map("expand_expression_to","IAO_0000424");
@@ -150,7 +151,7 @@ public class Obo2Owl {
 		OWLClass cls = trClass(termFrame.getId());
 		add(fac.getOWLDeclarationAxiom(cls));
 		for (String tag : termFrame.getTags()) {
-			System.out.println("tag:"+tag);
+			//System.out.println("tag:"+tag);
 			Collection<Clause> clauses = termFrame.getClauses(tag);
 			if (tag.equals("intersection_of")) {
 				add(trIntersectionOf(cls,clauses));
@@ -228,7 +229,7 @@ public class Obo2Owl {
 				
 			}
 		}
-		System.out.println(cls+" CL:"+clauses+" I:"+iSet+" E:"+eSet);
+		//out.println(cls+" CL:"+clauses+" I:"+iSet+" E:"+eSet);
 		eSet.add(fac.getOWLObjectIntersectionOf(iSet));
 		// TODO - fix this
 		if (annotations == null || annotations.size() == 0)
@@ -243,7 +244,7 @@ public class Obo2Owl {
 			System.out.println("no axiom");
 			return;
 		}
-		System.out.println("adding: ");
+		//System.out.println("adding: ");
 		//System.out.println(axiom);
 		AddAxiom addAx = new AddAxiom(owlOntology, axiom);
 		//System.out.println(addAx);
@@ -592,7 +593,7 @@ public class Obo2Owl {
 			// e.g. boolean
 			value = value.toString();
 		}
-		System.out.println("v="+value);
+		//System.out.println("v="+value);
 		return fac.getOWLTypedLiteral((String)value); // TODO
 	}
 

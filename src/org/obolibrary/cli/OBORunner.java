@@ -92,10 +92,7 @@ public class OBORunner {
 			System.out.println("saving to "+outputStream+" via "+format);
 			manager.saveOntology(ontology, format, outputStream);
 			//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-
-
-
-		}
+	}
 
 	}
 
@@ -201,6 +198,11 @@ public class OBORunner {
 				if (parts[1] != "" && !urlmap.containsKey(ns)) {
 					urlmap.put(ns, parts[1]);
 				}
+			}
+			else if (tag.equals("is_obsolete")) {
+				if (urlmap.containsKey(ns))
+					urlmap.remove(ns);
+				ns = null;
 			}
 			
 		}

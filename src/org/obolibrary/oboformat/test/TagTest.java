@@ -30,7 +30,7 @@ public class TagTest extends TestCase {
 	public static void testParseOBOFile() throws IOException {
 		OBODoc obodoc = parseOBOFile("test.obo");
 		System.out.println("F:"+obodoc);
-		assertTrue(obodoc.getTermFrames().size() == 3);
+		assertTrue(obodoc.getTermFrames().size() == 4);
 		assertTrue(obodoc.getTypedefFrames().size() == 1);
 		Frame frame = obodoc.getTermFrames().iterator().next();
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
@@ -70,7 +70,7 @@ public class TagTest extends TestCase {
 		System.out.println("DEF:"+cl);
 		assertTrue(cl.getTag().equals("def"));
 		assertTrue(cl.getValue().equals("a b c"));
-		assertTrue(cl.getValues().size() == 3);
+		assertTrue(cl.getValues().size() == 1);
 	}
 	public static void testParseDefTag2() {
 		Clause cl = parseLine("def: \"a b c\" [foo:1 \"blah blah\", bar:2]");

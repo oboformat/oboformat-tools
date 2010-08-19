@@ -368,9 +368,8 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref")) {
-			//return parseXref(cl);
-			return parseIdRef(cl);
+		if (tag.equals("xref") || tag.equals("xref_analog")) {
+			return parseDirectXref(cl);
 		}
 		if (tag.equals("is_a")) {
 			return parseIdRef(cl);
@@ -475,9 +474,8 @@ public class OBOFormatParser {
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
 		}
-		if (tag.equals("xref")) {
-			//return parseXref(cl);
-			return parseIdRef(cl);
+		if (tag.equals("xref") || tag.equals("xref_analog")) {
+			return parseDirectXref(cl);
 		}
 		if (tag.equals("domain")) {
 			return parseIdRef(cl);
@@ -747,9 +745,9 @@ public class OBOFormatParser {
 		return true;	
 	}
 
+	// an xref that supports a value of values in a clause
 	private boolean parseXref(Clause cl) {
 		parseZeroOrMoreWs();
-		//String id = getParseUntil(" \",]!{");
 		String id = getParseUntil("\",]!{");
 		if (id != null) {
 			if (id.contains(" ")) {
@@ -757,6 +755,27 @@ public class OBOFormatParser {
 			}
 			Xref xref = new Xref(id);
 			cl.addXref(xref);
+			parseZeroOrMoreWs();
+			if (s.peekCharIs('"')) {
+				s.consume("\"");
+				xref.setAnnotation(this.getParseUntilAdv("\""));
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	// an xref that is a direct value of a clause
+	private boolean parseDirectXref(Clause cl) {
+		parseZeroOrMoreWs();
+		String id = getParseUntil("\",]!{");
+		if (id != null) {
+			if (id.contains(" ")) {
+				System.out.println("accepting bad xref with spaces:"+id);
+			}
+			Xref xref = new Xref(id);
+			//cl.addXref(xref);
+			cl.addValue(xref);
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('"')) {
 				s.consume("\"");
