@@ -51,6 +51,7 @@ public class OBOFormatParser {
 	protected class MyStream {
 		int pos=0;
 		String line;
+		int lineNo = 0;
 		BufferedReader reader;
 		
 		public MyStream() {
@@ -93,6 +94,7 @@ public class OBOFormatParser {
 		public void advanceLine() {
 			try {
 				line = reader.readLine();
+				lineNo++;
 				pos = 0;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -154,6 +156,10 @@ public class OBOFormatParser {
 			if (eol() || eof())
 				return false;
 			return peekChar() == c;
+		}
+
+		public int getLineNo() {
+			return lineNo;
 		}
 	}
 	
@@ -225,8 +231,15 @@ public class OBOFormatParser {
 		setReader(reader);
 
 		OBODoc obodoc = new OBODoc();
-		if (parseOBODoc(obodoc))
-			return obodoc;
+		try {
+			if (parseOBODoc(obodoc))
+				return obodoc;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e);
+			System.err.println("Line:"+s.getLineNo());
+		}
 		return null;
 	}
 	
