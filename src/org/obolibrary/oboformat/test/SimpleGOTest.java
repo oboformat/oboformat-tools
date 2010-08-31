@@ -18,7 +18,6 @@ public class SimpleGOTest extends TestCase {
 	}
 
 
-
 	public SimpleGOTest(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub

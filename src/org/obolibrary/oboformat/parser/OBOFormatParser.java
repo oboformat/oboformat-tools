@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
@@ -260,7 +261,7 @@ public class OBOFormatParser {
 			return true;
 		}
 		else {
-			System.out.println("UNPARSED:"+s);
+			System.err.println("UNPARSED:"+s);
 			return false;
 		}
 	}
@@ -283,7 +284,7 @@ public class OBOFormatParser {
 			return false;
 
 		if (parseHeaderClause(h)) {
-			System.out.println("hdr// "+h);
+			//System.out.println("hdr// "+h);
 			return forceParseNlOrEof();
 		}
 		else {
@@ -350,7 +351,7 @@ public class OBOFormatParser {
 		}
 		else {
 			if (cl.getTag() != null) {
-				System.out.println("problem parsing tag:"+s);
+				System.err.println("problem parsing tag:"+s);
 			}
 				
 		}
@@ -453,7 +454,7 @@ public class OBOFormatParser {
 				
 			}
 			obodoc.addFrame(f);
-			System.out.println("parsed: "+f);
+			//System.out.println("parsed: "+f);
 			return true;
 		}
 		return false;
@@ -822,7 +823,7 @@ public class OBOFormatParser {
 		String id = getParseUntil("\",]!{");
 		if (id != null) {
 			if (id.contains(" ")) {
-				System.out.println("accepting bad xref with spaces:"+id);
+				System.err.println("accepting bad xref with spaces:"+id);
 			}
 			Xref xref = new Xref(id);
 			cl.addXref(xref);
@@ -843,7 +844,7 @@ public class OBOFormatParser {
 		if (id != null) {
 			id = id.replaceAll(" +\\Z", "");
 			if (id.contains(" ")) {
-				System.out.println("accepting bad xref with spaces:<"+id+">");
+				System.err.println("accepting bad xref with spaces:<"+id+">");
 			}
 			Xref xref = new Xref(id);
 			//cl.addXref(xref);
@@ -892,7 +893,7 @@ public class OBOFormatParser {
 				 v = getParseUntilAdv("\"");
 			}
 			else {
-				System.out.println("qualifier values should be enclosed in quotes. You have: "+q+"="+s.rest());
+				System.err.println("qualifier values should be enclosed in quotes. You have: "+q+"="+s.rest());
 				// TODO - warn
 				v = getParseUntil(" ,}");
 			}

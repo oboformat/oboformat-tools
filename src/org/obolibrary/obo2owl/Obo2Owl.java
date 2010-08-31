@@ -80,7 +80,7 @@ public class Obo2Owl {
 		OWLOntology ontology = bridge.convert(obodoc);
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		System.out.println("saving to "+outputStream+" fmt="+format);
+		System.err.println("saving to "+outputStream+" fmt="+format);
 		manager.saveOntology(ontology, format, outputStream);
 
 	}
@@ -241,7 +241,7 @@ public class Obo2Owl {
 
 	private void add(OWLAxiom axiom) {
 		if (axiom == null) {
-			System.out.println("no axiom");
+			System.err.println("no axiom");
 			return;
 		}
 		//System.out.println("adding: ");
@@ -252,7 +252,7 @@ public class Obo2Owl {
 			manager.applyChange(addAx);
 		}
 		catch (Exception e) {			
-			System.out.println(e+"\nCOULD NOT TRANSLATE AXIOM");
+			System.err.println(e+"\nCOULD NOT TRANSLATE AXIOM");
 		}
 	}
 
@@ -392,7 +392,7 @@ public class Obo2Owl {
 		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
 		
 		if (clause.getValue() == null) {
-			System.out.println("Problem:"+clause);
+			System.err.println("Problem:"+clause);
 		}
 
 		OWLAxiom ax = null;
@@ -413,7 +413,7 @@ public class Obo2Owl {
 		}
 		else {
 			// generic
-			System.out.println("generic clause:"+clause);
+			//System.out.println("generic clause:"+clause);
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trAnnotationProp(tag),
 					sub, 
