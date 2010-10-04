@@ -120,5 +120,17 @@ public class Frame {
 		return tags;
 	}
 
+	public void merge(Frame extFrame) throws FrameMergeException {
+		if (!extFrame.getId().equals(getId())) {
+			throw new FrameMergeException("ids do not match");
+		}
+		if (!extFrame.getType().equals(getType())) {
+			throw new FrameMergeException("frame types do not match");
+		}
+		for (Clause c : extFrame.getClauses()) {
+			addClause(c);
+		}
+		// note we do not perform a document structure check at this point
+	}
 
 }

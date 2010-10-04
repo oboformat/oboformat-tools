@@ -52,7 +52,7 @@ public class OBODoc {
 	}
 
 
-	public void addFrame(Frame f) {
+	public void addFrame(Frame f) throws FrameMergeException {
 		if (f.getType() == FrameType.TERM) {
 			addTermFrame(f);
 		}
@@ -65,30 +65,30 @@ public class OBODoc {
 		}
 	}
 	
-	public void addTermFrame(Frame f) {
+	public void addTermFrame(Frame f) throws FrameMergeException {
 		String id = f.getId();
 		if (termFrameMap.containsKey(id)) {
-			// merge
+			termFrameMap.get(id).merge(f);
 		}
 		else {
 			termFrameMap.put(id, f);
 		}
 	}
 	
-	public void addTypedefFrame(Frame f) {
+	public void addTypedefFrame(Frame f) throws FrameMergeException {
 		String id = f.getId();
 		if (typedefFrameMap.containsKey(id)) {
-			// merge
+			typedefFrameMap.get(id).merge(f);
 		}
 		else {
 			typedefFrameMap.put(id, f);
 		}
 	}
 	
-	public void addInstanceFrame(Frame f) {
+	public void addInstanceFrame(Frame f) throws FrameMergeException {
 		String id = f.getId();
 		if (instanceFrameMap.containsKey(id)) {
-			// merge
+			instanceFrameMap.get(id).merge(f);
 		}
 		else {
 			instanceFrameMap.put(id, f);
@@ -119,6 +119,14 @@ public class OBODoc {
 		return false;
 	}
 	
+	public void importContents(OBODoc extDoc) throws FrameMergeException {
+		for (Frame f : extDoc.getTermFrames())
+			addTermFrame(f);
+		for (Frame f : extDoc.getTypedefFrames())
+			addTypedefFrame(f);
+		for (Frame f : extDoc.getInstanceFrames())
+			addInstanceFrame(f);
+	}
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();

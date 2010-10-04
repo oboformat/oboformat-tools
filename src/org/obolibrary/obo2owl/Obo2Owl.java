@@ -203,8 +203,35 @@ public class Obo2Owl {
 	}
 
 	private OWLAxiom trUnionOf(OWLClass cls, Collection<Clause> clauses) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<? extends OWLAnnotation> annotations = trAnnotations(clauses);
+
+		Set<OWLClassExpression> eSet;
+		eSet = new HashSet<OWLClassExpression>();
+		eSet.add(cls);
+
+		Set<OWLClassExpression> iSet;
+		iSet = new HashSet<OWLClassExpression>();
+		for (Clause clause: clauses) {
+			Collection<QualifierValue> qvs = clause.getQualifierValues();
+			// TODO - quals
+			if (clause.getValues().size() == 1) {
+				iSet.add(trClass(clause.getValue()));
+			}
+			else {
+				System.err.println("union_of n-ary slots not is standard - converting anyway");
+				iSet.add(trRel((String)clause.getValue(),
+								(String)clause.getValue2(),
+								qvs));
+				
+			}
+		}
+		//out.println(cls+" CL:"+clauses+" I:"+iSet+" E:"+eSet);
+		eSet.add(fac.getOWLObjectUnionOf(iSet));
+		// TODO - fix this
+		if (annotations == null || annotations.size() == 0)
+			return fac.getOWLEquivalentClassesAxiom(eSet);
+		else
+			return fac.getOWLEquivalentClassesAxiom(eSet, annotations);
 	}
 
 	private OWLAxiom trIntersectionOf(OWLClass cls, Collection<Clause> clauses) {

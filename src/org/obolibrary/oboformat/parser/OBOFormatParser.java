@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.FrameMergeException;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
@@ -321,7 +322,7 @@ public class OBOFormatParser {
 	/**
 	 * term-frame ::= nl*  '[Term]' nl  id-Tag Class-ID EOL  { term-frame-clause EOL } 
 	 */
-	public boolean parseTermFrame(OBODoc obodoc) {
+	public boolean parseTermFrame(OBODoc obodoc)  {
 		Frame f = new Frame(FrameType.TERM);
 		parseZeroOrMoreWsOptCmtNl();
 		if (s.consume("[Term]")) {
@@ -330,7 +331,12 @@ public class OBOFormatParser {
 			while (parseTermFrameClauseEOL(f)) {
 				
 			}
-			obodoc.addFrame(f);
+			try {
+				obodoc.addFrame(f);
+			} catch (FrameMergeException e) {
+				// this should never happen
+				e.printStackTrace();
+			}
 			//System.out.println("parsed: "+f);
 			return true;
 		}
@@ -443,8 +449,9 @@ public class OBOFormatParser {
 
 	/**
 	 * Typedef-frame ::= nl*  '[Typedef]' nl  id-Tag Class-ID EOL  { Typedef-frame-clause EOL } 
+	 * @throws FrameMergeException 
 	 */
-	public boolean parseTypedefFrame(OBODoc obodoc) {
+	public boolean parseTypedefFrame(OBODoc obodoc)  {
 		Frame f = new Frame(FrameType.TYPEDEF);
 		parseZeroOrMoreWsOptCmtNl();
 		if (s.consume("[Typedef]")) {
@@ -453,7 +460,12 @@ public class OBOFormatParser {
 			while (parseTypedefFrameClauseEOL(f)) {
 				
 			}
-			obodoc.addFrame(f);
+			try {
+				obodoc.addFrame(f);
+			} catch (FrameMergeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			//System.out.println("parsed: "+f);
 			return true;
 		}
@@ -643,7 +655,7 @@ public class OBOFormatParser {
 	
 	private boolean parseIdRef(Clause cl) {
 		String id = getParseUntil(" !{");
-		if (id == null)
+		if (id == null || id.equals(""))
 			return false;
 		cl.addValue(id);
 		
@@ -692,6 +704,7 @@ public class OBOFormatParser {
 	 */
 	private boolean parseTermIntersectionOf(Clause cl) {
 		if (parseIdRef(cl)) {
+			// consumed the first ID
 			if (s.peekCharIs(' ')) {
 				parseOneOrMoreWs();
 				if (parseIdRef(cl)) {
@@ -1041,7 +1054,7 @@ public class OBOFormatParser {
 			return true;
 		}
 		
-		while (s.peekChar() == ' ') {
+		while (s.peekCharIs(' ')) {
 			s.advance(1);
 		}
 		return true;
