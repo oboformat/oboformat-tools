@@ -388,7 +388,18 @@ public class OBOFormatParser {
 			return parseUnquotedString(cl);
 		}
 		if (tag.equals("subset")) {
-			return parseIdRef(cl);
+			// in the obof1.4 spec, subsets may not contain spaces.
+			// unfortunately OE does not prohibit this, so subsets with spaces
+			// frequently escape. We should either allow spaces in the spec
+			// (with complicates parsing) or forbid them and reject all obo documents
+			// that do not conform. Unfortunately that would limit the utility of
+			// this parser, so for now we allow spaces. maybe make it strict again
+			// when community is sufficiently forewarned.
+			// (alternatively add smarts to OE to translate the spaces to underscores,
+			// so it's a one-off translation)
+			//
+			//return parseIdRef(cl);
+			return parseUnquotedString(cl);
 		}
 		if (tag.equals("synonym")) {
 			return parseSynonym(cl);
