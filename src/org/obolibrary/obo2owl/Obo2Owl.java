@@ -137,14 +137,50 @@ public class Obo2Owl {
 	}
 
 	private OWLOntology tr() throws OWLOntologyCreationException {
-		owlOntology = manager.createOntology();
+		Frame hf = obodoc.getHeaderFrame();
+		Clause ontClause = hf.getClause("ontology");
+		if (ontClause != null) {
+			String ontOboId = (String) ontClause.getValue();
+			IRI ontIRI;
+			if (ontOboId.contains(":")) {
+				ontIRI = IRI.create(ontOboId);
+			}
+			else {
+				ontIRI = IRI.create(DEFAULT_IRI_PREFIX+ontOboId+".owl");
+			}
+			owlOntology = manager.createOntology(ontIRI);
+		}
+		else {
+			owlOntology = manager.createOntology();
+		}
+		trHeaderFrame(hf);
+
+		
 		for (Frame f : obodoc.getTermFrames()) {
 			trTermFrame(f);
 		}
 		for (Frame f : obodoc.getTypedefFrames()) {
 			trTypedefFrame(f);
 		}
+		// TODO - individuals
 		return owlOntology;
+	}
+	
+	public void trHeaderFrame(Frame headerFrame) {
+		for (String tag : headerFrame.getTags()) {
+			if (tag.equals("ontology")) {
+				
+				// already processed
+			}
+			else if (tag.equals("import")) {
+				// TODO
+				//fac.getOWLImportsDeclaration(importedOntologyIRI);
+			}
+			else if (tag.equals("data-version")) {
+				//fac.getOWLVersionInfo();
+				// TODO
+			}
+		}		
 	}
 
 	public OWLClassExpression trTermFrame(Frame termFrame) {
@@ -193,12 +229,14 @@ public class Obo2Owl {
 
 	private OWLAxiom trRelationUnionOf(OWLProperty p, Collection<Clause> clauses) {
 		// TODO Auto-generated method stub
+		// not expressible in OWL - use APs. SWRL?
 		return null;
 	}
 
 	private OWLAxiom trRelationIntersectionOf(OWLProperty p,
 			Collection<Clause> clauses) {
 		// TODO Auto-generated method stub
+		// not expressible in OWL - use APs. SWRL?
 		return null;
 	}
 

@@ -3,6 +3,7 @@ date: 24:06:2010 12:33
 default-namespace: caro
 pairwise-disjoint: true
 treat-xrefs-as-equivalent: GO
+ontology: CARO
 
 [Term]
 id: CARO:0000000

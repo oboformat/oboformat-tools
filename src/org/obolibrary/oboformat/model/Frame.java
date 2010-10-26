@@ -64,6 +64,11 @@ public class Frame {
 		}
 		return cls;
 	}
+	
+	/**
+	 * @param tag
+	 * @return null if no value set, otherwise first value
+	 */
 	public Clause getClause(String tag) {
 		Collection<Clause> tagClauses = getClauses(tag);
 		if (tagClauses.size() == 0)
