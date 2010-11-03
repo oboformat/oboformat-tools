@@ -118,7 +118,17 @@ public class OBORunner {
 	}
 
 	private static void usage() {
-		// TODO Auto-generated method stub
+		System.out.println("obolib-obo2owl [--to SYNTAX] -o FILEPATH-URI OBO-FILE");
+		System.out.println("obolib-obo2owl -b BUILDPATH-URI");
+		System.out.println("\n");
+		System.out.println("Converts obo files to OWL. If -b option is used, entire\n");
+		System.out.println("obo repository is converted\n");
+		System.out.println("\n");
+		System.out.println("Example:\n");
+		System.out.println(" obolib-obo2owl -o file://`pwd`/my.owl my.obo\n");
+		System.out.println("Example:\n");
+		System.out.println(" obolib-obo2owl -b file://`pwd`\n");
+
 	}
 
 	public static void showMemory() {
@@ -132,6 +142,13 @@ public class OBORunner {
 	}
 
 
+	/**
+	 * makes OWL from all selected ontologies
+	 * 
+	 * 
+	 * @param dir
+	 * @throws IOException
+	 */
 	private static void buildAllOboOwlFiles(String dir) throws IOException {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
@@ -184,6 +201,13 @@ public class OBORunner {
 			System.out.println("FAIL:"+fail);
 	}
 
+	/**
+	 * 
+	 * find download URLs using obo foundry metadata file
+	 * 
+	 * @return mapping from ID-space (e.g. GO) to source download URL
+	 * @throws IOException
+	 */
 	private static Map<String,String> getOntDownloadMap() throws IOException {
 		return getOntDownloadMap(new URL("http://obo.cvs.sourceforge.net/viewvc/*checkout*/obo/obo/website/cgi-bin/ontologies.txt"));
 	}

@@ -72,10 +72,6 @@
 
 	
 	<target name="library_jars">
-		<mkdir dir="${runtimedir}" />
-		<sync todir="${runtimedir}">
-			<fileset refid="library_jars" />
-		</sync>
 	</target>
 
 	<target name="buildnum">
