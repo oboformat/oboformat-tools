@@ -128,6 +128,8 @@ public class OBORunner {
 		System.out.println(" obolib-obo2owl -o file://`pwd`/my.owl my.obo\n");
 		System.out.println("Example:\n");
 		System.out.println(" obolib-obo2owl -b file://`pwd`\n");
+		System.out.println("Example:\n");
+		System.out.println(" obolib-obo2owl -b file://`pwd` --download FBBT\n");
 
 	}
 
