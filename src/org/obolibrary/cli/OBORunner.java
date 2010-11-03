@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
@@ -43,9 +44,9 @@ public class OBORunner {
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
 		boolean buildObo = false;
 		String buildDir = null;
-		
+
 		int i=0;
- 
+
 		while (i < args.length) {
 			String opt = args[i];
 			System.out.println("processing arg: "+opt);
@@ -78,15 +79,18 @@ public class OBORunner {
 				if (to.equals("owlxml")) {
 					format = new OWLXMLOntologyFormat();
 				}
+				else if (to.contains("manchester")) {
+					format = new ManchesterOWLSyntaxOntologyFormat();
+				}
 				else {
-					
+					System.err.println("don't know format '"+to+"' -- reverting to default: "+format);
 				}
 			}
 			else {
 				paths.add(opt);
 			}
 		}
-		
+
 		if (ontsToDownload.size() > 0 && !buildObo) {
 			System.err.println("must specify dir with -b DIR");
 			System.exit(1);
@@ -95,7 +99,7 @@ public class OBORunner {
 		if (buildObo) {
 			buildAllOboOwlFiles(buildDir);
 		}
-		
+
 		for (String iri : paths) {
 			//showMemory();
 			OBOFormatParser p = new OBOFormatParser();
@@ -109,14 +113,14 @@ public class OBORunner {
 			System.out.println("saving to "+outputStream+" via "+format);
 			manager.saveOntology(ontology, format, outputStream);
 			//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-	}
+		}
 
 	}
 
 	private static void usage() {
 		// TODO Auto-generated method stub
 	}
-	
+
 	public static void showMemory() {
 		System.gc();
 		System.gc();
@@ -127,7 +131,7 @@ public class OBORunner {
 		System.out.println("Memory total:"+tm+" free:"+fm+" diff:"+mem+" (bytes) diff:"+(mem/1000000)+" (mb)");
 	}
 
-	
+
 	private static void buildAllOboOwlFiles(String dir) throws IOException {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
@@ -144,7 +148,7 @@ public class OBORunner {
 					Obo2Owl.convertURL(url,dir+"/"+ont+".owl");
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
-					
+
 					System.out.println("TIME_TO_CONVERT "+ont+" "+
 							+ (totalTime / 1000000d) + " ms");
 
@@ -190,7 +194,7 @@ public class OBORunner {
 	private static Map<String,String> getOntDownloadMap(URL url) throws IOException {
 		return getOntDownloadMap(new BufferedReader(new InputStreamReader(url.openStream())));
 	}
-	
+
 	private static Map<String,String> getOntDownloadMap(BufferedReader in) throws IOException {
 		Map<String,String> urlmap = new HashMap<String,String>();
 		String line;
@@ -231,9 +235,9 @@ public class OBORunner {
 				if (!parts[1].equals("obo"))
 					urlmap.put(ns, "http://purl.org/obo/obo/"+ns+".obo");
 			}
-			
+
 		}
 		return urlmap;
-		
+
 	}
-	}
+}

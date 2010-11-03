@@ -20,12 +20,19 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLPropertyExpression;
 import org.semanticweb.owlapi.model.OWLRestriction;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.BidirectionalShortFormProvider;
 
+/**
+ * @author cjm
+ * use MacroExpansionVisitor
+ *
+ */
+@Deprecated
 public class MacroExpansionEngine {
 	OWLClassExpression ce;
 	private OWLOntology ontology;
@@ -53,7 +60,7 @@ public class MacroExpansionEngine {
 
 
 
-	public void p(String expression) throws ParserException {
+	public OWLClassExpression p(String expression) throws ParserException {
 		ManchesterOWLSyntaxEditorParser parser = 
 				new ManchesterOWLSyntaxEditorParser(dataFactory, expression);
 		parser.setDefaultOntology(ontology);
@@ -62,7 +69,7 @@ public class MacroExpansionEngine {
 
 		parser.setOWLEntityChecker(entityChecker);
         ce = parser.parseClassExpression();
-		//ce = parser.parse("x");
+		return ce;
 	}
 	
 	public void t() {
@@ -108,6 +115,9 @@ public class MacroExpansionEngine {
 		if (ex instanceof OWLRestriction) {
 			OWLRestriction rex = (OWLRestriction)ex;
 			OWLPropertyExpression p = rex.getProperty();
+			if (rex instanceof OWLObjectSomeValuesFrom) {
+				
+			}
 		}
 		// TODO Auto-generated method stub
 		

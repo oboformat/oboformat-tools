@@ -846,7 +846,9 @@ public class OBOFormatParser {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{");
 		if (id != null) {
+			id = id.replaceAll(" *$", "");
 			if (id.contains(" ")) {
+				// TODO
 				System.err.println("accepting bad xref with spaces:"+id);
 			}
 			Xref xref = new Xref(id);

@@ -1,0 +1,76 @@
+ontology: XX
+
+[Term]
+id: CL:0000034
+name: stem cell
+namespace: cell
+intersection_of: CL:0000000 ! cell
+intersection_of: XX:capable_of GO:0017145 ! stem cell division
+
+[Term]
+id: CL:9999999
+name: test
+namespace: cell
+relationship: XX:capable_of GO:0017145 ! stem cell division
+
+[Term]
+id: CL:9999998
+name: test2
+namespace: cell
+relationship: XX:capable_of GO:0017145 ! stem cell division
+
+[Term]
+id: CL:9999997
+name: test3
+namespace: cell
+is_a: CL:0000000 ! cell
+relationship: XX:capable_of GO:0017145 ! stem cell division
+
+[Term]
+id: CL:9999996
+name: test4
+namespace: cell
+is_a: CL:0000000 ! cell
+relationship: XX:develops_from CL:0000000 ! cell
+
+[Term]
+id: CL:9999995
+name: test5
+namespace: cell
+is_a: CL:0000000 ! cell
+relationship: XX:develops_from CL:0000000 ! cell
+
+[Term]
+id: XX:1
+name: a
+
+[Term]
+id: CL:0000000
+name: cell
+namespace: cell
+xref: FMA:68646
+
+[Term]
+id: GO:0017145
+name: stem cell division
+namespace: biological_process
+
+[Typedef]
+id: XX:capable_of
+name: capable_of
+comment: note the difficulty in representing this one as a property chain on the instance level, because of the some-only pattern
+expand_expression_to: "http://purl.obolibrary.org/obo/XX_bearerOf some (http://purl.obolibrary.org/obo/XX_realizedBy only ?Y)" []
+is_class_level: true
+
+[Typedef]
+id: XX:bearerOf
+name: bearer_of
+
+[Typedef]
+id: XX:realizedBy
+name: realized_by
+
+[Typedef]
+id: XX:develops_from
+name: develops_from
+

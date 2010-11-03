@@ -682,6 +682,24 @@ public class Obo2Owl {
 			//throw new UnsupportedEncodingException();
 			return null;
 		}
+		
+		// TODO - treat_xrefs_as_equivalent
+		// special case rule for relation xrefs:
+		Frame tdf = obodoc.getTypedefFrame(id);
+		if (tdf != null) {
+			Object xref = tdf.getTagValue("xref");
+			if (xref != null) {
+				String xid = ((Xref)xref).getIdref();
+				
+				// RO and BFO have special status.
+				// avoid cycles (in case of self-xref)
+				if ((xid.startsWith("RO") ||
+						xid.startsWith("BFO")) &&
+						!xid.equals(id)) {
+					return oboIdToIRI(xid);
+				}
+			}
+		}
 		String[] idParts = id.split(":", 2);
 		String db;
 		String localId;
