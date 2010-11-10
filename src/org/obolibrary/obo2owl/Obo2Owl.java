@@ -129,6 +129,20 @@ public class Obo2Owl {
 	}
 
 
+	public OWLOntology convert(String oboFile) throws OWLOntologyCreationException {
+		
+		try{
+			OBOFormatParser p = new OBOFormatParser();
+			
+			OBODoc obodoc = p.parse(oboFile);
+		
+			return convert(obodoc);
+		}catch(IOException ex){
+			throw new OWLOntologyCreationException("Error Occured while parsing OBO '" + oboFile + "'", ex);
+		}
+
+	}
+	
 
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
