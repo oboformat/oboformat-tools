@@ -58,6 +58,7 @@ do
 	
 done
 
+CLASSPATH=""
 for ARG in "$CLASSPATH_RELATIVE"
 do
 	DEREFERENCED_CLASSPATH=`ls -1 -L $PATH_TO_ME/$ARG`
@@ -101,6 +102,7 @@ fi
 
 echo CMDARGS=$CMDARGS
 
+echo CP=$CLASSPATH
 CMD="$JAVAPATH -d64 -Xmx2048M -Xms2048M -Djava.library.path=$PATH_TO_ME/../lib -classpath $CLASSPATH -DlauncherDir=$PATH_TO_ME $JAVAARGS $CLASSNAME $CMDARGS"
 echo $CMD
 sh -c "$CMD"

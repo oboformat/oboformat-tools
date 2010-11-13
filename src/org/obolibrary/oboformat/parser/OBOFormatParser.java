@@ -504,6 +504,12 @@ public class OBOFormatParser {
 		String tag = getParseTag();
 		if (tag == null)
 			return false;
+		
+		if (tag.equals("is_metadata")) {
+			System.err.println("is_metadata DEPRECATED; switching to is_metadata_tag");
+			tag = "is_metadata_tag";
+		}
+		
 		cl.setTag(tag);
 		if (tag.equals("is_anonymous")) {
 			return parseBoolean(cl);

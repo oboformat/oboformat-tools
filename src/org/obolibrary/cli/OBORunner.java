@@ -164,7 +164,8 @@ public class OBORunner {
 					String url = ontmap.get(ont);
 					System.out.println("converting: "+ont+" from: "+url);
 					long initTime = System.nanoTime();
-					Obo2Owl.convertURL(url,dir+"/"+ont+".owl");
+					String ontId = ont.toLowerCase();
+					Obo2Owl.convertURL(url,dir+"/"+ontId+".owl",ontId);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
 
