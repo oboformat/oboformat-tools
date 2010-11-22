@@ -207,7 +207,10 @@ public class Obo2Owl {
 	}
 
 	public void trHeaderFrame(Frame headerFrame) {
+		IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
 		for (String tag : headerFrame.getTags()) {
+			
+			
 			if (tag.equals("ontology")) {
 
 				// already processed
@@ -215,10 +218,26 @@ public class Obo2Owl {
 			else if (tag.equals("import")) {
 				// TODO
 				//fac.getOWLImportsDeclaration(importedOntologyIRI);
+			//	manager.applyChange(new AddImport(baseOnt, manager.getOWLDataFactory()
+				//		.getOWLImportsDeclaration(importedIRI)));
 			}
 			else if (tag.equals("data-version")) {
 				//fac.getOWLVersionInfo();
+				Clause clause = headerFrame.getClause(tag);
+				
+				OWLAnnotationProperty ap = trAnnotationProp("remark");
+				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(clause.getValue()));
+				
+				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontIRI, ann);
+				
+				manager.applyChange(new AddAxiom(owlOntology, ax));
+				
 				// TODO
+			}else{
+				Collection<Clause> clauses = headerFrame.getClauses(tag);
+				for(Clause clause: clauses){
+					add(trGenericClause(ontIRI, tag, clause));
+				}
 			}
 		}		
 	}
@@ -481,19 +500,22 @@ public class Obo2Owl {
 			//System.out.println("chain:"+ax);
 			// TODO - annotations for equivalent to
 		}
-		else if (tag.equals("is_transitive")) {
+		else if (tag.equals("is_transitive") && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLTransitiveObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_symmetric")) {
+		else if (tag.equals("is_reflexive") && "true".equals(clause.getValue().toString())) {
+			ax = fac.getOWLReflexiveObjectPropertyAxiom(p, annotations);
+		}
+		else if (tag.equals("is_symmetric") && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLSymmetricObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_asymmetric")) {
+		else if (tag.equals("is_asymmetric") && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLAsymmetricObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_functional")) {
+		else if (tag.equals("is_functional") && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLFunctionalObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_inverse_functional")) {
+		else if (tag.equals("is_inverse_functional") && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLInverseFunctionalObjectPropertyAxiom(p, annotations);
 		}
 		else {
@@ -505,7 +527,7 @@ public class Obo2Owl {
 
 
 	private OWLAxiom trGenericClause(OWLNamedObject e, String tag, Clause clause) {
-		Collection<QualifierValue> qvs = clause.getQualifierValues();
+		/*Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
 
 		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
@@ -540,10 +562,52 @@ public class Obo2Owl {
 					annotations);
 		}
 		// TODO synonyms
-		return ax;
+		return ax;*/
+		
+		return trGenericClause(e.getIRI(), tag, clause);
 	}
 
 
+	private OWLAxiom trGenericClause(OWLAnnotationSubject sub, String tag, Clause clause) {
+		Collection<QualifierValue> qvs = clause.getQualifierValues();
+		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
+		
+//		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
+		
+		if (clause.getValue() == null) {
+			System.err.println("Problem:"+clause);
+		}
+
+		OWLAxiom ax = null;
+		if (tag.equals("name")) {
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trAnnotationProp(tag),
+					sub, 
+					trLiteral(clause.getValue()), 
+					annotations);
+		}
+		else if (tag.equals("def")) {
+			// TODO
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trAnnotationProp(tag),
+					sub, 
+					trLiteral(clause.getValue()), 
+					annotations);
+		}
+		else {
+			// generic
+			//System.out.println("generic clause:"+clause);
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trAnnotationProp(tag),
+					sub, 
+					trLiteral(clause.getValue()), 
+					annotations);
+		}
+		// TODO synonyms
+		return ax;
+	}
+	
+	
 
 	private Set<? extends OWLAnnotation> trAnnotations(Clause clause) {
 		Set<OWLAnnotation> anns = new HashSet<OWLAnnotation>();
