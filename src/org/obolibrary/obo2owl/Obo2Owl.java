@@ -581,7 +581,7 @@ public class Obo2Owl {
 		OWLAxiom ax = null;
 		if (tag.equals("name")) {
 			ax = fac.getOWLAnnotationAssertionAxiom(
-					trAnnotationProp(tag),
+					trTagToAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);
@@ -589,7 +589,7 @@ public class Obo2Owl {
 		else if (tag.equals("def")) {
 			// TODO
 			ax = fac.getOWLAnnotationAssertionAxiom(
-					trAnnotationProp(tag),
+					trTagToAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);
@@ -598,7 +598,7 @@ public class Obo2Owl {
 			// generic
 			//System.out.println("generic clause:"+clause);
 			ax = fac.getOWLAnnotationAssertionAxiom(
-					trAnnotationProp(tag),
+					trTagToAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);
