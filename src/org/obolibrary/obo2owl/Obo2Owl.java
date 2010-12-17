@@ -111,7 +111,7 @@ public class Obo2Owl {
 	}
 
 
-	private void initAnnotationPropertyMap() {
+	protected void initAnnotationPropertyMap() {
 		annotationPropertyMap = new HashMap<String,IRI>();
 		map("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED);
 		map("name",OWLRDFVocabulary.RDFS_LABEL);
@@ -124,11 +124,11 @@ public class Obo2Owl {
 		map("replaced_by","IAO_0100001");
 	}
 
-	private void map(String key, String iri) {
+	protected void map(String key, String iri) {
 		annotationPropertyMap.put(key, IRI.create(DEFAULT_IRI_PREFIX+iri));
 	}
 
-	private void map(String key, OWLRDFVocabulary vocab) {
+	protected void map(String key, OWLRDFVocabulary vocab) {
 		annotationPropertyMap.put(key, vocab.getIRI());
 	}
 
@@ -378,7 +378,7 @@ public class Obo2Owl {
 	}
 
 
-	private void add(OWLAxiom axiom) {
+	protected void add(OWLAxiom axiom) {
 		if (axiom == null) {
 			System.err.println("no axiom");
 			return;
@@ -568,7 +568,7 @@ public class Obo2Owl {
 	}
 
 
-	private OWLAxiom trGenericClause(OWLAnnotationSubject sub, String tag, Clause clause) {
+	protected OWLAxiom trGenericClause(OWLAnnotationSubject sub, String tag, Clause clause) {
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
 		
@@ -784,7 +784,7 @@ public class Obo2Owl {
 
 
 
-	private OWLAnnotationValue trLiteral(Object value) {
+	protected OWLAnnotationValue trLiteral(Object value) {
 		if (value instanceof Xref) {
 			value = ((Xref)value).getIdref();
 		}
