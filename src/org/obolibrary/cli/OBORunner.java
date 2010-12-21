@@ -44,6 +44,7 @@ public class OBORunner {
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
 		boolean buildObo = false;
 		String buildDir = null;
+		String defaultOnt = null;
 
 		int i=0;
 
@@ -57,6 +58,10 @@ public class OBORunner {
 			}
 			else if (opt.equals("-o") || opt.equals("--out")) {
 				outFile = args[i];
+				i++;
+			}
+			else if (opt.equals("--default-ontology")) {
+				defaultOnt = args[i];
 				i++;
 			}
 			else if (opt.equals("--download")) {
@@ -104,7 +109,11 @@ public class OBORunner {
 			//showMemory();
 			OBOFormatParser p = new OBOFormatParser();
 			OBODoc obodoc = p.parse(iri);
-
+			
+			if (defaultOnt != null) {
+				obodoc.addDefaultOntologyHeader(defaultOnt);
+			}
+			
 			Obo2Owl bridge = new Obo2Owl();
 			OWLOntologyManager manager = bridge.getManager();
 			OWLOntology ontology = bridge.convert(obodoc);
@@ -160,11 +169,12 @@ public class OBORunner {
 			if (omitOntsToDownload.size() > 0 && omitOntsToDownload.contains(ont))
 				continue;
 			if (ontmap.containsKey(ont)) {
+				//if (ontmap.get("format"))
 				try {
 					String url = ontmap.get(ont);
-					System.out.println("converting: "+ont+" from: "+url);
 					long initTime = System.nanoTime();
 					String ontId = ont.toLowerCase();
+					System.out.println("converting: "+ont+" from: "+url+" using default ont:"+ontId);
 					Obo2Owl.convertURL(url,dir+"/"+ontId+".owl",ontId);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless

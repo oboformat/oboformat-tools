@@ -40,7 +40,7 @@ public class CHEBITest extends TestCase {
 		Obo2Owl bridge = new Obo2Owl();
 		OWLOntologyManager manager = bridge.getManager();
 		OWLOntology ontology = bridge.convert(obodoc);
-		IRI outputStream = IRI.create("file:///tmp/cell.owl");
+		IRI outputStream = IRI.create("file:///tmp/chebi.owl");
 		System.out.println("saving to "+outputStream);
 		OWLOntologyFormat format = new OWLXMLOntologyFormat();
 		manager.saveOntology(ontology, format, outputStream);

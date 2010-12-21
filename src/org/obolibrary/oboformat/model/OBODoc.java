@@ -127,6 +127,18 @@ public class OBODoc {
 		for (Frame f : extDoc.getInstanceFrames())
 			addInstanceFrame(f);
 	}
+	
+	public  void addDefaultOntologyHeader(String defaultOnt) {
+		Frame hf = getHeaderFrame();
+		Clause ontClause = hf.getClause("ontology");
+		if (ontClause == null) {
+			ontClause = new Clause();
+			ontClause.setTag("ontology");
+			ontClause.setValue(defaultOnt);
+			hf.addClause(ontClause);
+		}
+	}
+
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
