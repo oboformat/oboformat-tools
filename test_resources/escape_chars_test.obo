@@ -1,0 +1,25 @@
+format-version: 1.2
+ontology: go
+subsetdef: goslim_candida "Candida GO slim"
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_pir "PIR GO slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_pombe "Fission yeast GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+subsetdef: unvetted "unvetted"
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+
+[Term]
+id: GO:0033942
+name: 4-alpha-D-\{(1->4)-alpha-D-glucano\}trehalose trehalohydrolase activity
+namespace: molecular_function
+def: "Catalysis of the hydrolysis of alpha-(1->4)-D-glucosidic linkage in 4-alpha-D-\{(1->4)-alpha-D-glucanosyl\}n trehalose to yield trehalose and alpha-(1->4)-D-glucan." [EC:3.2.1.141]
+synonym: "4-alpha-D-\{(1->4)-alpha-D-glucano\}trehalose glucanohydrolase (trehalose-producing) activity" EXACT [EC:3.2.1.141]
+synonym: "malto-oligosyltrehalose trehalohydrolase activity" EXACT [EC:3.2.1.141]
+synonym: "maltooligosyl trehalose trehalohydrolase activity" EXACT [EC:3.2.1.141]
+xref: EC:3.2.1.141
+xref: MetaCyc:3.2.1.141-RXN
+is_a: GO:0004553  ! hydrolase activity, hydrolyzing O-glycosyl compounds
+
