@@ -47,6 +47,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 public class Obo2Owl {
 
 	private static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
+	private static String defaultIDSpace = "";
 	OWLOntologyManager manager;
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
@@ -85,12 +86,21 @@ public class Obo2Owl {
 
 	}
 
+	/**
+	 * 
+	 * @param iri
+	 * @param outFile
+	 * @param defaultOnt -- e.g. "go". If the obo file contains no "ontology:" header tag, this is added 
+	 * @throws IOException
+	 * @throws OWLOntologyCreationException
+	 * @throws OWLOntologyStorageException
+	 */
 	public static void convertURL(String iri, String outFile, String defaultOnt) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		Obo2Owl bridge = new Obo2Owl();
 		OWLOntologyManager manager = bridge.getManager();
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parse(new URL(iri));
-		addDefaultOntologyHeader(obodoc, defaultOnt);
+		obodoc.addDefaultOntologyHeader(defaultOnt);
 		OWLOntology ontology = bridge.convert(obodoc);
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
@@ -99,18 +109,11 @@ public class Obo2Owl {
 
 	}
 
-	public static void addDefaultOntologyHeader(OBODoc obodoc, String defaultOnt) {
-		Frame hf = obodoc.getHeaderFrame();
-		Clause ontClause = hf.getClause("ontology");
-		if (ontClause == null) {
-			ontClause = new Clause();
-			ontClause.setTag("ontology");
-			ontClause.setValue(defaultOnt);
-			hf.addClause(ontClause);
-		}
-	}
 
-
+	/**
+	 * Table 5.8 Translation of Annotation Vocabulary.
+	 * 
+	 */
 	protected void initAnnotationPropertyMap() {
 		annotationPropertyMap = new HashMap<String,IRI>();
 		map("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED);
@@ -181,6 +184,7 @@ public class Obo2Owl {
 		Clause ontClause = hf.getClause("ontology");
 		if (ontClause != null) {
 			String ontOboId = (String) ontClause.getValue();
+			defaultIDSpace = ontOboId;
 			IRI ontIRI;
 			if (ontOboId.contains(":")) {
 				ontIRI = IRI.create(ontOboId);
@@ -191,6 +195,8 @@ public class Obo2Owl {
 			owlOntology = manager.createOntology(ontIRI);
 		}
 		else {
+			defaultIDSpace = "TODO";
+			// TODO - warn
 			owlOntology = manager.createOntology();
 		}
 		trHeaderFrame(hf);
@@ -470,6 +476,14 @@ public class Obo2Owl {
 			ax = fac.getOWLDisjointObjectPropertiesAxiom(
 					cSet, 
 					annotations);
+		}
+		else if (tag.equals("inverse_of")) {
+
+			Set<OWLObjectPropertyExpression> cSet;
+			cSet = new HashSet<OWLObjectPropertyExpression>();
+			cSet.add( p);
+			cSet.add( trObjectProp((String)v));
+			ax = fac.getOWLInverseObjectPropertiesAxiom(p, trObjectProp((String)v), annotations);
 		}
 		else if (tag.equals("equivalent_to")) {
 
@@ -825,6 +839,7 @@ public class Obo2Owl {
 				}
 			}
 		}
+		
 		String[] idParts = id.split(":", 2);
 		String db;
 		String localId;
@@ -837,6 +852,7 @@ public class Obo2Owl {
 			localId = id;
 		}
 		else { // ==1
+			// todo use owlOntology IRI
 			db = getDefaultIDSpace();
 			localId = idParts[0];
 		}
@@ -883,8 +899,7 @@ public class Obo2Owl {
 	}
 
 	private String getDefaultIDSpace() {
-		// TODO Auto-generated method stub
-		return "TODO";
+		return defaultIDSpace;
 	}
 
 
