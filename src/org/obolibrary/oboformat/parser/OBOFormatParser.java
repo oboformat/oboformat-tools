@@ -306,6 +306,9 @@ public class OBOFormatParser {
 		if (tag == "format-version") {
 			return parseUnquotedString(cl);
 		}
+		if (tag == "synonymtypedef") {
+			return parseSynonymTypedef(cl);
+		}
 		// default
 		return parseUnquotedString(cl);
 	}
@@ -707,6 +710,25 @@ public class OBOFormatParser {
 			return false;
 		}
 	}
+	
+	private boolean parseSynonymTypedef(Clause cl) {
+		parseIdRef(cl);
+		parseOneOrMoreWs();
+		
+		if (s.consume("\"")) {
+			String desc = getParseUntilAdv("\"");
+			cl.addValue(desc);
+			if (s.peekCharIs(' ')) {
+				parseOneOrMoreWs();
+				if (parseIdRef(cl)) {
+					
+				}
+			}
+			
+		}
+		return false;
+	}
+
 
 	private boolean parseRelationship(Clause cl) {
 		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
