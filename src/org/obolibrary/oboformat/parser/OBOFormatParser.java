@@ -300,13 +300,13 @@ public class OBOFormatParser {
 			return false;
 		cl.setTag(tag);
 		h.addClause(cl);
-		if (tag == "data-version") {
+		if (tag.equals( "data-version")) {
 			return parseUnquotedString(cl);
 		}
-		if (tag == "format-version") {
+		if (tag.equals("format-version")) {
 			return parseUnquotedString(cl);
 		}
-		if (tag == "synonymtypedef") {
+		if (tag.equals("synonymtypedef")) {
 			return parseSynonymTypedef(cl);
 		}
 		// default
