@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -55,8 +57,8 @@ public class Obo2Owl {
 	Map<String,String> idSpaceMap;
 	Map<String,IRI> annotationPropertyMap;
 	Set<OWLAnnotationProperty> apToDeclare;
-
-
+	private Map<String, OWLClass> clsToDeclar;
+	
 
 	public Obo2Owl() {
 		init();
@@ -70,7 +72,9 @@ public class Obo2Owl {
 		fac = manager.getOWLDataFactory();
 		initAnnotationPropertyMap();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
+		clsToDeclar = new Hashtable<String, OWLClass>();
 	}
+	
 
 
 	public static void convertURL(String iri, String outFile) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
@@ -226,8 +230,45 @@ public class Obo2Owl {
 				//fac.getOWLImportsDeclaration(importedOntologyIRI);
 			//	manager.applyChange(new AddImport(baseOnt, manager.getOWLDataFactory()
 				//		.getOWLImportsDeclaration(importedIRI)));
-			}
-			else if (tag.equals("data-version")) {
+			}else if (tag.equals("subsetdef")){
+		
+				//TODO: replace with the appropicate class name
+				OWLClass cls = clsToDeclar.get("subsetdef");
+				if(cls == null){
+					cls = trClass("subsetdef");
+					add(fac.getOWLDeclarationAxiom(cls));
+					clsToDeclar.put("subsetdef", cls);
+				}
+				Clause clause = headerFrame.getClause(tag);
+				OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + clause.getValue() ));
+				add (fac.getOWLClassAssertionAxiom(cls, indv) );
+
+				OWLAnnotationProperty ap = trAnnotationProp("name");
+				
+				add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral(clause.getValue2())));
+			}else if (tag.equals("synonymtypedef")){
+				OWLClass cls = clsToDeclar.get("synonymtypedef");
+				if(cls == null){
+					cls = trClass("synonymtypedef");
+					add(fac.getOWLDeclarationAxiom(cls));
+					clsToDeclar.put("synonymtypedef", cls);
+				}
+				Clause clause = headerFrame.getClause(tag);
+				
+				Object values[] = clause.getValues().toArray();
+				
+				OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + values[0]  ));
+				add (fac.getOWLClassAssertionAxiom(cls, indv) );
+
+				OWLAnnotationProperty ap = trAnnotationProp("name");
+				add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[1] )));
+
+				if(values.length>2){
+					ap = trAnnotationProp("scope");
+					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[2] )));
+				}
+			
+			}else if (tag.equals("data-version")) {
 				//fac.getOWLVersionInfo();
 				Clause clause = headerFrame.getClause(tag);
 				
@@ -391,7 +432,6 @@ public class Obo2Owl {
 		}
 		//System.out.println("adding:"+axiom);
 		AddAxiom addAx = new AddAxiom(owlOntology, axiom);
-		//System.out.println(addAx);
 		try {
 			manager.applyChange(addAx);
 		}
@@ -584,7 +624,7 @@ public class Obo2Owl {
 
 	protected OWLAxiom trGenericClause(OWLAnnotationSubject sub, String tag, Clause clause) {
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
-		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
+		Set<OWLAnnotation> annotations = trAnnotations(clause);
 		
 //		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
 		
@@ -608,6 +648,28 @@ public class Obo2Owl {
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
+		else if (tag.equals("synonym")) {
+
+			Object[] values= clause.getValues().toArray();
+			
+			if(values.length>1){
+				OWLAnnotation ann= fac.getOWLAnnotation(trTagToAnnotationProp("scope"), trLiteral(values[1]));
+				annotations.add(ann);
+			
+			
+				if(values.length>2){
+					ann= fac.getOWLAnnotation(trTagToAnnotationProp("type"), trLiteral(values[2]));
+					annotations.add(ann);
+					
+				}
+			}
+			
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trTagToAnnotationProp(tag),
+					sub, 
+					trLiteral(clause.getValue()), 
+					annotations);
+		}
 		else {
 			// generic
 			//System.out.println("generic clause:"+clause);
@@ -623,7 +685,7 @@ public class Obo2Owl {
 	
 	
 
-	private Set<? extends OWLAnnotation> trAnnotations(Clause clause) {
+	private Set<OWLAnnotation> trAnnotations(Clause clause) {
 		Set<OWLAnnotation> anns = new HashSet<OWLAnnotation>();
 		Collection<Xref> xrefs = clause.getXrefs();
 		if (xrefs != null) {
