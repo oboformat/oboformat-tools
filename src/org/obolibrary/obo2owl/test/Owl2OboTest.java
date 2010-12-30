@@ -1,10 +1,14 @@
 package org.obolibrary.obo2owl.test;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 
+import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -14,23 +18,20 @@ import junit.framework.TestCase;
 public class Owl2OboTest extends TestCase {
 
 	public static void testConversion() throws Exception{
+		Obo2Owl obo2owl = new Obo2Owl();
+		
+		OWLOntology ontology = obo2owl.convert("test_resources/caro.obo");
+		
 		Owl2Obo bridge = new Owl2Obo();
 		
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		
-		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File("test_resources/temp.owl"));
-		
 		OBODoc doc = bridge.convert(ontology);
-	
-		System.out.println( doc.getHeaderFrame() );
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test_resources/caro_converted.obo")));
 		
-	 	for(Frame f: doc.getTermFrames()){
-	 		System.out.println(f);
-	 	}
-	 	
-	 	for(Frame f: doc.getTypedefFrames()){
-	 		System.out.println(f);
-	 	}
+		OBOFormatWriter oboWriter = new OBOFormatWriter();
+		
+		oboWriter.write(doc, writer);
+		
+		writer.close();
 		
 	}
 	

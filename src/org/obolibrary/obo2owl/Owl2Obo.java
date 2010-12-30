@@ -173,7 +173,7 @@ public class Owl2Obo {
 			clause.addValue(value);
 			frame.addClause(clause);
 			
-			if("def".equals(tag) || "synonym".equals(tag)){
+			if("def".equals(tag)){
 				for(OWLAnnotation aan: aanAx.getAnnotations()){
 					String propId = propToTag(aan.getProperty());
 					
@@ -198,17 +198,17 @@ public class Owl2Obo {
 					}else if("type".equals(propId)){
 						type = ((OWLLiteral) aan.getValue()).getLiteral();
 					}
-					
-					if(scope != null){
-						clause.addValue(scope);
-						
-						if(type != null){
-							clause.addValue(type);
-						}
-					}
-					
-					
 				}
+				
+				
+				if(scope != null){
+					clause.addValue(scope);
+					
+					if(type != null){
+						clause.addValue(type);
+					}
+				}
+				
 			}
 
 			
