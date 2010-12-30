@@ -1,7 +1,10 @@
 package org.obolibrary.cli;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -15,8 +18,11 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.obolibrary.obo2owl.Obo2Owl;
+import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -27,9 +33,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 /**
- * Adapted from Matthew Horridge's OWLAPI examples by Chris Mungall.
- * 
- * See: http://wiki.geneontology.org/index.php/OBO-Edit:Reasoner_Benchmarks
+ * command line access to obo2owl
  */
 public class OBORunner {
 
@@ -45,6 +49,7 @@ public class OBORunner {
 		boolean buildObo = false;
 		String buildDir = null;
 		String defaultOnt = null;
+		boolean isOboToOwl = true;
 
 		int i=0;
 
@@ -56,13 +61,16 @@ public class OBORunner {
 				usage();
 				System.exit(0);
 			}
+			else if (opt.equals("--default-ontology")) {
+				defaultOnt = args[i];
+				i++;
+			}
 			else if (opt.equals("-o") || opt.equals("--out")) {
 				outFile = args[i];
 				i++;
 			}
-			else if (opt.equals("--default-ontology")) {
-				defaultOnt = args[i];
-				i++;
+			else if (opt.equals("--owl2obo")) {
+				isOboToOwl = false;
 			}
 			else if (opt.equals("--download")) {
 				ontsToDownload.add(args[i]);
@@ -76,7 +84,6 @@ public class OBORunner {
 				buildObo = true;
 				buildDir = args[i];
 				i++;
-
 			}
 			else if (opt.equals("-t") || opt.equals("--to")) {
 				String to = args[i];
@@ -106,22 +113,37 @@ public class OBORunner {
 		}
 
 		for (String iri : paths) {
-			//showMemory();
-			OBOFormatParser p = new OBOFormatParser();
-			OBODoc obodoc = p.parse(iri);
-			
-			if (defaultOnt != null) {
-				obodoc.addDefaultOntologyHeader(defaultOnt);
+			if (isOboToOwl) {
+				//showMemory();
+				OBOFormatParser p = new OBOFormatParser();
+				OBODoc obodoc = p.parse(iri);
+
+				if (defaultOnt != null) {
+					obodoc.addDefaultOntologyHeader(defaultOnt);
+				}
+
+				Obo2Owl bridge = new Obo2Owl();
+				OWLOntologyManager manager = bridge.getManager();
+				OWLOntology ontology = bridge.convert(obodoc);
+				IRI outputStream = IRI.create(outFile);
+				//format = new OWLXMLOntologyFormat();
+				//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
+				System.out.println("saving to "+outputStream+" via "+format);
+				manager.saveOntology(ontology, format, outputStream);
 			}
-			
-			Obo2Owl bridge = new Obo2Owl();
-			OWLOntologyManager manager = bridge.getManager();
-			OWLOntology ontology = bridge.convert(obodoc);
-			IRI outputStream = IRI.create(outFile);
-			//format = new OWLXMLOntologyFormat();
-			System.out.println("saving to "+outputStream+" via "+format);
-			manager.saveOntology(ontology, format, outputStream);
-			//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
+			else {
+				OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
+				OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(iri));
+				Owl2Obo bridge = new Owl2Obo();
+				OBODoc doc = bridge.convert(ontology);
+				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outFile)));
+				
+				OBOFormatWriter oboWriter = new OBOFormatWriter();
+				
+				oboWriter.write(doc, writer);
+				
+				writer.close();
+			}
 		}
 
 	}
