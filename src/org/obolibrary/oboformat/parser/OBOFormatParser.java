@@ -309,6 +309,13 @@ public class OBOFormatParser {
 		if (tag.equals("synonymtypedef")) {
 			return parseSynonymTypedef(cl);
 		}
+		if (tag.equals("subsetdef")) {
+			return parseSubsetdef(cl);
+		}
+
+		
+		
+		
 		// default
 		return parseUnquotedString(cl);
 	}
@@ -710,6 +717,21 @@ public class OBOFormatParser {
 			return false;
 		}
 	}
+
+	
+	private boolean parseSubsetdef(Clause cl) {
+		parseIdRef(cl);
+		parseOneOrMoreWs();
+		
+		if (s.consume("\"")) {
+			String desc = getParseUntilAdv("\"");
+			cl.addValue(desc);
+		}else
+			return false;
+			
+		return true;
+	}
+	
 	
 	private boolean parseSynonymTypedef(Clause cl) {
 		parseIdRef(cl);
@@ -726,7 +748,7 @@ public class OBOFormatParser {
 			}
 			
 		}
-		return false;
+		return true;
 	}
 
 

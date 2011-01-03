@@ -55,13 +55,13 @@ public class OBOFormatWriter {
 	public void write(OBODoc doc, BufferedWriter writer) throws IOException{
 		Frame headerFrame = doc.getHeaderFrame();
 		
-		writeHeadr(headerFrame, writer);
+		writeHeader(headerFrame, writer);
 
 		for(Frame f: doc.getTermFrames()){
 			write(f, writer);
 		}
 		
-		for(Frame f: doc.getTermFrames()){
+		for(Frame f: doc.getTypedefFrames()){
 			write(f, writer);
 		}
 	}
@@ -70,17 +70,21 @@ public class OBOFormatWriter {
 		writer.write(ln+"\n");
 	}
 	
-	public void writeHeadr(Frame frame, BufferedWriter writer) throws IOException{
+	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
 	
 		Clause c = frame.getClause("format-version");
 		if(c != null)
 			write(c, writer);
 		
 		
-		for(Clause claue: frame.getClauses()){
-			if(claue.getTag().equals("format-version"))
+		for(String tag: frame.getTags()){
+
+			if(tag.equals("format-version"))
 				continue;
-			write(claue, writer);
+			
+			for(Clause claue: frame.getClauses(tag)){
+				write(claue, writer);
+			}
 		}
 		
 		writeLine("", writer);

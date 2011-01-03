@@ -239,13 +239,17 @@ public class Obo2Owl {
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("subsetdef", cls);
 				}
-				Clause clause = headerFrame.getClause(tag);
-				OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + clause.getValue() ));
-				add (fac.getOWLClassAssertionAxiom(cls, indv) );
-
-				OWLAnnotationProperty ap = trAnnotationProp("name");
 				
-				add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral(clause.getValue2())));
+				for(Clause clause: headerFrame.getClauses(tag)){
+				
+		//		Clause clause = headerFrame.getClause(tag);
+					OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + clause.getValue() ));
+					add (fac.getOWLClassAssertionAxiom(cls, indv) );
+	
+					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
+					
+					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral(clause.getValue2())));
+				}
 			}else if (tag.equals("synonymtypedef")){
 				OWLClass cls = clsToDeclar.get("synonymtypedef");
 				if(cls == null){
@@ -253,19 +257,21 @@ public class Obo2Owl {
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("synonymtypedef", cls);
 				}
-				Clause clause = headerFrame.getClause(tag);
+			//	Clause clause = headerFrame.getClause(tag);
 				
-				Object values[] = clause.getValues().toArray();
-				
-				OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + values[0]  ));
-				add (fac.getOWLClassAssertionAxiom(cls, indv) );
-
-				OWLAnnotationProperty ap = trAnnotationProp("name");
-				add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[1] )));
-
-				if(values.length>2){
-					ap = trAnnotationProp("scope");
-					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[2] )));
+				for(Clause clause: headerFrame.getClauses(tag)){
+					Object values[] = clause.getValues().toArray();
+					
+					OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + values[0]  ));
+					add (fac.getOWLClassAssertionAxiom(cls, indv) );
+	
+					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
+					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[1] )));
+	
+					if(values.length>2){
+						ap = trTagToAnnotationProp("scope");
+						add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[2] )));
+					}
 				}
 			
 			}else if (tag.equals("data-version")) {

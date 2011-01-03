@@ -50,6 +50,8 @@ public class Owl2Obo {
 	Map<String, String> annotationPropertyMap;
 	Set<OWLAnnotationProperty> apToDeclare;
 
+	private String ontologyId;
+	
 	private void init() {
 		idSpaceMap = new HashMap<String, String>();
 		manager = OWLManager.createOWLOntologyManager();
@@ -102,26 +104,39 @@ public class Owl2Obo {
 		return tr();
 	}
 
-	private String getIdentifier(OWLObject obj) {
+	private String getIdentifier(OWLObject obj, boolean isTermId) {
 		if (obj instanceof OWLEntity)
-			return getIdentifier(((OWLEntity) obj).getIRI());
+			return getIdentifier(((OWLEntity) obj).getIRI(), isTermId);
 
 		return null;
 	}
 
-	private String getIdentifier(IRI iriId) {
+	
+	private String getIdentifier(OWLObject obj) {
+		return getIdentifier(obj, true);
+	}
+
+	private String getIdentifier(IRI iriId, boolean isTermId) {
 		String iri = iriId.toString();
 		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
 			iri = iri.replace("http://purl.obolibrary.org/obo/", "");
-			int p = iri.indexOf('_');
-
-			if (p >= 0) {
-				iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
+			
+			if(isTermId){
+				int p = iri.indexOf('_');
+	
+				if (p >= 0) {
+					iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
+				}
 			}
 		}
 
 		return iri;
 
+	}
+
+	
+	private String getIdentifier(IRI iriId) {
+		return getIdentifier(iriId, true);
 	}
 
 	private OBODoc tr() throws OWLOntologyCreationException {
@@ -224,6 +239,13 @@ public class Owl2Obo {
 
 		String id = getIdentifier(ontology.getOntologyID().getOntologyIRI());
 
+		int index = id.lastIndexOf(".owl");
+		if(index>0){
+			id = id.substring(0, index);
+		}
+		
+		this.ontologyId = id;
+		
 		Clause c = new Clause();
 		c.setTag("ontology");
 		c.setValue(id);
@@ -302,6 +324,12 @@ public class Owl2Obo {
 	private void tr(OWLDeclarationAxiom axiom) {
 		OWLEntity entity = axiom.getEntity();
 
+		String id = getIdentifier(entity);
+		
+		if((this.ontologyId + ":subsetdef").equals(id) || (this.ontologyId+":synonymtypedef").equals(id)){
+			return;
+		}
+		
 		Frame f = null;
 		if (entity instanceof OWLClass) {
 			f = new Frame(FrameType.TERM);
@@ -317,6 +345,11 @@ public class Owl2Obo {
 			}
 
 			add(f);
+		
+			
+			if(f.getClauses().isEmpty()){
+				System.out.println("Hello World");
+			}
 		}
 
 	}
@@ -351,13 +384,19 @@ public class Owl2Obo {
 	private void tr(OWLClassAssertionAxiom ax){
 		String clsId = getIdentifier(ax.getClassExpression());
 		
+		int index = clsId.indexOf(ontologyId + ":");
+		
+		if(index>=0){
+			clsId = clsId.substring(ontologyId.length()+1);
+		}
+		
 		if("synonymtypedef".equals(clsId)){
 			Frame f = this.obodoc.getHeaderFrame();
 			Clause c = new Clause();
 			c.setTag("synonymtypedef");
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
-			String indvId = getIdentifier(indv);
+			String indvId = getIdentifier(indv, false);
 			c.addValue(indvId);
 			
 			String nameValue = "";
@@ -367,7 +406,7 @@ public class Owl2Obo {
 				String value = ((OWLLiteral) ann.getValue()).getLiteral();
 
 				if("name".equals(propId)){
-					nameValue = value;
+					nameValue = "\"" +value + "\"";
 				}else
 					scopeValue = value;
 			}
@@ -385,7 +424,7 @@ public class Owl2Obo {
 			c.setTag("subsetdef");
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
-			String indvId = getIdentifier(indv);
+			String indvId = getIdentifier(indv, false);
 			c.addValue(indvId);
 			
 			String nameValue = "";
@@ -394,7 +433,7 @@ public class Owl2Obo {
 				String value = ((OWLLiteral) ann.getValue()).getLiteral();
 
 				if("name".equals(propId)){
-					nameValue = value;
+					nameValue = "\"" +value + "\"";
 				}
 			}
 			
@@ -420,13 +459,13 @@ public class Owl2Obo {
 				c.setValue(getIdentifier(sup));
 				f.addClause(c);
 			} else if (sup instanceof OWLObjectSomeValuesFrom) {
-				OWLQuantifiedRestriction r = (OWLQuantifiedRestriction) sup;
+				OWLObjectSomeValuesFrom r = (OWLObjectSomeValuesFrom) sup;
 
 				Clause c = new Clause();
 				c.setTag("relationship");
 				c.addValue(getIdentifier(r.getProperty()));
 				;
-				c.addValue(getIdentifier(sup));
+				c.addValue(getIdentifier(r.getFiller()));
 
 				f.addClause(c);
 			} else {

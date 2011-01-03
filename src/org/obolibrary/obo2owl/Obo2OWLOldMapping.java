@@ -68,6 +68,36 @@ public class Obo2OWLOldMapping extends Obo2Owl {
 		annotationPropertyMap.put("synonym",IRI.create(OBOINOWL+"hasSynonym"));
 
 	}
+
+	
+	private OWLAxiom handleDef(OWLAnnotationSubject sub, Clause clause){
+		
+		//Create OWL class of id "Definition" 
+		if(!annotationsClasses.contains("def")){
+			OWLClass cls = fac.getOWLClass(IRI.create(OBOINOWL + "Definition")); 
+			
+			annotationsClasses.put("def", cls);
+			add(fac.getOWLDeclarationAxiom(cls));
+		}
+		
+		//get "Definition" OWL class for the tag def
+		OWLClass cls = annotationsClasses.get("def");
+		
+		OWLAnonymousIndividual indvidual = fac.getOWLAnonymousIndividual();
+		add( fac.getOWLClassAssertionAxiom(cls,indvidual ) );
+		
+		add( 
+				fac.getOWLAnnotationAssertionAxiom(
+						trTagToAnnotationProp("name"), indvidual, trLiteral(clause.getValue())
+						)
+							);
+		
+		OWLAnnotationProperty prop =  trTagToAnnotationProp("def");
+		
+		OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(prop, sub, indvidual);
+		
+		return ax;
+	}
 	
 	
 	private OWLAxiom handleAnnotationWithClassAssertion(OWLAnnotationSubject sub, String tag, String className,  Clause clause){
@@ -81,7 +111,7 @@ public class Obo2OWLOldMapping extends Obo2Owl {
 		OWLClass cls = annotationsClasses.get(tag);
 		
 		OWLAnonymousIndividual indvidual = fac.getOWLAnonymousIndividual();
-		fac.getOWLClassAssertionAxiom(cls,indvidual );
+		add( fac.getOWLClassAssertionAxiom(cls,indvidual ) );
 		
 		add( 
 				fac.getOWLAnnotationAssertionAxiom(
@@ -107,7 +137,10 @@ public class Obo2OWLOldMapping extends Obo2Owl {
 		OWLAxiom ax = null;
 		
 		if("def".equals(tag)){
-			ax = handleAnnotationWithClassAssertion(sub, tag, "Definition", clause);
+			//ax = handleAnnotationWithClassAssertion(sub, tag, "Definition", clause);
+			System.out.println("------------");
+			ax = handleDef(sub, clause);
+			System.out.println("------------");
 		}else if("subset".equals(tag)){
 			ax = handleAnnotationWithClassAssertion(sub, tag, "Subset", clause);
 		}else if("synonym".equals(tag)){
