@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.*;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -48,29 +49,36 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Obo2Owl {
 
-	private static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
+	
+	
+	private static Logger LOG = Logger.getLogger(Obo2Owl.class);
+	
+	public static final boolean DEBUG = LOG.isDebugEnabled();
+	
+	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
+	
+	public static final String IRI_CLASS_SYNONYMTYPEDEF = DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
+	public static final String IRI_CLASS_SUBSETDEF = DEFAULT_IRI_PREFIX + "IAO_subsetdef";
+
+	
 	private static String defaultIDSpace = "";
 	OWLOntologyManager manager;
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
 	OBODoc obodoc;
 	Map<String,String> idSpaceMap;
-	Map<String,IRI> annotationPropertyMap;
+	public static Map<String,IRI> annotationPropertyMap = initAnnotationPropertyMap();
 	Set<OWLAnnotationProperty> apToDeclare;
 	private Map<String, OWLClass> clsToDeclar;
 	
-
 	public Obo2Owl() {
 		init();
 	}
-
-
 
 	private void init() {
 		idSpaceMap = new HashMap<String,String>();
 		manager = OWLManager.createOWLOntologyManager();
 		fac = manager.getOWLDataFactory();
-		initAnnotationPropertyMap();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 		clsToDeclar = new Hashtable<String, OWLClass>();
 	}
@@ -85,7 +93,10 @@ public class Obo2Owl {
 		OWLOntology ontology = bridge.convert(obodoc);
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		System.err.println("saving to "+outputStream+" fmt="+format);
+		
+		if(DEBUG)
+			LOG.debug("saving to "+outputStream+" fmt="+format);
+		
 		manager.saveOntology(ontology, format, outputStream);
 
 	}
@@ -108,7 +119,8 @@ public class Obo2Owl {
 		OWLOntology ontology = bridge.convert(obodoc);
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		System.err.println("saving to "+outputStream+" fmt="+format);
+		if(DEBUG)
+			LOG.debug("saving to "+outputStream+" fmt="+format);
 		manager.saveOntology(ontology, format, outputStream);
 
 	}
@@ -118,25 +130,22 @@ public class Obo2Owl {
 	 * Table 5.8 Translation of Annotation Vocabulary.
 	 * 
 	 */
-	protected void initAnnotationPropertyMap() {
-		annotationPropertyMap = new HashMap<String,IRI>();
-		map("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED);
-		map("name",OWLRDFVocabulary.RDFS_LABEL);
-		map("comment",OWLRDFVocabulary.RDFS_COMMENT);
-		map("expand_expression_to","IAO_0000424");
-		map("expand_assertion_to","IAO_0000425");
-		map("def","IAO_0000115");
-		map("synonym","IAO_0000118");
-		map("is_anti_symmetric","IAO_0000427");
-		map("replaced_by","IAO_0100001");
-	}
-
-	protected void map(String key, String iri) {
-		annotationPropertyMap.put(key, IRI.create(DEFAULT_IRI_PREFIX+iri));
-	}
-
-	protected void map(String key, OWLRDFVocabulary vocab) {
-		annotationPropertyMap.put(key, vocab.getIRI());
+	private static HashMap<String, IRI> initAnnotationPropertyMap() {
+		
+		HashMap<String, IRI> map = new HashMap<String, IRI>();
+		map.put("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
+		map.put("name",OWLRDFVocabulary.RDFS_LABEL.getIRI());
+		map.put("comment",OWLRDFVocabulary.RDFS_COMMENT.getIRI());
+		map.put("expand_expression_to",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000424"));
+		map.put("expand_assertion_to",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000425"));
+		map.put("def",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000115"));
+		map.put("synonym", IRI.create(DEFAULT_IRI_PREFIX+"IAO_0000118"));
+		map.put("is_anti_symmetric",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000427"));
+//		map.put("subsetdef", IRI.create(DEFAULT_IRI_PREFIX+ OWLRDFVocabulary.RDFS_LABEL));
+//		map.put("synonymtypedef",IRI.create(DEFAULT_IRI_PREFIX+ OWLRDFVocabulary.RDFS_LABEL));
+		map.put("replaced_by",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0100001"));
+		
+		return map;
 	}
 
 	public OWLOntologyManager getManager() {
@@ -196,6 +205,7 @@ public class Obo2Owl {
 			else {
 				ontIRI = IRI.create(DEFAULT_IRI_PREFIX+ontOboId+".owl");
 			}
+			
 			owlOntology = manager.createOntology(ontIRI);
 		}
 		else {
@@ -232,28 +242,26 @@ public class Obo2Owl {
 				//		.getOWLImportsDeclaration(importedIRI)));
 			}else if (tag.equals("subsetdef")){
 		
-				//TODO: replace with the appropicate class name
 				OWLClass cls = clsToDeclar.get("subsetdef");
 				if(cls == null){
-					cls = trClass("subsetdef");
+					cls = trClass(IRI_CLASS_SUBSETDEF);
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("subsetdef", cls);
 				}
 				
 				for(Clause clause: headerFrame.getClauses(tag)){
 				
-		//		Clause clause = headerFrame.getClause(tag);
-					OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + clause.getValue() ));
+					OWLIndividual indv= trIndividual(  clause.getValue().toString() );
 					add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
 					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
 					
-					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral(clause.getValue2())));
+					add (fac.getOWLAnnotationAssertionAxiom(ap, ((OWLNamedIndividual)indv).getIRI(), trLiteral(clause.getValue2())));
 				}
 			}else if (tag.equals("synonymtypedef")){
 				OWLClass cls = clsToDeclar.get("synonymtypedef");
 				if(cls == null){
-					cls = trClass("synonymtypedef");
+					cls = trClass(IRI_CLASS_SYNONYMTYPEDEF);
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("synonymtypedef", cls);
 				}
@@ -262,7 +270,7 @@ public class Obo2Owl {
 				for(Clause clause: headerFrame.getClauses(tag)){
 					Object values[] = clause.getValues().toArray();
 					
-					OWLNamedIndividual indv= fac.getOWLNamedIndividual(IRI.create(DEFAULT_IRI_PREFIX + values[0]  ));
+					OWLNamedIndividual indv= (OWLNamedIndividual) trIndividual( values[0].toString()  );
 					add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
 					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
@@ -794,7 +802,7 @@ public class Obo2Owl {
 		return null;
 	}
 
-
+	
 	private OWLClass trClass(String classId) {
 		IRI iri = oboIdToIRI(classId);
 		return fac.getOWLClass(iri);
@@ -885,7 +893,7 @@ public class Obo2Owl {
 
 	private IRI oboIdToIRI(String id) {
 		if (id.contains(" ")) {
-			System.err.println("id contains space: "+id);
+			LOG.error("id contains space: "+id);
 			//throw new UnsupportedEncodingException();
 			return null;
 		}
@@ -969,8 +977,5 @@ public class Obo2Owl {
 	private String getDefaultIDSpace() {
 		return defaultIDSpace;
 	}
-
-
-
 
 }

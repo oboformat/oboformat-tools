@@ -32,7 +32,6 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
@@ -40,45 +39,52 @@ public class Owl2Obo {
 
 	private static Logger LOG = Logger.getLogger(Owl2Obo.class);
 
-	private static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
 	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
 	OBODoc obodoc;
 	Map<String, String> idSpaceMap;
 	// Map<String,IRI> annotationPropertyMap;
-	Map<String, String> annotationPropertyMap;
+	public static Map<String, String> annotationPropertyMap = initAnnotationPropertyMap();
 	Set<OWLAnnotationProperty> apToDeclare;
 
 	private String ontologyId;
+	
 	
 	private void init() {
 		idSpaceMap = new HashMap<String, String>();
 		manager = OWLManager.createOWLOntologyManager();
 		fac = manager.getOWLDataFactory();
-		initAnnotationPropertyMap();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 	}
 
-	private void initAnnotationPropertyMap() {
-		annotationPropertyMap = new HashMap<String, String>();
+	private static HashMap<String, String>  initAnnotationPropertyMap() {
+		/*annotationPropertyMap = new HashMap<String, String>();
 		annotationPropertyMap.put(OWLRDFVocabulary.RDFS_LABEL.getIRI()
 				.toString(), "name");
 		annotationPropertyMap.put(OWLRDFVocabulary.RDFS_COMMENT.getIRI()
 				.toString(), "comment");
-		annotationPropertyMap.put(DEFAULT_IRI_PREFIX + "IAO_0000424",
+		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000424",
 				"expand_expression_to");
-		annotationPropertyMap.put(DEFAULT_IRI_PREFIX + "IAO_0000425",
+		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000425",
 				"expand_assertion_to");
-		annotationPropertyMap.put(DEFAULT_IRI_PREFIX + "IAO_0000115", "def");
+		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000115", "def");
 		annotationPropertyMap
-				.put(DEFAULT_IRI_PREFIX + "IAO_0000118", "synonym");
-		annotationPropertyMap.put(DEFAULT_IRI_PREFIX + "IAO_0000427",
+				.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000118", "synonym");
+		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000427",
 				"is_anti_symmetric");
-		annotationPropertyMap.put(DEFAULT_IRI_PREFIX + "IAO_0100001",
+		annotationPropertyMap.put(OBO2 DEFAULT_IRI_PREFIX + "IAO_0100001",
 				"replaced_by");
 		annotationPropertyMap
-				.put(DEFAULT_IRI_PREFIX + "remark", "data-version");
+				.put(DEFAULT_IRI_PREFIX + "remark", "data-version");*/
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		for(String key: Obo2Owl.annotationPropertyMap.keySet()){
+			IRI propIRI =Obo2Owl.annotationPropertyMap.get(key);
+			map.put(propIRI.toString(), key);
+		}
+		
+		return map;
 
 	}
 
@@ -104,39 +110,27 @@ public class Owl2Obo {
 		return tr();
 	}
 
-	private String getIdentifier(OWLObject obj, boolean isTermId) {
-		if (obj instanceof OWLEntity)
-			return getIdentifier(((OWLEntity) obj).getIRI(), isTermId);
-
+	
+	public static String getIdentifier(OWLObject obj) {
+		if(obj instanceof OWLEntity)
+			return getIdentifier(((OWLEntity)obj).getIRI());
+		
 		return null;
 	}
 
-	
-	private String getIdentifier(OWLObject obj) {
-		return getIdentifier(obj, true);
-	}
-
-	private String getIdentifier(IRI iriId, boolean isTermId) {
+	public static String getIdentifier(IRI iriId) {
 		String iri = iriId.toString();
 		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
 			iri = iri.replace("http://purl.obolibrary.org/obo/", "");
-			
-			if(isTermId){
-				int p = iri.indexOf('_');
-	
-				if (p >= 0) {
-					iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
-				}
+			int p = iri.indexOf('_');
+
+			if (p >= 0) {
+				iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
 			}
 		}
 
 		return iri;
 
-	}
-
-	
-	private String getIdentifier(IRI iriId) {
-		return getIdentifier(iriId, true);
 	}
 
 	private OBODoc tr() throws OWLOntologyCreationException {
@@ -324,11 +318,10 @@ public class Owl2Obo {
 	private void tr(OWLDeclarationAxiom axiom) {
 		OWLEntity entity = axiom.getEntity();
 
-		String id = getIdentifier(entity);
-		
-		if((this.ontologyId + ":subsetdef").equals(id) || (this.ontologyId+":synonymtypedef").equals(id)){
+		Set<OWLAnnotationAssertionAxiom> set  = entity.getAnnotationAssertionAxioms(this.owlOntology);
+
+		if(set.isEmpty())
 			return;
-		}
 		
 		Frame f = null;
 		if (entity instanceof OWLClass) {
@@ -338,28 +331,23 @@ public class Owl2Obo {
 		}
 
 		if (f != null) {
-			for (OWLAnnotationAssertionAxiom aanAx : entity
-					.getAnnotationAssertionAxioms(this.owlOntology)) {
+			for (OWLAnnotationAssertionAxiom aanAx : set) {
 				
 				tr(aanAx, f);
 			}
 
 			add(f);
 		
-			
-			if(f.getClauses().isEmpty()){
-				System.out.println("Hello World");
-			}
 		}
 
 	}
 
-	private String propToTag(OWLAnnotationProperty prop) {
+	public static String propToTag(OWLAnnotationProperty prop) {
 		String iri = prop.getIRI().toString();
 		String tag = annotationPropertyMap.get(iri);
 
 		if (tag == null) {
-			String prefix = DEFAULT_IRI_PREFIX + "IAO_";
+			String prefix = Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_";
 			if (iri.startsWith(prefix)) {
 				tag = iri.substring(prefix.length());
 			}
@@ -382,30 +370,30 @@ public class Owl2Obo {
 
 	
 	private void tr(OWLClassAssertionAxiom ax){
-		String clsId = getIdentifier(ax.getClassExpression());
+		OWLObject cls = ax.getClassExpression();
 		
-		int index = clsId.indexOf(ontologyId + ":");
+		if(!(cls instanceof OWLClass))
+			return;
 		
-		if(index>=0){
-			clsId = clsId.substring(ontologyId.length()+1);
-		}
+		String clsIRI = ((OWLClass) cls).getIRI().toString();
 		
-		if("synonymtypedef".equals(clsId)){
+		
+		if(Obo2Owl.IRI_CLASS_SYNONYMTYPEDEF.equals(clsIRI)){
 			Frame f = this.obodoc.getHeaderFrame();
 			Clause c = new Clause();
 			c.setTag("synonymtypedef");
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
-			String indvId = getIdentifier(indv, false);
+			String indvId = getIdentifier(indv);
 			c.addValue(indvId);
 			
 			String nameValue = "";
 			String scopeValue = null;
 			for(OWLAnnotation ann: indv.getAnnotations(owlOntology)){
-				String propId = propToTag(ann.getProperty());
+				String propId = ann.getProperty().getIRI().toString();
 				String value = ((OWLLiteral) ann.getValue()).getLiteral();
 
-				if("name".equals(propId)){
+				if(OWLRDFVocabulary.RDFS_LABEL.getIRI().toString().equals(propId)){
 					nameValue = "\"" +value + "\"";
 				}else
 					scopeValue = value;
@@ -418,21 +406,21 @@ public class Owl2Obo {
 				}
 			
 			f.addClause(c);
-		}else if("subsetdef".equals(clsId)){
+		}else if(Obo2Owl.IRI_CLASS_SUBSETDEF.equals(clsIRI)){
 			Frame f = this.obodoc.getHeaderFrame();
 			Clause c = new Clause();
 			c.setTag("subsetdef");
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
-			String indvId = getIdentifier(indv, false);
+			String indvId = getIdentifier(indv);
 			c.addValue(indvId);
 			
 			String nameValue = "";
 			for(OWLAnnotation ann: indv.getAnnotations(owlOntology)){
-				String propId = propToTag(ann.getProperty());
+				String propId = ann.getProperty().getIRI().toString();
 				String value = ((OWLLiteral) ann.getValue()).getLiteral();
 
-				if("name".equals(propId)){
+				if(OWLRDFVocabulary.RDFS_LABEL.getIRI().toString().equals(propId)){
 					nameValue = "\"" +value + "\"";
 				}
 			}

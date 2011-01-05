@@ -48,7 +48,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Obo2OWLOldMapping extends Obo2Owl {
 
-	private static Logger LOG = Logger.getLogger(Obo2OWLOldMapping.class);
+	/*private static Logger LOG = Logger.getLogger(Obo2OWLOldMapping.class);
 	private static boolean DEBUG = LOG.isDebugEnabled();
 	
 	private static final String OBOINOWL = "http://purl.obolibrary.org/obo/";
@@ -180,7 +180,7 @@ public class Obo2OWLOldMapping extends Obo2Owl {
 		return ap;
 	}
 
-
+*/
 
 	
 	

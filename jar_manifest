@@ -6,5 +6,5 @@ Sealed: true
 Specification-Version: $VERSION$
 Specification-Vendor: OBO Foundry
 Implementation-Title: oboparser
-Implementation-Version: build175_${build_date}
+Implementation-Version: build177_${build_date}
 Implementation-Vendor: OBO Foundry
