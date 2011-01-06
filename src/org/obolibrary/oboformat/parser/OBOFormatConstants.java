@@ -59,7 +59,9 @@ public class OBOFormatConstants {
 		TAG_DISJOINT_OVER( "disjoint_over"),
 		TAG_EXPAND_ASSERTION_TO( "expand_assertion_to"),
 		TAG_EXPAND_EXPRESSION_TO( "expand_expression_to"),
-		TAG_IS_CLASS_LEVEL( "is_class_level");
+		TAG_IS_CLASS_LEVEL_TAG( "is_class_level_tag"),
+		TAG_IS_METADATA_TAG("is_metadata_tag"),
+		TAG_CONSIDER("consider");
 		
 		private String tag;
 		

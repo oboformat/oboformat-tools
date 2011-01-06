@@ -50,7 +50,7 @@ public class Owl2Obo {
 	public static Map<String, String> annotationPropertyMap = initAnnotationPropertyMap();
 	Set<OWLAnnotationProperty> apToDeclare;
 
-	private String ontologyId;
+	//private String ontologyId;
 	
 	
 	private void init() {
@@ -204,12 +204,8 @@ public class Owl2Obo {
 		}
 
 	}
-
-	private void tr(OWLOntology ontology) {
-		Frame f = new Frame(FrameType.HEADER);
-
-		this.obodoc.setHeaderFrame(f);
-
+	
+	public static String getOntologyId(OWLOntology ontology){
 		String id = getIdentifier(ontology.getOntologyID().getOntologyIRI());
 
 		int index = id.lastIndexOf(".owl");
@@ -217,7 +213,16 @@ public class Owl2Obo {
 			id = id.substring(0, index);
 		}
 		
-		this.ontologyId = id;
+		return id;
+	}
+
+	private void tr(OWLOntology ontology) {
+		Frame f = new Frame(FrameType.HEADER);
+
+		this.obodoc.setHeaderFrame(f);
+
+		String id = getOntologyId(this.owlOntology);
+		//this.ontologyId = id;
 		
 		Clause c = new Clause();
 		c.setTag("ontology");

@@ -2,7 +2,6 @@ package org.obolibrary.obo2owl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
@@ -13,14 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.oboformat.model.*;
-import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
@@ -38,15 +34,12 @@ import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLProperty;
-import org.semanticweb.owlapi.model.OWLPropertyExpression;
-import org.semanticweb.owlapi.model.OWLRestriction;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Obo2Owl {
@@ -59,8 +52,10 @@ public class Obo2Owl {
 	
 	@Deprecated
 	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
-	
+
+	@Deprecated
 	public static final String IRI_CLASS_SYNONYMTYPEDEF = DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
+	@Deprecated
 	public static final String IRI_CLASS_SUBSETDEF = DEFAULT_IRI_PREFIX + "IAO_subsetdef";
 
 	
@@ -139,12 +134,12 @@ public class Obo2Owl {
 		map.put("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
 		map.put("name",OWLRDFVocabulary.RDFS_LABEL.getIRI());
 		map.put("comment",OWLRDFVocabulary.RDFS_COMMENT.getIRI());
-		map.put("expand_expression_to",Obo2OWLVocabulary.IAO_0000424.getIRI());
-		map.put("expand_assertion_to",Obo2OWLVocabulary.IAO_0000425.getIRI());
-		map.put("def",Obo2OWLVocabulary.IAO_0000115.getIRI());
-		map.put("synonym",Obo2OWLVocabulary.IAO_0000118.getIRI());
-		map.put("is_anti_symmetric",Obo2OWLVocabulary.IAO_0000427.getIRI());
-		map.put("replaced_by", Obo2OWLVocabulary.IAO_0100001.getIRI());
+		map.put("expand_expression_to",Obo2OWLVocabulary.IRI_IAO_0000424.getIRI());
+		map.put("expand_assertion_to",Obo2OWLVocabulary.IRI_IAO_0000425.getIRI());
+		map.put("def",Obo2OWLVocabulary.IRI_IAO_0000115.getIRI());
+		map.put("synonym",Obo2OWLVocabulary.IRI_IAO_0000118.getIRI());
+		map.put("is_anti_symmetric",Obo2OWLVocabulary.IRI_IAO_0000427.getIRI());
+		map.put("replaced_by", Obo2OWLVocabulary.IRI_IAO_0100001.getIRI());
 		
 		return map;
 	}
@@ -245,7 +240,7 @@ public class Obo2Owl {
 		
 				OWLClass cls = clsToDeclar.get("subsetdef");
 				if(cls == null){
-					cls = trClass(IRI_CLASS_SUBSETDEF);
+					cls = trClass(trTagToIRI("subsetdef").toString());
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("subsetdef", cls);
 				}
@@ -262,7 +257,7 @@ public class Obo2Owl {
 			}else if (tag.equals("synonymtypedef")){
 				OWLClass cls = clsToDeclar.get("synonymtypedef");
 				if(cls == null){
-					cls = trClass(IRI_CLASS_SYNONYMTYPEDEF);
+					cls = trClass(trTagToIRI("synonymtypedef").toString());
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put("synonymtypedef", cls);
 				}
@@ -840,14 +835,23 @@ public class Obo2Owl {
 		return fac.getOWLNamedIndividual(iri);
 	}
 
-	private OWLAnnotationProperty trTagToAnnotationProp(String tag) {
-		OWLAnnotationProperty ap;
+	public static IRI trTagToIRI(String tag){
+		IRI  iri = null;
 		if (annotationPropertyMap.containsKey(tag)) {
-			ap = fac.getOWLAnnotationProperty(annotationPropertyMap.get(tag));
+			iri = annotationPropertyMap.get(tag);
 		}
 		else {
-			ap = fac.getOWLAnnotationProperty(IRI.create(DEFAULT_IRI_PREFIX+"IAO_"+tag));
+			iri = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+"IAO_"+tag);
 		}
+		
+		return iri;
+		
+	}
+	
+	private OWLAnnotationProperty trTagToAnnotationProp(String tag) {
+		IRI iri = trTagToIRI(tag);
+		OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(iri);
+
 		if (!apToDeclare.contains(ap)) {
 			apToDeclare.add(ap);
 			add(fac.getOWLDeclarationAxiom(ap));
