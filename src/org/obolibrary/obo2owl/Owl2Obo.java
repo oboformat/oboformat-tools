@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.*;
 import org.obolibrary.oboformat.model.Frame.FrameType;
+import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -24,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -110,29 +112,6 @@ public class Owl2Obo {
 		return tr();
 	}
 
-	
-	public static String getIdentifier(OWLObject obj) {
-		if(obj instanceof OWLEntity)
-			return getIdentifier(((OWLEntity)obj).getIRI());
-		
-		return null;
-	}
-
-	public static String getIdentifier(IRI iriId) {
-		String iri = iriId.toString();
-		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
-			iri = iri.replace("http://purl.obolibrary.org/obo/", "");
-			int p = iri.indexOf('_');
-
-			if (p >= 0) {
-				iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
-			}
-		}
-
-		return iri;
-
-	}
-
 	private OBODoc tr() throws OWLOntologyCreationException {
 		obodoc = new OBODoc();
 
@@ -170,7 +149,7 @@ public class Owl2Obo {
 	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 
 		OWLAnnotationProperty prop = aanAx.getProperty();
-		String tag = propToTag(prop);
+		String tag = owlObjectToTag(prop);
 
 		if (tag != null) {
 			String value = ((OWLLiteral) aanAx.getValue()).getLiteral();
@@ -184,7 +163,7 @@ public class Owl2Obo {
 			
 			if("def".equals(tag)){
 				for(OWLAnnotation aan: aanAx.getAnnotations()){
-					String propId = propToTag(aan.getProperty());
+					String propId = owlObjectToTag(aan.getProperty());
 					
 					if("xref".equals(propId)){
 						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
@@ -196,7 +175,7 @@ public class Owl2Obo {
 				String scope = null;
 				String type = null;
 				for(OWLAnnotation aan: aanAx.getAnnotations()){
-					String propId = propToTag(aan.getProperty());
+					String propId = owlObjectToTag(aan.getProperty());
 					
 					if("xref".equals(propId)){
 						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
@@ -342,6 +321,54 @@ public class Owl2Obo {
 
 	}
 
+	
+	public static String getIdentifier(OWLObject obj) {
+		if(obj instanceof OWLEntity)
+			return getIdentifier(((OWLEntity)obj).getIRI());
+		
+		return null;
+	}
+
+	public static String getIdentifier(IRI iriId) {
+		String iri = iriId.toString();
+		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
+			iri = iri.replace("http://purl.obolibrary.org/obo/", "");
+			int p = iri.indexOf('_');
+
+			if (p >= 0) {
+				iri = iri.substring(0, p) + ":" + iri.substring(p + 1);
+			}
+		}
+
+		return iri;
+
+	}
+	
+	
+	public static String owlObjectToTag(OWLObject obj){
+		
+		if(!(obj instanceof OWLNamedObject)){
+			return null;
+		}
+		
+		String iri = ((OWLNamedObject) obj).getIRI().toString();
+	
+		String tag = annotationPropertyMap.get(iri);
+
+		if (tag == null) {
+			String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
+			if (iri.startsWith(prefix)) {
+				tag = iri.substring(prefix.length());
+				if(!OBOFormatConstants.TAGS.contains(tag))
+					tag = null;
+			}
+			
+			
+		}
+		return tag;
+	}
+	
+	/*
 	public static String propToTag(OWLAnnotationProperty prop) {
 		String iri = prop.getIRI().toString();
 		String tag = annotationPropertyMap.get(iri);
@@ -353,7 +380,7 @@ public class Owl2Obo {
 			}
 		}
 		return tag;
-	}
+	}*/
 
 	private Frame getTermFrame(OWLEntity entity) {
 		String id = getIdentifier(entity.getIRI());

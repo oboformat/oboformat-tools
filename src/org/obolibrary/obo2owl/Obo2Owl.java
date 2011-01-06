@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.oboformat.model.*;
+import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
@@ -55,6 +57,7 @@ public class Obo2Owl {
 	
 	public static final boolean DEBUG = LOG.isDebugEnabled();
 	
+	@Deprecated
 	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
 	
 	public static final String IRI_CLASS_SYNONYMTYPEDEF = DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
@@ -136,14 +139,12 @@ public class Obo2Owl {
 		map.put("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
 		map.put("name",OWLRDFVocabulary.RDFS_LABEL.getIRI());
 		map.put("comment",OWLRDFVocabulary.RDFS_COMMENT.getIRI());
-		map.put("expand_expression_to",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000424"));
-		map.put("expand_assertion_to",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000425"));
-		map.put("def",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000115"));
-		map.put("synonym", IRI.create(DEFAULT_IRI_PREFIX+"IAO_0000118"));
-		map.put("is_anti_symmetric",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0000427"));
-//		map.put("subsetdef", IRI.create(DEFAULT_IRI_PREFIX+ OWLRDFVocabulary.RDFS_LABEL));
-//		map.put("synonymtypedef",IRI.create(DEFAULT_IRI_PREFIX+ OWLRDFVocabulary.RDFS_LABEL));
-		map.put("replaced_by",IRI.create(DEFAULT_IRI_PREFIX+ "IAO_0100001"));
+		map.put("expand_expression_to",Obo2OWLVocabulary.IAO_0000424.getIRI());
+		map.put("expand_assertion_to",Obo2OWLVocabulary.IAO_0000425.getIRI());
+		map.put("def",Obo2OWLVocabulary.IAO_0000115.getIRI());
+		map.put("synonym",Obo2OWLVocabulary.IAO_0000118.getIRI());
+		map.put("is_anti_symmetric",Obo2OWLVocabulary.IAO_0000427.getIRI());
+		map.put("replaced_by", Obo2OWLVocabulary.IAO_0100001.getIRI());
 		
 		return map;
 	}
