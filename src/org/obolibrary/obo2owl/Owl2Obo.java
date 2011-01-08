@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.*;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -21,20 +22,33 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
+import org.semanticweb.owlapi.model.OWLDisjointObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
+import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
+import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
+import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Owl2Obo {
@@ -128,8 +142,33 @@ public class Owl2Obo {
 				tr((OWLEquivalentClassesAxiom) ax);
 			}else if (ax instanceof OWLClassAssertionAxiom){
 				tr((OWLClassAssertionAxiom)ax);
-			}else {
-				LOG.warn("Cann't Translate axiom: " + ax);
+			}else if(ax instanceof OWLEquivalentObjectPropertiesAxiom) {
+				tr((OWLEquivalentObjectPropertiesAxiom)ax);
+			}else if(ax instanceof OWLSubObjectPropertyOfAxiom){
+				tr((OWLSubObjectPropertyOfAxiom)ax);
+			}else if(ax instanceof OWLObjectPropertyRangeAxiom){
+				tr((OWLObjectPropertyRangeAxiom)ax);
+			}else if (ax instanceof OWLFunctionalObjectPropertyAxiom){
+				tr((OWLFunctionalObjectPropertyAxiom)ax);
+			}else if(ax instanceof OWLSymmetricObjectPropertyAxiom){
+				tr((OWLSymmetricObjectPropertyAxiom)ax);
+			}else if(ax instanceof OWLObjectPropertyDomainAxiom){
+				tr((OWLObjectPropertyDomainAxiom)ax);
+			}else if(ax instanceof OWLInverseFunctionalObjectPropertyAxiom){
+				tr((OWLInverseFunctionalObjectPropertyAxiom)ax);
+			}else if(ax instanceof OWLDisjointObjectPropertiesAxiom){
+				tr((OWLDisjointObjectPropertiesAxiom)ax);
+			}else if (ax instanceof OWLReflexiveObjectPropertyAxiom){
+				tr((OWLReflexiveObjectPropertyAxiom)ax);
+			}else if(ax instanceof OWLTransitiveObjectPropertyAxiom){
+				tr((OWLTransitiveObjectPropertyAxiom)ax);
+			}
+			
+			else{
+				if(!(ax instanceof OWLAnnotationAssertionAxiom)){
+					System.err.println("Cann't Translate axiom: " + ax);
+					LOG.warn("The axiom is not translated: " + ax);
+				}
 			}
 			// tr(ax);
 		}
@@ -146,6 +185,160 @@ public class Owl2Obo {
 		}
 	}
 
+	private void trObjectProperty(OWLObjectProperty prop, String tag, String value){
+		if(prop == null || value == null)
+			return;
+		
+		Frame f = getTypedefFrame(prop);
+		Clause clause = new Clause();
+		clause.setTag(tag);
+		
+		clause.addValue(value);
+		f.addClause(clause);
+		
+	}
+	
+	private void trNaryPropertyAxiom(OWLNaryPropertyAxiom ax, String tag){
+		Set<OWLObjectPropertyExpression> set = ax.getProperties();
+		
+		if(set.size()>1){
+			boolean first = true;
+			OWLObjectProperty prop = null;
+			String disjointFrom = null;
+			for(OWLObjectPropertyExpression ex: set){
+				if(first){
+					first = false;
+					if(ex instanceof OWLObjectProperty)
+						prop = (OWLObjectProperty)ex;
+				}else{
+					disjointFrom = getIdentifier(ex);
+				}
+			}
+			
+			trObjectProperty(prop, tag, disjointFrom);
+			
+		}else{
+			LOG.warn("Unhandeled axiom: " + ax);
+		}
+		
+	}
+	
+	private void tr(OWLEquivalentObjectPropertiesAxiom ax){
+		trNaryPropertyAxiom(ax, OboFormatTag.TAG_EQUIVALENT_TO.getTag());
+	}
+	
+	private void tr(OWLTransitiveObjectPropertyAxiom ax){
+		OWLObjectPropertyExpression prop = ax.getProperty();
+
+		if(prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), "true");
+		}
+	}
+	
+	private void tr(OWLDisjointObjectPropertiesAxiom ax){
+		trNaryPropertyAxiom(ax, OboFormatTag.TAG_DISJOINT_FROM.getTag());
+		/*Set<OWLObjectPropertyExpression> set = ax.getProperties();
+		
+		if(set.size()>1){
+			boolean first = true;
+			OWLObjectProperty prop = null;
+			String disjointFrom = null;
+			for(OWLObjectPropertyExpression ex: set){
+				if(first){
+					first = false;
+					if(ex instanceof OWLObjectProperty)
+						prop = (OWLObjectProperty)ex;
+				}else{
+					disjointFrom = getIdentifier(ex);
+				}
+			}
+			
+			trObjectProperty(prop, OboFormatTag.TAG_DISJOINT_FROM.getTag(), disjointFrom);
+			
+		}else{
+			LOG.warn("Unhandeled axiom: " + ax);
+		}*/
+	}
+	
+	private void tr(OWLReflexiveObjectPropertyAxiom ax){
+		OWLObjectPropertyExpression prop = ax.getProperty();
+
+		if(prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), "true");
+		}
+		
+	}
+	
+	private void tr(OWLInverseFunctionalObjectPropertyAxiom ax){
+		OWLObjectPropertyExpression prop = ax.getProperty();
+
+		if(prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), "true");
+		}
+	}
+	
+	private void tr(OWLObjectPropertyDomainAxiom ax){
+		String range = getIdentifier(ax.getDomain());
+		OWLObjectPropertyExpression prop = ax.getProperty();
+		
+		if(range != null && prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_DOMAIN.getTag(), range);
+		}
+	}
+	
+	private void tr(OWLSymmetricObjectPropertyAxiom ax){
+		OWLObjectPropertyExpression prop = ax.getProperty();
+
+		if(prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), "true");
+		}
+		
+	}
+	
+	
+	private void tr(OWLFunctionalObjectPropertyAxiom ax){
+		OWLObjectPropertyExpression prop = ax.getProperty();
+
+		if(prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), "true");
+		}
+	}
+	
+	private void tr(OWLObjectPropertyRangeAxiom ax){
+	
+		String range = getIdentifier(ax.getRange());
+		OWLObjectPropertyExpression prop = ax.getProperty();
+		
+		if(range != null && prop instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_RANGE.getTag(), range);
+		}
+		
+	}
+	
+	
+	private void tr(OWLSubObjectPropertyOfAxiom ax){
+		
+		OWLObjectPropertyExpression sup = ax.getSuperProperty();
+		OWLObjectPropertyExpression sub = ax.getSuperProperty();
+		
+		
+		if(sub instanceof OWLObjectProperty && sup instanceof OWLObjectProperty){
+		
+			String supId = getIdentifier(sup);
+			
+			Frame f = getTypedefFrame((OWLEntity)ax.getSubProperty());
+			Clause clause = new Clause();
+			clause.setTag(OboFormatTag.TAG_IS_A.getTag());
+			clause.addValue(supId);
+			f.addClause(clause);
+			
+		}else{
+			LOG.warn("Unhandled axiom: " + ax);
+		}
+		
+		
+	}
+	
 	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 
 		OWLAnnotationProperty prop = aanAx.getProperty();
@@ -153,8 +346,8 @@ public class Owl2Obo {
 
 		if (tag != null) {
 			String value = ((OWLLiteral) aanAx.getValue()).getLiteral();
-			if ("id".equals(tag))
-				frame.setId(value);
+			//if ("id".equals(tag))
+			//	frame.setId(value);
 
 			Clause clause = new Clause();
 			clause.setTag(tag);
@@ -258,16 +451,16 @@ public class Owl2Obo {
 			c.setTag("equivalent_to");
 			c.setValue(cls2);
 			f.addClause(c);
-		} else if (ax instanceof OWLObjectUnionOf) {
-			List<OWLClassExpression> list2 = ((OWLObjectUnionOf) ax)
+		} else if (ce2 instanceof OWLObjectUnionOf) {
+			List<OWLClassExpression> list2 = ((OWLObjectUnionOf) ce2)
 					.getOperandsAsList();
 			Clause c = new Clause();
 			c.setTag("union_of");
 			c.setValue(getIdentifier(list2.get(0)));
 			f.addClause(c);
-		} else if (ax instanceof OWLObjectIntersectionOf) {
+		} else if (ce2 instanceof OWLObjectIntersectionOf) {
 
-			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ax).getOperandsAsList();
+			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();
 			Clause c = new Clause();
 			c.setTag("intersection_of");
 			OWLClassExpression ce = list2.get(0);
@@ -309,9 +502,11 @@ public class Owl2Obo {
 		
 		Frame f = null;
 		if (entity instanceof OWLClass) {
-			f = new Frame(FrameType.TERM);
+			//f = new Frame(FrameType.TERM);
+			f= getTermFrame(entity);
 		} else if (entity instanceof OWLObjectProperty) {
-			f = new Frame(FrameType.TYPEDEF);
+			//f = new Frame(FrameType.TYPEDEF);
+			f = getTypedefFrame(entity);
 		}
 
 		if (f != null) {
@@ -390,7 +585,6 @@ public class Owl2Obo {
 	private Frame getTermFrame(OWLEntity entity) {
 		String id = getIdentifier(entity.getIRI());
 		Frame f = this.obodoc.getTermFrame(id);
-
 		if (f == null) {
 			f = new Frame(FrameType.TERM);
 			f.setId(id);
@@ -398,6 +592,19 @@ public class Owl2Obo {
 		}
 
 		return f;
+	}
+	
+	private Frame getTypedefFrame(OWLEntity entity){
+		String id = getIdentifier(entity.getIRI());
+		Frame f = this.obodoc.getTypedefFrame(id);
+		if (f == null) {
+			f = new Frame(FrameType.TYPEDEF);
+			f.setId(id);
+			add(f);
+		}
+
+		return f;
+		
 	}
 
 	
@@ -413,7 +620,7 @@ public class Owl2Obo {
 		if(Obo2Owl.IRI_CLASS_SYNONYMTYPEDEF.equals(clsIRI)){
 			Frame f = this.obodoc.getHeaderFrame();
 			Clause c = new Clause();
-			c.setTag("synonymtypedef");
+			c.setTag(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag());
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
 			String indvId = getIdentifier(indv);
@@ -441,7 +648,7 @@ public class Owl2Obo {
 		}else if(Obo2Owl.IRI_CLASS_SUBSETDEF.equals(clsIRI)){
 			Frame f = this.obodoc.getHeaderFrame();
 			Clause c = new Clause();
-			c.setTag("subsetdef");
+			c.setTag(OboFormatTag.TAG_SUBSETDEF.getTag());
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
 			String indvId = getIdentifier(indv);

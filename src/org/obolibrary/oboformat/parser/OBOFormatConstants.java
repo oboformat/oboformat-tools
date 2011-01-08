@@ -1,12 +1,14 @@
 package org.obolibrary.oboformat.parser;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 public class OBOFormatConstants {
 
 	public enum OboFormatTag{
 	
+		TAG_FORMAT_VERSION("format-version"),
 		TAG_ONTOLOGY( "ontology"),
 		TAG_DATA_VERSION( "data-version"),
 		TAG_DATE( "date"),
@@ -61,7 +63,8 @@ public class OBOFormatConstants {
 		TAG_EXPAND_EXPRESSION_TO( "expand_expression_to"),
 		TAG_IS_CLASS_LEVEL_TAG( "is_class_level_tag"),
 		TAG_IS_METADATA_TAG("is_metadata_tag"),
-		TAG_CONSIDER("consider");
+		TAG_CONSIDER("consider"),
+		TAG_INVERSE_OF("inverse_of");
 		
 		private String tag;
 		
@@ -78,15 +81,23 @@ public class OBOFormatConstants {
 		}
 	}
 	
-	public final static Set<String> TAGS = buildTagsSet();
+	public final static Set<String> TAGS;
 	
-	private static Set<String> buildTagsSet(){
-		Set<String> tags = new HashSet<String>();
+	private static Hashtable<String, OboFormatTag> tagsTable;
+	
+	
+	static{
+		 tagsTable = new Hashtable<String, OBOFormatConstants.OboFormatTag>();
 		
 		 for(OboFormatTag tag: OboFormatTag.values()){
-			 tags.add(tag.getTag());
+			 tagsTable.put(tag.getTag(), tag);
 		 }
-		return tags;
+		 
+		 TAGS = tagsTable.keySet();
+	}
+	
+	public static OboFormatTag getTag(String tag){
+		return tagsTable.get(tag);
 	}
 	
 }

@@ -21,12 +21,12 @@ public class Owl2OboTest extends TestCase {
 	public static void testConversion() throws Exception{
 		Obo2Owl obo2owl = new Obo2Owl();
 		
-		OWLOntology ontology = obo2owl.convert("test_resources/fly_anatomy.obo");
+		OWLOntology ontology = obo2owl.convert("test_resources/temp.obo");
 		
 		Owl2Obo bridge = new Owl2Obo();
 		
 		OBODoc doc = bridge.convert(ontology);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test_resources/fly_anatomy_converted.obo")));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test_resources/temp_converted.obo")));
 		
 		OBOFormatWriter oboWriter = new OBOFormatWriter();
 		

@@ -134,12 +134,17 @@ public class Obo2Owl {
 		map.put("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
 		map.put("name",OWLRDFVocabulary.RDFS_LABEL.getIRI());
 		map.put("comment",OWLRDFVocabulary.RDFS_COMMENT.getIRI());
-		map.put("expand_expression_to",Obo2OWLVocabulary.IRI_IAO_0000424.getIRI());
+		
+		for(Obo2OWLVocabulary vac: Obo2OWLVocabulary.values()){
+			map.put(vac.getMappedTag(), vac.getIRI());
+		}
+		
+	/*	map.put("expand_expression_to",Obo2OWLVocabulary.IRI_IAO_0000424.getIRI());
 		map.put("expand_assertion_to",Obo2OWLVocabulary.IRI_IAO_0000425.getIRI());
 		map.put("def",Obo2OWLVocabulary.IRI_IAO_0000115.getIRI());
 		map.put("synonym",Obo2OWLVocabulary.IRI_IAO_0000118.getIRI());
 		map.put("is_anti_symmetric",Obo2OWLVocabulary.IRI_IAO_0000427.getIRI());
-		map.put("replaced_by", Obo2OWLVocabulary.IRI_IAO_0100001.getIRI());
+		map.put("replaced_by", Obo2OWLVocabulary.IRI_IAO_0100001.getIRI());*/
 		
 		return map;
 	}

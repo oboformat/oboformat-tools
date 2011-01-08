@@ -18,6 +18,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.model.Frame.FrameType;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 /**
  * implements the OBO Format 1.4 specification
@@ -25,9 +26,9 @@ import org.obolibrary.oboformat.model.Frame.FrameType;
  */
 public class OBOFormatParser {
 	
-	final String DATA_VERSION = "data-version";
-	final String ID = "id";
-	final String NAME = "name";
+	//final String DATA_VERSION = "data-version";
+	//final String ID = "id";
+	//final String NAME = "name";
 	
 	SimpleDateFormat headerDateFormat = new SimpleDateFormat("dd:MM:yyyy HH:mm");
 	SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
@@ -36,7 +37,7 @@ public class OBOFormatParser {
 		HEADER, BODY
 	}
 	
-	protected enum Tag {
+	/*protected enum Tag {
 		ID,
 		DATA_VERSION,
 		NAMESPACE,
@@ -48,7 +49,7 @@ public class OBOFormatParser {
 	protected void initTagMap() {
 		tagMap.put("id",Tag.ID);
 		
-	}
+	}*/
 	
 	protected class MyStream {
 		int pos=0;
@@ -295,21 +296,24 @@ public class OBOFormatParser {
 	
 	protected boolean parseHeaderClause(Frame h) {
 		Clause cl = new Clause();
-		String tag = getParseTag();
-		if (tag == null)
+		String t = getParseTag();
+		if (t == null)
 			return false;
-		cl.setTag(tag);
+		cl.setTag(t);
+		
+		OboFormatTag tag = OBOFormatConstants.getTag(t);
+		
 		h.addClause(cl);
-		if (tag.equals( "data-version")) {
+		if (tag == OboFormatTag.TAG_DATA_VERSION) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("format-version")) {
+		if (tag == OboFormatTag.TAG_FORMAT_VERSION) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("synonymtypedef")) {
+		if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF) {
 			return parseSynonymTypedef(cl);
 		}
-		if (tag.equals("subsetdef")) {
+		if (tag == OboFormatTag.TAG_SUBSETDEF) {
 			return parseSubsetdef(cl);
 		}
 
@@ -375,29 +379,35 @@ public class OBOFormatParser {
 	}
 	
 	public boolean parseTermFrameClause(Clause cl) {
-		String tag = getParseTag();
-		if (tag == null)
+		
+		String t = getParseTag();
+		if (t == null)
 			return false;
-		cl.setTag(tag);
-		if (tag.equals("is_anonymous")) {
+		
+		OboFormatTag tag = OBOFormatConstants.getTag(t);
+		
+		cl.setTag(t);
+		if (tag == OboFormatTag.TAG_IS_ANONYMOUS) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("name")) {
+		
+		
+		if (tag == OboFormatTag.TAG_NAME) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("namespace")) {
+		if (tag == OboFormatTag.TAG_NAMESPACE) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("alt_id")) {
+		if (tag == OboFormatTag.TAG_ALT_ID) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("def")) {
+		if (tag == OboFormatTag.TAG_DEF) {
 			return parseDef(cl);
 		}
-		if (tag.equals("comment")) {
+		if (tag == OboFormatTag.TAG_COMMENT) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("subset")) {
+		if (tag == OboFormatTag.TAG_SUBSET) {
 			// in the obof1.4 spec, subsets may not contain spaces.
 			// unfortunately OE does not prohibit this, so subsets with spaces
 			// frequently escape. We should either allow spaces in the spec
@@ -411,52 +421,52 @@ public class OBOFormatParser {
 			//return parseIdRef(cl);
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("synonym")) {
+		if (tag == OboFormatTag.TAG_SYNONYM) {
 			return parseSynonym(cl);
 		}
-		if (parseDeprecatedSynonym(tag,cl)) {
+		if (parseDeprecatedSynonym(t,cl)) {
 			return true;
 		}
-		if (tag.equals("xref")) {
+		if (tag == OboFormatTag.TAG_XREF) {
 			return parseDirectXref(cl);
 		}
-		if (tag.equals("builtin")) {
+		if (tag == OboFormatTag.TAG_BUILTIN) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("property_value")) {
+		if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
 			return parsePropertyValue(cl);
 		}
-		if (tag.equals("is_a")) {
+		if (tag == OboFormatTag.TAG_IS_A) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("intersection_of")) {
+		if (tag == OboFormatTag.TAG_INTERSECTION_OF) {
 			return parseTermIntersectionOf(cl);
 		}
-		if (tag.equals("union_of")) {
+		if (tag == OboFormatTag.TAG_UNION_OF) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("equivalent_to")) {
+		if (tag== OboFormatTag.TAG_EQUIVALENT_TO) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("disjoint_from")) {
+		if (tag == OboFormatTag.TAG_DISJOINT_FROM) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("relationship")) {
+		if (tag == OboFormatTag.TAG_RELATIONSHIP) {
 			return parseRelationship(cl);
 		}
-		if (tag.equals("created_by")) {
+		if (tag == OboFormatTag.TAG_CREATED_BY) {
 			return parsePerson(cl);
 		}
-		if (tag.equals("creation_date")) {
+		if (tag == OboFormatTag.TAG_CREATION_DATE) {
 			return parseISODate(cl);
 		}
-		if (tag.equals("is_obsolete")) {
+		if (tag == OboFormatTag.TAG_IS_OBSELETE) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("replaced_by")) {
+		if (tag == OboFormatTag.TAG_REPLACED_BY) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("consider")) {
+		if (tag == OboFormatTag.TAG_CONSIDER) {
 			return parseIdRef(cl);
 		}
 
@@ -511,137 +521,140 @@ public class OBOFormatParser {
 	}
 	
 	public boolean parseTypedefFrameClause(Clause cl) {
-		String tag = getParseTag();
-		if (tag == null)
+		String t= getParseTag();
+		if (t == null)
 			return false;
 		
-		if (tag.equals("is_metadata")) {
+		if (t.equals("is_metadata")) {
 			System.err.println("is_metadata DEPRECATED; switching to is_metadata_tag");
-			tag = "is_metadata_tag";
+			t = OboFormatTag.TAG_IS_METADATA_TAG.getTag();
 		}
 		
-		cl.setTag(tag);
-		if (tag.equals("is_anonymous")) {
+		OboFormatTag tag = OBOFormatConstants.getTag(t);
+
+		cl.setTag(t);
+		
+		if (tag == OboFormatTag.TAG_IS_ANONYMOUS) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("name")) {
+		if (tag == OboFormatTag.TAG_NAME) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("namespace")) {
+		if (tag == OboFormatTag.TAG_NAMESPACE) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("alt_id")) {
+		if (tag == OboFormatTag.TAG_ALT_ID) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("def")) {
+		if (tag == OboFormatTag.TAG_DEF) {
 			return parseDef(cl);
 		}
-		if (tag.equals("comment")) {
+		if (tag == OboFormatTag.TAG_COMMENT) {
 			return parseUnquotedString(cl);
 		}
-		if (tag.equals("subset")) {
+		if (tag == OboFormatTag.TAG_SUBSET) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("synonym")) {
+		if (tag== OboFormatTag.TAG_SYNONYM) {
 			return parseSynonym(cl);
 		}
-		if (parseDeprecatedSynonym(tag,cl)) {
+		if (parseDeprecatedSynonym(t,cl)) {
 			return true;
 		}
-		if (tag.equals("xref")) {
+		if (tag == OboFormatTag.TAG_XREF) {
 			return parseDirectXref(cl);
 		}
-		if (tag.equals("property_value")) {
+		if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
 			return parsePropertyValue(cl);
 		}
-		if (tag.equals("domain")) {
+		if (tag == OboFormatTag.TAG_DOMAIN) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("range")) {
+		if (tag == OboFormatTag.TAG_RANGE) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("builtin")) {
+		if (tag == OboFormatTag.TAG_BUILTIN) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_anti_symmetric")) {
+		if (tag == OboFormatTag.TAG_IS_ANTI_SYMMETRIC) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_cyclic")) {
+		if (tag == OboFormatTag.TAG_IS_CYCLIC) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_reflexive")) {
+		if (tag == OboFormatTag.TAG_IS_REFLEXIVE) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_symmetric")) {
+		if (tag == OboFormatTag.TAG_IS_SYMMETRIC) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_transitive")) {
+		if (tag == OboFormatTag.TAG_IS_TRANSITIVE) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_functional")) {
+		if (tag == OboFormatTag.TAG_IS_FUNCTIONAL) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_inverse_functional")) {
+		if (tag == OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_a")) {
+		if (tag == OboFormatTag.TAG_IS_A) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("intersection_of")) {
+		if (tag == OboFormatTag.TAG_INTERSECTION_OF) {
 			return parseTypedefIntersectionOf(cl);
 		}
-		if (tag.equals("union_of")) {
+		if (tag == OboFormatTag.TAG_UNION_OF) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("equivalent_to")) {
+		if (tag == OboFormatTag.TAG_EQUIVALENT_TO) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("disjoint_from")) {
+		if (tag == OboFormatTag.TAG_DISJOINT_FROM) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("inverse_of")) {
+		if (tag == OboFormatTag.TAG_INVERSE_OF) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("transitive_over")) {
+		if (tag == OboFormatTag.TAG_TRANSITIVE_OVER) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("holds_over_chain")) {
+		if (tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN) {
 			return parseIdRefPair(cl);
 		}
-		if (tag.equals("equivalent_to_chain")) {
+		if (tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN) {
 			return parseIdRefPair(cl);
 		}
-		if (tag.equals("disjoint_over")) {
+		if (tag == OboFormatTag.TAG_DISJOINT_OVER) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("relationship")) {
+		if (tag == OboFormatTag.TAG_RELATIONSHIP) {
 			return parseRelationship(cl);
 		}
-		if (tag.equals("created_by")) {
+		if (tag == OboFormatTag.TAG_CREATED_BY) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("creation_date")) {
+		if (tag == OboFormatTag.TAG_CREATION_DATE) {
 			return parseISODate(cl);
 		}
-		if (tag.equals("is_obsolete")) {
+		if (tag == OboFormatTag.TAG_IS_OBSELETE) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("replaced_by")) {
+		if (tag == OboFormatTag.TAG_REPLACED_BY) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("consider")) {
+		if (tag == OboFormatTag.TAG_CONSIDER) {
 			return parseIdRef(cl);
 		}
-		if (tag.equals("is_metadata_tag")) {
+		if (tag == OboFormatTag.TAG_IS_METADATA_TAG) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("is_class_level")) {
+		if (tag == OboFormatTag.TAG_IS_CLASS_LEVEL_TAG) {
 			return parseBoolean(cl);
 		}
-		if (tag.equals("expand_assertion_to")) {
+		if (tag == OboFormatTag.TAG_EXPAND_ASSERTION_TO) {
 			return parseOwlDef(cl);
 		}
-		if (tag.equals("expand_expression_to")) {
+		if (tag == OboFormatTag.TAG_EXPAND_EXPRESSION_TO) {
 			return parseOwlDef(cl);
 		}
 
@@ -804,7 +817,7 @@ public class OBOFormatParser {
 		else {
 			return false;
 		}
-		cl.setTag("synonym");
+		cl.setTag(OboFormatTag.TAG_SYNONYM.getTag());
 		if (s.consume("\"")) {
 			String syn = getParseUntilAdv("\"");
 			cl.setValue(syn);
@@ -1004,12 +1017,17 @@ public class OBOFormatParser {
 	}
 
 	protected boolean parseIdLine(Frame f) {
-		String tag = getParseTag();
-		if (!tag.equals(ID)) {
+		String t = getParseTag();
+		
+		
+		OboFormatTag tag = OBOFormatConstants.getTag(t);
+		
+		
+		if (tag != OboFormatTag.TAG_ID) {
 			return false;
 		}
 		Clause cl = new Clause();
-		cl.setTag("id");
+		cl.setTag(t);
 		f.addClause(cl);
 		String id = getParseUntil(" !{");
 		if (id == null)
@@ -1163,16 +1181,16 @@ public class OBOFormatParser {
 	
 	private String mapDeprecatedTag(String tag) {
 		if (tag.equals("inverse_of_on_instance_level")) {
-			return "inverse_of";
+			return OboFormatTag.TAG_INVERSE_OF.getTag();
 		}
 		if (tag.equals("xref_analog")) {
-			return "xref";
+			return OboFormatTag.TAG_XREF.getTag();
 		}
 		if (tag.equals("xref_unknown")) {
-			return "xref";
+			return OboFormatTag.TAG_XREF.getTag();
 		}
 		if (tag.equals("instance_level_is_transitive")) {
-			return "is_transitive";
+			return OboFormatTag.TAG_IS_TRANSITIVE.getTag();
 		}
 		return tag;
 	}
