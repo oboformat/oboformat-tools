@@ -734,7 +734,7 @@ public class Obo2Owl {
 		Frame relFrame = obodoc.getTypedefFrame(relId);
 		OWLObjectPropertyExpression pe = trObjectProp(relId);
 		OWLClassExpression ce = trClass(classId);
-		Integer exact = getQVInt("exactCardinality", quals);
+		Integer exact = getQVInt("cardinality", quals);
 		Integer min = getQVInt("minCardinality", quals);
 		Integer max = getQVInt("maxCardinality", quals);
 		Boolean allSome = getQVBoolean("all_some", quals);
