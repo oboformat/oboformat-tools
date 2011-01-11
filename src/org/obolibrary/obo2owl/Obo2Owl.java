@@ -15,6 +15,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.oboformat.model.*;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
@@ -131,9 +133,9 @@ public class Obo2Owl {
 	private static HashMap<String, IRI> initAnnotationPropertyMap() {
 		
 		HashMap<String, IRI> map = new HashMap<String, IRI>();
-		map.put("is_obsolete",OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
-		map.put("name",OWLRDFVocabulary.RDFS_LABEL.getIRI());
-		map.put("comment",OWLRDFVocabulary.RDFS_COMMENT.getIRI());
+		map.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),OWLRDFVocabulary.OWL_DEPRECATED.getIRI());
+		map.put(OboFormatTag.TAG_NAME.getTag(),OWLRDFVocabulary.RDFS_LABEL.getIRI());
+		map.put(OboFormatTag.TAG_COMMENT.getTag(),OWLRDFVocabulary.RDFS_COMMENT.getIRI());
 		
 		for(Obo2OWLVocabulary vac: Obo2OWLVocabulary.values()){
 			map.put(vac.getMappedTag(), vac.getIRI());
@@ -195,7 +197,7 @@ public class Obo2Owl {
 
 	private OWLOntology tr() throws OWLOntologyCreationException {
 		Frame hf = obodoc.getHeaderFrame();
-		Clause ontClause = hf.getClause("ontology");
+		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY.getTag());
 		if (ontClause != null) {
 			String ontOboId = (String) ontClause.getValue();
 			defaultIDSpace = ontOboId;
@@ -229,52 +231,53 @@ public class Obo2Owl {
 
 	public void trHeaderFrame(Frame headerFrame) {
 		IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
-		for (String tag : headerFrame.getTags()) {
+		for (String t: headerFrame.getTags()) {
 			
+			OboFormatTag tag = OBOFormatConstants.getTag(t);
 			
-			if (tag.equals("ontology")) {
+			if (tag == OboFormatTag.TAG_ONTOLOGY) {
 
 				// already processed
 			}
-			else if (tag.equals("import")) {
+			else if (tag == OboFormatTag.TAG_IMPORT) {
 				// TODO
 				//fac.getOWLImportsDeclaration(importedOntologyIRI);
 			//	manager.applyChange(new AddImport(baseOnt, manager.getOWLDataFactory()
 				//		.getOWLImportsDeclaration(importedIRI)));
-			}else if (tag.equals("subsetdef")){
+			}else if (tag == OboFormatTag.TAG_SUBSETDEF){
 		
-				OWLClass cls = clsToDeclar.get("subsetdef");
+				OWLClass cls = clsToDeclar.get(t);
 				if(cls == null){
-					cls = trClass(trTagToIRI("subsetdef").toString());
+					cls = trClass(trTagToIRI(t).toString());
 					add(fac.getOWLDeclarationAxiom(cls));
-					clsToDeclar.put("subsetdef", cls);
+					clsToDeclar.put(t, cls);
 				}
 				
-				for(Clause clause: headerFrame.getClauses(tag)){
+				for(Clause clause: headerFrame.getClauses(t)){
 				
 					OWLIndividual indv= trIndividual(  clause.getValue().toString() );
 					add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
-					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
+					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
 					
 					add (fac.getOWLAnnotationAssertionAxiom(ap, ((OWLNamedIndividual)indv).getIRI(), trLiteral(clause.getValue2())));
 				}
-			}else if (tag.equals("synonymtypedef")){
-				OWLClass cls = clsToDeclar.get("synonymtypedef");
+			}else if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF){
+				OWLClass cls = clsToDeclar.get(t);
 				if(cls == null){
-					cls = trClass(trTagToIRI("synonymtypedef").toString());
+					cls = trClass(trTagToIRI(t).toString());
 					add(fac.getOWLDeclarationAxiom(cls));
-					clsToDeclar.put("synonymtypedef", cls);
+					clsToDeclar.put(t, cls);
 				}
 			//	Clause clause = headerFrame.getClause(tag);
 				
-				for(Clause clause: headerFrame.getClauses(tag)){
+				for(Clause clause: headerFrame.getClauses(t)){
 					Object values[] = clause.getValues().toArray();
 					
 					OWLNamedIndividual indv= (OWLNamedIndividual) trIndividual( values[0].toString()  );
 					add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
-					OWLAnnotationProperty ap = trTagToAnnotationProp("name");
+					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
 					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[1] )));
 	
 					if(values.length>2){
@@ -283,11 +286,11 @@ public class Obo2Owl {
 					}
 				}
 			
-			}else if (tag.equals("data-version")) {
+			}else if (tag == OboFormatTag.TAG_DATA_VERSION) {
 				//fac.getOWLVersionInfo();
-				Clause clause = headerFrame.getClause(tag);
+				Clause clause = headerFrame.getClause(t);
 				
-				OWLAnnotationProperty ap = trAnnotationProp("remark");
+				OWLAnnotationProperty ap = trAnnotationProp(OboFormatTag.TAG_REMARK.getTag());
 				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(clause.getValue()));
 				
 				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontIRI, ann);
@@ -296,9 +299,9 @@ public class Obo2Owl {
 				
 				// TODO
 			}else{
-				Collection<Clause> clauses = headerFrame.getClauses(tag);
+				Collection<Clause> clauses = headerFrame.getClauses(t);
 				for(Clause clause: clauses){
-					add(trGenericClause(ontIRI, tag, clause));
+					add(trGenericClause(ontIRI, t, clause));
 				}
 			}
 		}		
@@ -307,18 +310,21 @@ public class Obo2Owl {
 	public OWLClassExpression trTermFrame(Frame termFrame) {
 		OWLClass cls = trClass(termFrame.getId());
 		add(fac.getOWLDeclarationAxiom(cls));
-		for (String tag : termFrame.getTags()) {
+		for (String t : termFrame.getTags()) {
 			//System.out.println("tag:"+tag);
-			Collection<Clause> clauses = termFrame.getClauses(tag);
-			if (tag.equals("intersection_of")) {
+			Collection<Clause> clauses = termFrame.getClauses(t);
+			
+			OboFormatTag tag = OBOFormatConstants.getTag(t);
+			
+			if (tag == OboFormatTag.TAG_INTERSECTION_OF) {
 				add(trIntersectionOf(cls,clauses));
 			}
-			else if (tag.equals("union_of")) {
+			else if (tag == OboFormatTag.TAG_UNION_OF) {
 				add(trUnionOf(cls,clauses));
 			}
 			else {
 				for (Clause clause : clauses) {
-					add(trTermClause(cls,tag,clause));
+					add(trTermClause(cls,t,clause));
 				}
 			}
 		}
@@ -327,8 +333,8 @@ public class Obo2Owl {
 
 	public OWLNamedObject trTypedefFrame(Frame typedefFrame) {
 		// TODO - annotation props
-		if (typedefFrame.getTagValue("is_metadata_tag") != null &&
-				(Boolean)typedefFrame.getTagValue("is_metadata_tag")) {
+		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag()) != null &&
+				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
 
 			OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
 			add(fac.getOWLDeclarationAxiom(p));
@@ -346,10 +352,13 @@ public class Obo2Owl {
 
 			for (String tag : typedefFrame.getTags()) {
 				Collection<Clause> clauses = typedefFrame.getClauses(tag);
-				if (tag.equals("intersection_of")) {
+				
+				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+				
+				if (_tag == OboFormatTag.TAG_INTERSECTION_OF) {
 					add(trRelationIntersectionOf(p,clauses));
 				}
-				else if (tag.equals("union_of")) {
+				else if (_tag == OboFormatTag.TAG_UNION_OF) {
 					add(trRelationUnionOf(p,clauses));
 				}
 				else {
@@ -392,7 +401,8 @@ public class Obo2Owl {
 				iSet.add(trClass(clause.getValue()));
 			}
 			else {
-				System.err.println("union_of n-ary slots not is standard - converting anyway");
+				LOG.error("union_of n-ary slots not is standard - converting anyway");
+				//System.err.println("union_of n-ary slots not is standard - converting anyway");
 				iSet.add(trRel((String)clause.getValue(),
 						(String)clause.getValue2(),
 						qvs));
@@ -459,12 +469,13 @@ public class Obo2Owl {
 		OWLAxiom ax;
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
-		if (tag.equals("is_a")) {
+		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+		if (_tag == OboFormatTag.TAG_IS_A) {
 			ax = fac.getOWLSubClassOfAxiom(cls, 
 					trClass((String)clause.getValue()), 
 					annotations);
 		}
-		else if (tag.equals("relationship")) {
+		else if (_tag == OboFormatTag.TAG_RELATIONSHIP) {
 			// TODO
 			ax = fac.getOWLSubClassOfAxiom(cls, 
 					this.trRel((String)clause.getValue(),
@@ -472,7 +483,7 @@ public class Obo2Owl {
 							qvs),
 							annotations);
 		}
-		else if (tag.equals("disjoint_from")) {
+		else if (_tag == OboFormatTag.TAG_DISJOINT_FROM) {
 
 			Set<OWLClassExpression> cSet;
 			cSet = new HashSet<OWLClassExpression>();
@@ -482,7 +493,7 @@ public class Obo2Owl {
 					cSet, 
 					annotations);
 		}
-		else if (tag.equals("equivalent_to")) {
+		else if (_tag == OboFormatTag.TAG_EQUIVALENT_TO) {
 
 			Set<OWLClassExpression> cSet;
 			cSet = new HashSet<OWLClassExpression>();
@@ -505,13 +516,14 @@ public class Obo2Owl {
 		Object v = clause.getValue();
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
-		if (tag.equals("is_a")) {
+		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+		if (_tag == OboFormatTag.TAG_IS_A) {
 			ax = fac.getOWLSubObjectPropertyOfAxiom(
 					p,
 					trObjectProp((String)v), 
 					annotations);
 		}
-		else if (tag.equals("relationship")) {
+		else if (_tag == OboFormatTag.TAG_RELATIONSHIP) {
 			/*
 			OWLAnnotationProperty metaProp = (OWLAnnotationProperty) p;
 			OWLAnnotationSubject sub = (OWLAnnotationSubject) p;
@@ -522,7 +534,7 @@ public class Obo2Owl {
 			 */
 			ax = null; // TODO
 		}
-		else if (tag.equals("disjoint_from")) {
+		else if (_tag == OboFormatTag.TAG_DISJOINT_FROM) {
 
 			Set<OWLObjectPropertyExpression> cSet;
 			cSet = new HashSet<OWLObjectPropertyExpression>();
@@ -532,7 +544,7 @@ public class Obo2Owl {
 					cSet, 
 					annotations);
 		}
-		else if (tag.equals("inverse_of")) {
+		else if (_tag == OboFormatTag.TAG_INVERSE_OF) {
 
 			Set<OWLObjectPropertyExpression> cSet;
 			cSet = new HashSet<OWLObjectPropertyExpression>();
@@ -540,7 +552,7 @@ public class Obo2Owl {
 			cSet.add( trObjectProp((String)v));
 			ax = fac.getOWLInverseObjectPropertiesAxiom(p, trObjectProp((String)v), annotations);
 		}
-		else if (tag.equals("equivalent_to")) {
+		else if (_tag == OboFormatTag.TAG_EQUIVALENT_TO) {
 
 			Set<OWLObjectPropertyExpression> cSet;
 			cSet = new HashSet<OWLObjectPropertyExpression>();
@@ -550,17 +562,17 @@ public class Obo2Owl {
 					cSet, 
 					annotations);
 		}
-		else if (tag.equals("domain")) {
+		else if (_tag == OboFormatTag.TAG_DOMAIN) {
 			ax = fac.getOWLObjectPropertyDomainAxiom(p,
 					trClass(v), 
 					annotations);
 		}
-		else if (tag.equals("range")) {
+		else if (_tag == OboFormatTag.TAG_RANGE) {
 			ax = fac.getOWLObjectPropertyRangeAxiom(p,
 					trClass(v), 
 					annotations);
 		}
-		else if (tag.equals("holds_over_chain") || tag.equals("equivalent_to_chain")) {
+		else if (_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN || _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN) {
 			List<OWLObjectPropertyExpression> chain =
 				new Vector<OWLObjectPropertyExpression>();
 			chain.add(trObjectProp(v));
@@ -569,22 +581,22 @@ public class Obo2Owl {
 			//System.out.println("chain:"+ax);
 			// TODO - annotations for equivalent to
 		}
-		else if (tag.equals("is_transitive") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_TRANSITIVE && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLTransitiveObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_reflexive") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_REFLEXIVE && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLReflexiveObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_symmetric") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_SYMMETRIC && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLSymmetricObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_asymmetric") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_ASYMMETRIC  && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLAsymmetricObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_functional") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_FUNCTIONAL && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLFunctionalObjectPropertyAxiom(p, annotations);
 		}
-		else if (tag.equals("is_inverse_functional") && "true".equals(clause.getValue().toString())) {
+		else if (_tag == OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLInverseFunctionalObjectPropertyAxiom(p, annotations);
 		}
 		else {
@@ -648,14 +660,15 @@ public class Obo2Owl {
 		}
 
 		OWLAxiom ax = null;
-		if (tag.equals("name")) {
+		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+		if (_tag == OboFormatTag.TAG_NAME) {
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
-		else if (tag.equals("def")) {
+		else if (_tag == OboFormatTag.TAG_DEF) {
 			// TODO
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
@@ -663,7 +676,7 @@ public class Obo2Owl {
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
-		else if (tag.equals("synonym")) {
+		else if (_tag == OboFormatTag.TAG_SYNONYM) {
 
 			Object[] values= clause.getValues().toArray();
 			
@@ -705,7 +718,7 @@ public class Obo2Owl {
 		Collection<Xref> xrefs = clause.getXrefs();
 		if (xrefs != null) {
 			for (Xref x : xrefs) {
-				OWLAnnotationProperty ap = trTagToAnnotationProp("xref");
+				OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_XREF.getTag());
 				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(x));
 				anns.add(ann);
 			}
@@ -819,7 +832,7 @@ public class Obo2Owl {
 	private String mapPropId(String id) {
 		Frame f = obodoc.getTypedefFrame(id);
 		if (f != null) {
-			Collection<Object> xrefs = f.getTagValues("xref");
+			Collection<Object> xrefs = f.getTagValues(OboFormatTag.TAG_XREF.getTag());
 			for (Object x : xrefs) {
 				String xid = ((Xref)x).getIdref();
 				if (obodoc.isTreatXrefsAsEquivalent(getIdPrefix(xid))) {
@@ -912,7 +925,7 @@ public class Obo2Owl {
 		// special case rule for relation xrefs:
 		Frame tdf = obodoc.getTypedefFrame(id);
 		if (tdf != null) {
-			Object xref = tdf.getTagValue("xref");
+			Object xref = tdf.getTagValue(OboFormatTag.TAG_XREF.getTag());
 			if (xref != null) {
 				String xid = ((Xref)xref).getIdref();
 

@@ -126,6 +126,10 @@ public class Frame {
 	}
 
 	public void merge(Frame extFrame) throws FrameMergeException {
+		
+		if(this == extFrame)
+			return;
+		
 		if (!extFrame.getId().equals(getId())) {
 			throw new FrameMergeException("ids do not match");
 		}

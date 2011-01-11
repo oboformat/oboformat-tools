@@ -588,6 +588,9 @@ public class OBOFormatParser {
 		if (tag == OboFormatTag.TAG_IS_SYMMETRIC) {
 			return parseBoolean(cl);
 		}
+		if (tag == OboFormatTag.TAG_IS_ASYMMETRIC) {
+			return parseBoolean(cl);
+		}
 		if (tag == OboFormatTag.TAG_IS_TRANSITIVE) {
 			return parseBoolean(cl);
 		}

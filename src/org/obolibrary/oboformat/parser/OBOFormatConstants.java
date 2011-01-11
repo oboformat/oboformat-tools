@@ -64,7 +64,8 @@ public class OBOFormatConstants {
 		TAG_IS_CLASS_LEVEL_TAG( "is_class_level_tag"),
 		TAG_IS_METADATA_TAG("is_metadata_tag"),
 		TAG_CONSIDER("consider"),
-		TAG_INVERSE_OF("inverse_of");
+		TAG_INVERSE_OF("inverse_of"),
+		TAG_IS_ASYMMETRIC("is_asymmetric");
 		
 		private String tag;
 		

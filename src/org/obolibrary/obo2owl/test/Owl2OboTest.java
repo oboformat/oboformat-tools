@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Frame;
@@ -19,6 +21,8 @@ import junit.framework.TestCase;
 public class Owl2OboTest extends TestCase {
 
 	public static void testConversion() throws Exception{
+
+		Logger.getRootLogger().setLevel(Level.ERROR);
 		Obo2Owl obo2owl = new Obo2Owl();
 		
 		OWLOntology ontology = obo2owl.convert("test_resources/temp.obo");
