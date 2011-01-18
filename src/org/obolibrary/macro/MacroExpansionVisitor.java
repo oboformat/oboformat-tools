@@ -1,9 +1,11 @@
 package org.obolibrary.macro;
 
+import org.coode.owlapi.functionalparser.OWLFunctionalSyntaxOWLParser;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.semanticweb.owlapi.expression.OWLEntityChecker;
 import org.semanticweb.owlapi.expression.ParserException;
 import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
+import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.BidirectionalShortFormProvider;
 
@@ -53,6 +55,7 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 	}
 
 	public OWLClassExpression parseManchesterExpression(String expression) throws ParserException {
+		
 		ManchesterOWLSyntaxEditorParser parser = 
 			new ManchesterOWLSyntaxEditorParser(dataFactory, expression);
 		parser.setDefaultOntology(ontology);
@@ -60,9 +63,14 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		//	new DefaultEntityChecker();
 
 		//parser.setOWLEntityChecker(entityChecker);
+		
 		System.out.println("parsing:"+expression);
-		OWLClassExpression ce = parser.parseClassExpression();
-		return ce;
+		
+		parser.parseClassAtom();
+	//	OWLClassExpression ce = parser.parseClassExpression();
+	//	return ce;
+		return null;
+		
 	}
 
 	public void expandAll() {
@@ -133,6 +141,11 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 					System.out.println("TEMPLATEVAL: "+templateVal.toString());
 
 					String tStr = expandExpressionMap.get(iri);
+					//tStr = "SubClassOf(CL:0000034 SomeValuesFrom(bearer_of,AllValuesFrom(realized_by,GO:0017145)))";
+					
+					
+					tStr = "<http://purl.obolibrary.org/obo/CARO_0000069> ";
+
 					System.out.println("t: "+tStr);
 					String exStr = tStr.replaceAll("\\?Y", templateVal.toString());
 					try {
@@ -268,14 +281,14 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 	}
 
 
-	public OWLDataRange visit(OWLTypedLiteral node) {
+	/*public OWLDataRange visit(OWLTypedLiteral node) {
 		return null;
 	}
 
 
 	public OWLDataRange visit(OWLStringLiteral node) {
 		return null;
-	}
+	}*/
 
 
 	public OWLDataRange visit(OWLFacetRestriction node) {
@@ -493,6 +506,12 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 	public OWLAxiom visit(OWLDatatypeDefinitionAxiom axiom) {
 		return axiom;
+	}
+
+
+	public OWLDataRange visit(OWLLiteral node) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

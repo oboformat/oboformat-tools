@@ -388,7 +388,7 @@ public class Owl2Obo {
 				for(OWLAnnotation aan: aanAx.getAnnotations()){
 					String propId = owlObjectToTag(aan.getProperty());
 					
-					if(_tag == OboFormatTag.TAG_XREF){
+					if(OboFormatTag.TAG_XREF.getTag().equals(propId)){
 						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
 						Xref xref = new Xref(xrefValue);
 						clause.addXref(xref);
@@ -577,8 +577,6 @@ public class Owl2Obo {
 			String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
 			if (iri.startsWith(prefix)) {
 				tag = iri.substring(prefix.length());
-				//if(!OBOFormatConstants.TAGS.contains(tag))
-				//	tag = null;
 			}
 			
 			
