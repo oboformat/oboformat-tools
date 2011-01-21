@@ -71,6 +71,8 @@ public class Obo2Owl {
 	Set<OWLAnnotationProperty> apToDeclare;
 	private Map<String, OWLClass> clsToDeclar;
 	
+	private Map<String, OWLAnnotationProperty> typedefToAnnotationProperty;
+	
 	public Obo2Owl() {
 		init();
 	}
@@ -81,6 +83,7 @@ public class Obo2Owl {
 		fac = manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 		clsToDeclar = new Hashtable<String, OWLClass>();
+		typedefToAnnotationProperty = new Hashtable<String, OWLAnnotationProperty>();
 	}
 	
 
@@ -218,12 +221,12 @@ public class Obo2Owl {
 		}
 		trHeaderFrame(hf);
 
+		for (Frame f : obodoc.getTypedefFrames()) {
+			trTypedefFrame(f);
+		}
 
 		for (Frame f : obodoc.getTermFrames()) {
 			trTermFrame(f);
-		}
-		for (Frame f : obodoc.getTypedefFrames()) {
-			trTypedefFrame(f);
 		}
 		// TODO - individuals
 		return owlOntology;
@@ -337,6 +340,7 @@ public class Obo2Owl {
 				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
 
 			OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
+			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
 			add(fac.getOWLDeclarationAxiom(p));
 			for (String tag : typedefFrame.getTags()) {
 				for (Clause clause : typedefFrame.getClauses(tag)) {
@@ -477,11 +481,23 @@ public class Obo2Owl {
 		}
 		else if (_tag == OboFormatTag.TAG_RELATIONSHIP) {
 			// TODO
-			ax = fac.getOWLSubClassOfAxiom(cls, 
-					this.trRel((String)clause.getValue(),
-							(String)clause.getValue2(),
-							qvs),
-							annotations);
+			
+			IRI relId = oboIdToIRI((String)clause.getValue());
+			
+			OWLAnnotationProperty prop = typedefToAnnotationProperty.get(relId.toString());
+			
+			if(prop != null){
+				ax = fac.getOWLAnnotationAssertionAxiom(prop, 
+						cls.getIRI(),  
+						oboIdToIRI((String)clause.getValue2()), 
+						annotations);
+			}else{
+				ax = fac.getOWLSubClassOfAxiom(cls, 
+						this.trRel((String)clause.getValue(),
+								(String)clause.getValue2(),
+								qvs),
+								annotations);
+			}
 		}
 		else if (_tag == OboFormatTag.TAG_DISJOINT_FROM) {
 

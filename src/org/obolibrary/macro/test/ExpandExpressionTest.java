@@ -11,6 +11,7 @@ import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -44,16 +45,15 @@ public class ExpandExpressionTest extends TestCase {
 		OWLOntology ontology = bridge.convert(obodoc);
 		
 		MacroExpansionVisitor mev = 
-			new MacroExpansionVisitor(df,ontology);
-		mev.expandAll();
+			new MacroExpansionVisitor(df,ontology, manager);
+		OWLOntology outputOntology = mev.expandAll();
 		
-		/*
 		IRI outputStream = IRI.create("file:///tmp/"+fn+".owl");
 		System.out.println("saving to "+outputStream);
 		OWLOntologyFormat format = new OWLXMLOntologyFormat();
-		manager.saveOntology(ontology, format, outputStream);
-		*/
-		return ontology;
+		manager.saveOntology(outputOntology, format, outputStream);
+
+		return outputOntology;
 	}
 
 }

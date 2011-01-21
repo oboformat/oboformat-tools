@@ -1,14 +1,19 @@
 package org.obolibrary.macro;
 
-import org.coode.owlapi.functionalparser.OWLFunctionalSyntaxOWLParser;
+import org.apache.log4j.Logger;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
+import org.obolibrary.obo2owl.Owl2Obo;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.expression.OWLEntityChecker;
 import org.semanticweb.owlapi.expression.ParserException;
 import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
-import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.BidirectionalShortFormProvider;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,19 +26,44 @@ import java.util.Set;
  */
 public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLClassExpression>, OWLDataVisitorEx<OWLDataRange>, OWLAxiomVisitorEx<OWLAxiom> {
 
+	private static final Logger log = Logger.getLogger(MacroExpansionVisitor.class);
+	private static final boolean DEBUG = log.isDebugEnabled();
+	
+	
 	private boolean negated;
 
 	private OWLDataFactory dataFactory;
-	private OWLOntology ontology;
+	private OWLOntology inputOntology;
 
 	private Map<IRI,String> expandAssertionToMap;
 	private Map<IRI,String> expandExpressionMap;
 	private BidirectionalShortFormProvider bidiShortFormProvider;
+	
+	private OWLOntologyManager outputManager;
+	
+	private OWLOntology outputOntology;
 
-	public MacroExpansionVisitor(OWLDataFactory dataFactory, OWLOntology ontology) {
+	private OWLEntityChecker entityChecker;
+	
+	public MacroExpansionVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology, OWLOntologyManager manager) {
 		this.dataFactory = dataFactory;
-		this.ontology = ontology;
+		this.inputOntology = inputOntology;
 		seedMaps();
+		
+		entityChecker = new ShortFormEntityChecker(
+                new BidirectionalShortFormProviderAdapter(
+                        manager,
+                        Collections.singleton( inputOntology ),
+                        new SimpleShortFormProvider() ) );
+		
+		outputManager = OWLManager.createOWLOntologyManager();
+		
+		try{
+			outputOntology = outputManager.createOntology(inputOntology.getOntologyID());
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+
 	}
 
 
@@ -41,16 +71,41 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		expandExpressionMap = new HashMap<IRI,String>();
 		expandAssertionToMap = new HashMap<IRI,String>();
 		OWLAnnotationProperty expandExpressionAP =
-			dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.obolibrary.org/obo/IAO_0000424"));
-		for (OWLObjectProperty p : ontology.getObjectPropertiesInSignature()) {
-			for (OWLAnnotation a : p.getAnnotations(ontology, expandExpressionAP)) {
+		//	dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.obolibrary.org/obo/IAO_0000424"));
+			
+			dataFactory.getOWLAnnotationProperty(Obo2OWLVocabulary.IRI_IAO_0000424.getIRI());
+			
+		OWLAnnotationProperty expandAssertionAP =
+			//	dataFactory.getOWLAnnotationProperty(IRI.create("http://purl.obolibrary.org/obo/IAO_0000424"));
+				
+				dataFactory.getOWLAnnotationProperty(Obo2OWLVocabulary.IRI_IAO_0000425.getIRI());
+	
+		
+		for (OWLObjectProperty p : inputOntology.getObjectPropertiesInSignature()) {
+			for (OWLAnnotation a : p.getAnnotations(inputOntology, expandExpressionAP)) {
 				OWLAnnotationValue v = a.getValue();
 				if (v instanceof OWLLiteral) {
 					String str = ((OWLLiteral)v).getLiteral();
-					System.out.println("mapping "+p+" to "+str);
+					if(DEBUG)
+						log.debug("mapping "+p+" to "+str);
 					expandExpressionMap.put(p.getIRI(), str);
 				}
 			}
+		}
+		
+		for(OWLAnnotationProperty p: inputOntology.getAnnotationPropertiesInSignature()){
+			for (OWLAnnotation a : p.getAnnotations(inputOntology, expandAssertionAP)) {
+				OWLAnnotationValue v = a.getValue();
+				if (v instanceof OWLLiteral) {
+					String str = ((OWLLiteral)v).getLiteral();
+					
+					if(DEBUG)
+						log.debug("assertion mapping "+p+" to "+str);
+					
+					expandAssertionToMap.put(p.getIRI(), str);
+				}
+			}
+			
 		}
 	}
 
@@ -58,36 +113,78 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		
 		ManchesterOWLSyntaxEditorParser parser = 
 			new ManchesterOWLSyntaxEditorParser(dataFactory, expression);
-		parser.setDefaultOntology(ontology);
-				//OWLEntityChecker entityChecker = 
-		//	new DefaultEntityChecker();
-
-		//parser.setOWLEntityChecker(entityChecker);
+	
+        parser.setOWLEntityChecker(  entityChecker   ) ;
 		
-		System.out.println("parsing:"+expression);
+        if(DEBUG)
+        	log.debug("parsing:"+expression);
 		
-		parser.parseClassAtom();
-	//	OWLClassExpression ce = parser.parseClassExpression();
-	//	return ce;
-		return null;
+		OWLClassExpression ce = parser.parseClassExpression();
+		return ce;
+		
+	}
+	
+	private void output(OWLAxiom axiom){
+		if (axiom == null) {
+			log.error("no axiom");
+			return;
+		}
+		//System.out.println("adding:"+axiom);
+		AddAxiom addAx = new AddAxiom(outputOntology, axiom);
+		try {
+			outputManager.applyChange(addAx);
+		}
+		catch (Exception e) {			
+			log.error("COULD NOT TRANSLATE AXIOM", e);
+		}
 		
 	}
 
-	public void expandAll() {
-		for (OWLAxiom ax : ontology.getAxioms()) {
+	public OWLOntology expandAll() {
+		for (OWLAxiom ax : inputOntology.getAxioms()) {
+			
+			OWLAxiom exAx = ax;
 			if (ax instanceof OWLSubClassOfAxiom) {
-				this.visit((OWLSubClassOfAxiom)ax);
+				exAx = this.visit((OWLSubClassOfAxiom)ax);
 			}
 			else if (ax instanceof OWLEquivalentClassesAxiom) {
-				this.visit((OWLEquivalentClassesAxiom)ax);
+				exAx = this.visit((OWLEquivalentClassesAxiom)ax);
 			}
-			else {
-				
+			else if(ax instanceof OWLDeclarationAxiom) {
+				exAx = this.visit((OWLDeclarationAxiom) ax);
 			}
+			
+			output(exAx);
 		}
+		
+		return outputOntology;
 	}
 
 	public OWLClassExpression visit(OWLClass desc) {
+		
+		if(DEBUG)
+			log.debug("OWLClass visit: " + desc);
+		
+		for(OWLAnnotationAssertionAxiom ax: desc.getAnnotationAssertionAxioms(inputOntology)){
+			OWLAnnotationProperty prop = ax.getProperty();
+			
+			String expandTo = this.expandAssertionToMap.get(prop.getIRI());
+			
+			if(expandTo != null){
+				if(DEBUG)
+					log.debug("Template to Expand" + expandTo);
+				
+				expandTo = expandTo.replaceAll("\\?X", Owl2Obo.getIdentifier(desc.getIRI()).replace(":", "_"));
+				expandTo = expandTo.replaceAll("\\?Y", Owl2Obo.getIdentifier((IRI) ax.getValue() ).replace(":", "_"));
+
+				if(DEBUG)
+					log.debug("Expanding " + expandTo);
+				
+				//TODO: 
+			}
+			
+		}
+		
 		return desc;
 	}
 
@@ -135,19 +232,17 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 					
 				}
 				if (filler instanceof OWLNamedObject) {
-					 templateVal = ((OWLNamedObject)filler).getIRI();
+					 templateVal =  ((OWLNamedObject)filler).getIRI();
 				}
 				if (templateVal != null) {
 					System.out.println("TEMPLATEVAL: "+templateVal.toString());
 
 					String tStr = expandExpressionMap.get(iri);
-					//tStr = "SubClassOf(CL:0000034 SomeValuesFrom(bearer_of,AllValuesFrom(realized_by,GO:0017145)))";
 					
-					
-					tStr = "<http://purl.obolibrary.org/obo/CARO_0000069> ";
-
 					System.out.println("t: "+tStr);
-					String exStr = tStr.replaceAll("\\?Y", templateVal.toString());
+					String exStr = tStr.replaceAll("\\?Y", Owl2Obo.getIdentifier( templateVal).replaceAll(":", "_"));
+					System.out.println("R: "+exStr);
+
 					try {
 						OWLClassExpression ce = parseManchesterExpression(exStr);
 						return  dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), ce);
@@ -399,6 +494,16 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 
 	public OWLAxiom visit(OWLDeclarationAxiom axiom) {
+		
+		OWLEntity entity = axiom.getEntity();
+		
+		if(entity instanceof OWLClass){
+			//((OWLClass)axiom.getEntity()).accept(this);
+			OWLClassExpression ex = ((OWLClass)entity).accept(this);
+		}
+		
+		
+		
 		return axiom;
 	}
 
