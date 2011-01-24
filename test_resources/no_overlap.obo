@@ -1,0 +1,24 @@
+
+[Typedef]
+id: no_overlap
+expand_assertion_to: "Class: ?X DisjointWith: (obo:BFO_0000051 some obo:BFO_0000050 some ?Y)" []
+is_type_level: true
+
+[Term]
+id: TEST:1
+name: nucleus
+
+[Term]
+id: TEST:2
+name: cytoplasm
+xref: RO:8888888
+relationship: no_overlap TEST:1
+
+[Typefef]
+id: BFO:0000051
+name: has part
+
+[Typefef]
+id: BFO:0000050
+name: part of
+
