@@ -59,7 +59,7 @@
 	</target>
 
 	<!-- classes that should appear in the main jar file -->
-	<fileset id="main_jar_contents" dir="${outputdir}" includes="**/*.class,**/resources/**" excludes="**/.svn/*" />
+	<fileset id="main_jar_contents" dir="${outputdir}" includes="**/*.class, **/*.properties ,**/resources/**" excludes="**/.svn/*" />
 
 	<target name="all" depends="clean, classes, jar, apidocs" description="Cleans and rebuilds from scratch">
 	</target>
@@ -98,6 +98,9 @@
 				<path refid="classpath" />
 			</classpath>
 		</javac>
+
+		<copy file="conf/log4j.properties" todir="${outputdir}" overwrite="true" />
+		
 	</target>
 
 	<target name="jarmanifest" depends="library_jars, checkjar, buildnum" unless="main_jar_current">
