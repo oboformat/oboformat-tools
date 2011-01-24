@@ -3,6 +3,8 @@ package org.obolibrary.macro.test;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.oboformat.model.Frame;
@@ -24,7 +26,8 @@ import junit.framework.TestCase;
 public class ExpandExpressionTest extends TestCase {
 
 	public static void testExpand() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		OWLOntology owlOnt = convertOBOFile("capable_of.obo");
+		Logger.getRootLogger().setLevel(Level.ALL);
+		OWLOntology owlOnt = convertOBOFile("no_overlap.obo");
 		
 	}
 	

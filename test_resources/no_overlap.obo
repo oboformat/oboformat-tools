@@ -7,7 +7,6 @@ name: nucleus
 [Term]
 id: TEST:2
 name: cytoplasm
-xref: RO:8888888
 relationship: no_overlap TEST:1
 
 [Typedef]
@@ -20,5 +19,7 @@ name: part of
 
 [Typedef]
 id: no_overlap
-expand_assertion_to: "Class: ?X DisjointWith: (obo:BFO_0000051 some obo:BFO_0000050 some ?Y)" []
+expand_assertion_to: "Class: ?X DisjointWith: BFO_0000051 some (BFO_0000050 some ?Y)" []
 is_class_level: true
+is_metadata_tag: true
+xref: RO:8888888

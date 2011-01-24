@@ -2,6 +2,7 @@ package org.obolibrary.macro;
 
 import org.apache.log4j.Logger;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.coode.owlapi.manchesterowlsyntax.OntologyAxiomPair;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -109,6 +110,23 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		}
 	}
 
+	private Set<OntologyAxiomPair> parseManchesterExpressionFrames(String expression) throws ParserException {
+		
+		ManchesterOWLSyntaxEditorParser parser = 
+			new ManchesterOWLSyntaxEditorParser(dataFactory, expression);
+	
+        parser.setOWLEntityChecker(  entityChecker   ) ;
+		
+        if(DEBUG)
+        	log.debug("parsing:"+expression);
+		
+        Set<OntologyAxiomPair> set =  parser.parseFrames();
+	
+		return set;
+		
+	}
+	
+	
 	public OWLClassExpression parseManchesterExpression(String expression) throws ParserException {
 		
 		ManchesterOWLSyntaxEditorParser parser = 
@@ -120,6 +138,7 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
         	log.debug("parsing:"+expression);
 		
 		OWLClassExpression ce = parser.parseClassExpression();
+	
 		return ce;
 		
 	}
@@ -149,20 +168,63 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 			}
 			else if (ax instanceof OWLEquivalentClassesAxiom) {
 				exAx = this.visit((OWLEquivalentClassesAxiom)ax);
+			}else if(ax instanceof OWLAnnotationAssertionAxiom){
+			 	for(OWLAxiom expandedAx: expand((OWLAnnotationAssertionAxiom)ax)){
+			 		output(expandedAx);
+			 	}
 			}
-			else if(ax instanceof OWLDeclarationAxiom) {
+			/*else if(ax instanceof OWLDeclarationAxiom) {
 				exAx = this.visit((OWLDeclarationAxiom) ax);
-			}
+			}*/
 			
 			output(exAx);
 		}
 		
+		
+	//	inputOntology.getAnn
+		
 		return outputOntology;
 	}
 
+	public Set<OWLAxiom> expand(OWLAnnotationAssertionAxiom ax){
+		
+		OWLAnnotationProperty prop = ax.getProperty();
+		
+		String expandTo = this.expandAssertionToMap.get(prop.getIRI());
+		HashSet<OWLAxiom> setAx = new HashSet<OWLAxiom>();
+		
+		if(expandTo != null){
+			if(DEBUG)
+				log.debug("Template to Expand" + expandTo);
+			
+			expandTo = expandTo.replaceAll("\\?X", Owl2Obo.getIdentifier((IRI)ax.getSubject()).replace(":", "_"));
+			expandTo = expandTo.replaceAll("\\?Y", Owl2Obo.getIdentifier((IRI) ax.getValue() ).replace(":", "_"));
+
+			if(DEBUG)
+				log.debug("Expanding " + expandTo);
+			
+		
+			try{
+				Set<OntologyAxiomPair> setAxp =  this.parseManchesterExpressionFrames(expandTo);
+				
+				for(OntologyAxiomPair axp: setAxp){
+					setAx.add(axp.getAxiom());
+					
+				}
+				
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+			//TODO: 
+		}
+		
+		
+		return setAx;
+	}
+	
 	public OWLClassExpression visit(OWLClass desc) {
 		
-		if(DEBUG)
+		/*if(DEBUG)
 			log.debug("OWLClass visit: " + desc);
 		
 		for(OWLAnnotationAssertionAxiom ax: desc.getAnnotationAssertionAxioms(inputOntology)){
@@ -180,10 +242,16 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 				if(DEBUG)
 					log.debug("Expanding " + expandTo);
 				
+			
+				try{
+					this.parseManchesterExpressionFrames(expandTo);
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
 				//TODO: 
 			}
 			
-		}
+		}*/
 		
 		return desc;
 	}
@@ -495,12 +563,12 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 	public OWLAxiom visit(OWLDeclarationAxiom axiom) {
 		
-		OWLEntity entity = axiom.getEntity();
+		/*WLEntity entity = axiom.getEntity();
 		
 		if(entity instanceof OWLClass){
 			//((OWLClass)axiom.getEntity()).accept(this);
 			OWLClassExpression ex = ((OWLClass)entity).accept(this);
-		}
+		}*/
 		
 		
 		
@@ -509,6 +577,7 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 
 	public OWLAxiom visit(OWLAnnotationAssertionAxiom axiom) {
+		
 		return axiom;
 	}
 

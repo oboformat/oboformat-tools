@@ -56,10 +56,12 @@ public class Obo2Owl {
 	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
 
 	@Deprecated
-	public static final String IRI_CLASS_SYNONYMTYPEDEF = DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
+	public static final String IRI_CLASS_SYNONYMTYPEDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
 	@Deprecated
-	public static final String IRI_CLASS_SUBSETDEF = DEFAULT_IRI_PREFIX + "IAO_subsetdef";
+	public static final String IRI_CLASS_SUBSETDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_subsetdef";
 
+	@Deprecated
+	public static final String IRI_PROP_isReversiblePropertyChain =  Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_isReversiblePropertyChain";
 	
 	private static String defaultIDSpace = "";
 	OWLOntologyManager manager;
@@ -531,7 +533,7 @@ public class Obo2Owl {
 		OWLAxiom ax = null;
 		Object v = clause.getValue();
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
-		Set<? extends OWLAnnotation> annotations = trAnnotations(clause);
+		Set<OWLAnnotation> annotations = trAnnotations(clause);
 		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 		if (_tag == OboFormatTag.TAG_IS_A) {
 			ax = fac.getOWLSubObjectPropertyOfAxiom(
@@ -589,6 +591,13 @@ public class Obo2Owl {
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN || _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN) {
+			
+			if(_tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN){
+				OWLAnnotation ann = fac.getOWLAnnotation(trAnnotationProp(IRI_PROP_isReversiblePropertyChain), trLiteral("true"));
+				annotations.add(ann);
+				// isReversiblePropertyChain
+			}
+			
 			List<OWLObjectPropertyExpression> chain =
 				new Vector<OWLObjectPropertyExpression>();
 			chain.add(trObjectProp(v));
@@ -596,8 +605,10 @@ public class Obo2Owl {
 			ax = fac.getOWLSubPropertyChainOfAxiom(chain , p, annotations);
 			//System.out.println("chain:"+ax);
 			// TODO - annotations for equivalent to
-		}
-		else if (_tag == OboFormatTag.TAG_IS_TRANSITIVE && "true".equals(clause.getValue().toString())) {
+		}else if (_tag == OboFormatTag.TAG_PROPERTY_VALUE){
+			
+			
+		}else if (_tag == OboFormatTag.TAG_IS_TRANSITIVE && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLTransitiveObjectPropertyAxiom(p, annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_IS_REFLEXIVE && "true".equals(clause.getValue().toString())) {
