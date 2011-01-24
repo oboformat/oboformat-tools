@@ -1,8 +1,4 @@
-
-[Typedef]
-id: no_overlap
-expand_assertion_to: "Class: ?X DisjointWith: (obo:BFO_0000051 some obo:BFO_0000050 some ?Y)" []
-is_type_level: true
+ontology: test
 
 [Term]
 id: TEST:1
@@ -14,11 +10,15 @@ name: cytoplasm
 xref: RO:8888888
 relationship: no_overlap TEST:1
 
-[Typefef]
+[Typedef]
 id: BFO:0000051
 name: has part
 
-[Typefef]
+[Typedef]
 id: BFO:0000050
 name: part of
 
+[Typedef]
+id: no_overlap
+expand_assertion_to: "Class: ?X DisjointWith: (obo:BFO_0000051 some obo:BFO_0000050 some ?Y)" []
+is_class_level: true
