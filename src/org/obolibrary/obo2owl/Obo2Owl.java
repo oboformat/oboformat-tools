@@ -745,9 +745,11 @@ public class Obo2Owl {
 		Collection<Xref> xrefs = clause.getXrefs();
 		if (xrefs != null) {
 			for (Xref x : xrefs) {
-				OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_XREF.getTag());
-				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(x));
-				anns.add(ann);
+				if(x.getIdref() != null && x.getIdref().length()>0){
+					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_XREF.getTag());
+					OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(x));
+					anns.add(ann);
+				}
 			}
 		}
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
