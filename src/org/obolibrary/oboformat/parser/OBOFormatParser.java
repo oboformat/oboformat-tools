@@ -152,7 +152,7 @@ public class OBOFormatParser {
 		}
 		
 		public String toString() {
-			return line + "//" + pos;
+			return line + "//" + pos+" LINE:"+lineNo;
 		}
 
 		public boolean peekCharIs(char c) {
