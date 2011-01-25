@@ -20,6 +20,7 @@ import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -41,7 +42,8 @@ public class OBORunner {
 	static Set<String> ontsToDownload = new HashSet<String>();
 	static Set<String> omitOntsToDownload = new HashSet<String>();
 
-	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
+		OBOFormatDanglingReferenceException{
 
 		Collection<String> paths = new Vector<String>();
 		String outFile = null;
@@ -50,6 +52,7 @@ public class OBORunner {
 		String buildDir = null;
 		String defaultOnt = null;
 		boolean isOboToOwl = true;
+		boolean allowDangling =false;
 
 		int i=0;
 
@@ -79,8 +82,9 @@ public class OBORunner {
 			else if (opt.equals("--omit-download")) {
 				omitOntsToDownload.add(args[i]);
 				i++;
-			}
-			else if (opt.equals("-b") || opt.equals("--build")) {
+			}else if(opt.equals("--allowdangling")){
+				allowDangling = true;
+			}else if (opt.equals("-b") || opt.equals("--build")) {
 				buildObo = true;
 				buildDir = args[i];
 				i++;
@@ -117,6 +121,9 @@ public class OBORunner {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
 				OBODoc obodoc = p.parse(iri);
+				
+				if(!allowDangling)
+					p.checkDanglingReferences(obodoc);
 
 				if (defaultOnt != null) {
 					obodoc.addDefaultOntologyHeader(defaultOnt);
@@ -128,7 +135,7 @@ public class OBORunner {
 				IRI outputStream = IRI.create(outFile);
 				//format = new OWLXMLOntologyFormat();
 				//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-				System.out.println("saving to "+outputStream+" via "+format);
+				System.out.println("saving to "+ ontology + "," +outputStream+" via "+format);
 				manager.saveOntology(ontology, format, outputStream);
 			}
 			else {
@@ -149,7 +156,7 @@ public class OBORunner {
 	}
 
 	private static void usage() {
-		System.out.println("obolib-obo2owl [--to SYNTAX] -o FILEPATH-URI OBO-FILE");
+		System.out.println("obolib-obo2owl [--to SYNTAX, --allowdangling] -o FILEPATH-URI OBO-FILE");
 		System.out.println("obolib-obo2owl -b BUILDPATH-URI");
 		System.out.println("\n");
 		System.out.println("Converts obo files to OWL. If -b option is used, entire\n");

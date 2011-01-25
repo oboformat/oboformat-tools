@@ -266,8 +266,83 @@ public class OBOFormatParser {
 			System.err.println("UNPARSED:"+s);
 			return false;
 		}
+		
+	}
+	
+	public void checkDanglingReferences(OBODoc doc) throws OBOFormatDanglingReferenceException{
+		
+		//check term frames 
+		for(Frame f: doc.getTermFrames()){
+			for(String tag: f.getTags()){
+				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+				
+				Clause c = f.getClause(tag);
+				if(_tag == OboFormatTag.TAG_INTERSECTION_OF 
+						||_tag == OboFormatTag.TAG_UNION_OF
+						||_tag == OboFormatTag.TAG_EQUIVALENT_TO
+						||_tag == OboFormatTag.TAG_DISJOINT_FROM
+						||_tag == OboFormatTag.TAG_RELATIONSHIP
+						||_tag == OboFormatTag.TAG_IS_A){
+					
+					if(c.getValues().size() >1){
+						checkRelation(c.getValue().toString(), tag, f.getId(), doc);
+						checkClassReference(c.getValue2().toString(), tag, f.getId(), doc);
+					}else
+						checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+				}
+			}
+		}
+		
+		
+		//check typedef frames
+		for(Frame f: doc.getTypedefFrames()){
+			for(String tag: f.getTags()){
+				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+				
+				Clause c = f.getClause(tag);
+				if(_tag == OboFormatTag.TAG_IS_A
+						||_tag == OboFormatTag.TAG_INTERSECTION_OF
+						||_tag == OboFormatTag.TAG_UNION_OF
+						||_tag == OboFormatTag.TAG_EQUIVALENT_TO
+						||_tag == OboFormatTag.TAG_DISJOINT_FROM
+						||_tag == OboFormatTag.TAG_INVERSE_OF
+						||_tag == OboFormatTag.TAG_TRANSITIVE_OVER
+						||_tag == OboFormatTag.TAG_DISJOINT_OVER
+						){
+					
+					checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+				}else if(_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN
+								|| _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN
+								|| _tag == OboFormatTag.TAG_RELATIONSHIP
+					){
+					checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+					checkRelation(c.getValue2().toString(),tag, f.getId(), doc);
+				}else if(_tag == OboFormatTag.TAG_DOMAIN 
+						||_tag == OboFormatTag.TAG_RANGE
+						){
+						checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+				}
+			}
+		}
+		
+		
 	}
 
+	private void checkRelation(String relId, String tag, String frameId, OBODoc doc) throws OBOFormatDanglingReferenceException{
+		if(doc.getTypedefFrame(relId) == null){
+			throw new OBOFormatDanglingReferenceException("The relation '" + relId+ "' reference in" +
+					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not delclared");
+		}
+	}
+	
+	private void checkClassReference(String classId, String tag, String frameId, OBODoc doc)
+		throws OBOFormatDanglingReferenceException{
+		if(doc.getTermFrame(classId) == null){
+			throw new OBOFormatDanglingReferenceException("The class '" + classId+ "' reference in" +
+					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not delclared");
+		}
+	}
+	
 	public boolean parseHeaderFrame(Frame h) {
 		if (s.peekChar() == '[') 
 			return false;
