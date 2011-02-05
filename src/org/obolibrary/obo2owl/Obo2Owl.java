@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLAnonymousClassExpression;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -781,6 +782,12 @@ public class Obo2Owl {
 		Integer max = getQVInt("maxCardinality", quals);
 		Boolean allSome = getQVBoolean("all_some", quals);
 		Boolean allOnly = getQVBoolean("all_only", quals);
+
+		// obo-format allows dangling references to classes in class expressions;
+		// create an explicit class declaration to be sure
+		if (ce instanceof OWLClass) {
+			add(fac.getOWLDeclarationAxiom((OWLClass)ce));
+		}
 
 		if (exact != null && exact > 0) {
 			ex = fac.getOWLObjectExactCardinality(exact,pe,ce);
