@@ -1,5 +1,6 @@
 package org.obolibrary.cli;
 
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,6 +54,8 @@ public class OBORunner {
 		String defaultOnt = null;
 		boolean isOboToOwl = true;
 		boolean allowDangling =false;
+		String outputdir = ".";
+		String outsufix = "";
 
 		int i=0;
 
@@ -74,6 +77,13 @@ public class OBORunner {
 			}
 			else if (opt.equals("--owl2obo")) {
 				isOboToOwl = false;
+			}
+			else if (opt.equals("--outdir")) {
+				outputdir = args[i];
+				i++;
+			}else if (opt.equals("--outsufix")){
+				outsufix = args[i];
+				i++;
 			}
 			else if (opt.equals("--download")) {
 				ontsToDownload.add(args[i]);
@@ -116,7 +126,11 @@ public class OBORunner {
 			buildAllOboOwlFiles(buildDir);
 		}
 
+		if(outsufix.trim().length()>0)
+			outsufix= "-" + outsufix.trim(); 
+		
 		for (String iri : paths) {
+			
 			if (isOboToOwl) {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
@@ -132,10 +146,17 @@ public class OBORunner {
 				Obo2Owl bridge = new Obo2Owl();
 				OWLOntologyManager manager = bridge.getManager();
 				OWLOntology ontology = bridge.convert(obodoc);
-				IRI outputStream = IRI.create(outFile);
+				
+				String outputURI = outFile;
+				String ontologyId = Owl2Obo.getOntologyId(ontology);
+				if(outputURI == null){
+					outputURI = new File(outputdir,   ontologyId+ outsufix + ".owl").toURI().toString();
+				}
+				
+				IRI outputStream = IRI.create(outputURI);
 				//format = new OWLXMLOntologyFormat();
 				//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-				System.out.println("saving to "+ ontology + "," +outputStream+" via "+format);
+				System.out.println("saving to "+ ontologyId + "," +outputStream+" via "+format);
 				manager.saveOntology(ontology, format, outputStream);
 			}
 			else {
@@ -143,7 +164,15 @@ public class OBORunner {
 				OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(iri));
 				Owl2Obo bridge = new Owl2Obo();
 				OBODoc doc = bridge.convert(ontology);
-				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outFile)));
+				
+				String outputFilePath = outFile;
+				if(outFile == null){
+					outputFilePath =  Owl2Obo.getOntologyId(ontology) +outsufix + ".obo";
+				}
+
+				System.out.println("saving to "+ outputFilePath);
+				
+				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFilePath)));
 				
 				OBOFormatWriter oboWriter = new OBOFormatWriter();
 				
