@@ -382,6 +382,12 @@ public class Owl2Obo {
 						clause.addXref(xref);
 					}
 				}
+			}else if(_tag == OboFormatTag.TAG_REMARK){
+			
+					String version = ((OWLLiteral) aanAx.getValue()).getLiteral();
+					clause.setTag(OboFormatTag.TAG_DATA_VERSION.getTag());
+					clause.setValue(version);
+					
 			}else if(_tag == OboFormatTag.TAG_SYNONYM){
 				String scope = null;
 				String type = null;

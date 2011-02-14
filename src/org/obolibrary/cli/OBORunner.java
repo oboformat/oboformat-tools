@@ -23,11 +23,17 @@ import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
@@ -55,8 +61,10 @@ public class OBORunner {
 		boolean isOboToOwl = true;
 		boolean allowDangling =false;
 		String outputdir = ".";
-		String outsufix = "";
-
+//		String outsufix = "";
+		String version = null;
+		
+		
 		int i=0;
 
 		while (i < args.length) {
@@ -77,12 +85,12 @@ public class OBORunner {
 			}
 			else if (opt.equals("--owl2obo")) {
 				isOboToOwl = false;
-			}
-			else if (opt.equals("--outdir")) {
+			}else if (opt.equals("--outdir")) {
 				outputdir = args[i];
 				i++;
-			}else if (opt.equals("--outsufix")){
-				outsufix = args[i];
+			}
+			else if (opt.equals("--owlversion")) {
+				version = args[i];
 				i++;
 			}
 			else if (opt.equals("--download")) {
@@ -126,8 +134,6 @@ public class OBORunner {
 			buildAllOboOwlFiles(buildDir);
 		}
 
-		if(outsufix.trim().length()>0)
-			outsufix= "-" + outsufix.trim(); 
 		
 		for (String iri : paths) {
 			
@@ -147,10 +153,14 @@ public class OBORunner {
 				OWLOntologyManager manager = bridge.getManager();
 				OWLOntology ontology = bridge.convert(obodoc);
 				
+				if(version != null){
+					addVersion(ontology, version, manager);
+				}
+				
 				String outputURI = outFile;
 				String ontologyId = Owl2Obo.getOntologyId(ontology);
 				if(outputURI == null){
-					outputURI = new File(outputdir,   ontologyId+ outsufix + ".owl").toURI().toString();
+					outputURI = new File(outputdir,   ontologyId+ ".owl").toURI().toString();
 				}
 				
 				IRI outputStream = IRI.create(outputURI);
@@ -162,12 +172,17 @@ public class OBORunner {
 			else {
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
 				OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(iri));
+				
+				if(version != null){
+					addVersion(ontology, version, manager);
+				}
+				
 				Owl2Obo bridge = new Owl2Obo();
 				OBODoc doc = bridge.convert(ontology);
 				
 				String outputFilePath = outFile;
 				if(outFile == null){
-					outputFilePath =  Owl2Obo.getOntologyId(ontology) +outsufix + ".obo";
+					outputFilePath =  Owl2Obo.getOntologyId(ontology)  + ".obo";
 				}
 
 				System.out.println("saving to "+ outputFilePath);
@@ -334,5 +349,18 @@ public class OBORunner {
 		}
 		return urlmap;
 
+	}
+	
+	private static void addVersion(OWLOntology ontology, String version, OWLOntologyManager manager){
+		OWLDataFactory fac = manager.getOWLDataFactory();
+		
+		OWLAnnotationProperty ap = fac.getOWLAnnotationProperty( Obo2Owl.trTagToIRI(OboFormatTag.TAG_REMARK.getTag()));
+		OWLAnnotation ann = fac.getOWLAnnotation(ap, fac.getOWLLiteral(version));
+		
+		OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontology.getOntologyID().getOntologyIRI(), ann);
+		
+		manager.applyChange(new AddAxiom(ontology, ax));
+
+		
 	}
 }
