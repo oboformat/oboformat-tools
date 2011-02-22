@@ -225,6 +225,11 @@ public class Obo2Owl {
 		trHeaderFrame(hf);
 
 		for (Frame f : obodoc.getTypedefFrames()) {
+			trTypedefToAnnotationProperty(f);
+		}
+		
+		
+		for (Frame f : obodoc.getTypedefFrames()) {
 			trTypedefFrame(f);
 		}
 
@@ -336,9 +341,10 @@ public class Obo2Owl {
 		}
 		return cls;
 	}
-
-	public OWLNamedObject trTypedefFrame(Frame typedefFrame) {
-		// TODO - annotation props
+	
+	
+	private OWLNamedObject trTypedefToAnnotationProperty(Frame typedefFrame){
+	
 		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag()) != null &&
 				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
 
@@ -352,6 +358,28 @@ public class Obo2Owl {
 				}
 			}
 			return p;
+		}		
+		
+		return null;
+	}
+	
+
+	public OWLNamedObject trTypedefFrame(Frame typedefFrame) {
+		// TODO - annotation props
+		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag()) != null &&
+				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
+
+			return null;
+			/*OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
+			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
+			add(fac.getOWLDeclarationAxiom(p));
+			for (String tag : typedefFrame.getTags()) {
+				for (Clause clause : typedefFrame.getClauses(tag)) {
+					//System.out.println(p+" p "+tag+" t "+clause);
+					add(trGenericClause(p, tag, clause));					
+				}
+			}
+			return p;*/
 		}
 		else {
 			OWLObjectProperty p = trObjectProp(typedefFrame.getId());
