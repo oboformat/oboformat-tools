@@ -543,15 +543,19 @@ public class Obo2Owl {
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_RELATIONSHIP) {
-			/*
-			OWLAnnotationProperty metaProp = (OWLAnnotationProperty) p;
-			OWLAnnotationSubject sub = (OWLAnnotationSubject) p;
-			OWLAnnotationValue val = 
-				trProp((String)clause.getValue2());
-			ax = fac.getOWLAnnotationAssertionAxiom(metaProp,sub,val,
-					annotations);
-			 */
-			ax = null; // TODO
+			IRI relId = oboIdToIRI((String)clause.getValue());
+			
+			OWLAnnotationProperty metaProp = typedefToAnnotationProperty.get(relId.toString());
+			
+			if(metaProp != null){
+				ax = fac.getOWLAnnotationAssertionAxiom(metaProp, 
+						p.getIRI(),  
+						oboIdToIRI((String)clause.getValue2()), 
+						annotations);
+			}else{
+				//System.err.println("no annotation prop:"+relId);
+				ax = null; // TODO
+			}
 		}
 		else if (_tag == OboFormatTag.TAG_DISJOINT_FROM) {
 
