@@ -1,0 +1,29 @@
+ontology: gcitest
+
+[Typedef]
+id: TEST:0000001
+name: homeomorphic for
+is_metadata_tag: true
+expand_assertion_to: "Class: ?Y SubClassOf: ?X only ?Y" []
+
+[Typedef]
+id: part_of
+name: part of
+xref: BFO:0000050
+is_reflexive: true
+is_transitive: true
+is_anti_symmetric: true
+relationship: TEST:0000001 BFO:0000002
+relationship: TEST:0000001 BFO:0000007
+
+[Term]
+id: BFO:0000002 ! continuant
+name: continuant
+
+[Term]
+id: BFO:0000007 ! process
+name: process
+
+
+
+
