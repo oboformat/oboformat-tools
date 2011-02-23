@@ -1,4 +1,5 @@
 ontology: gcitest
+remark: something of a misnomer doesn't actually test GCIs. The idea is that we can declare a relation homeomorphic for a particular class; e.g. part_of is homemorphic for continuants and processes. this means that parthood relations are always continuant-continuant or process-process, never continuant-process. note that this isn't possible with ordinary domain/range constraints without making sub-relations for part_of
 
 [Typedef]
 id: TEST:0000001
