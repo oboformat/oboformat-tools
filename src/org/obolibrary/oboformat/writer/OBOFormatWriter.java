@@ -8,10 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Iterator;
+
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
-import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Frame.FrameType;
+import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 
@@ -145,8 +147,12 @@ public class OBOFormatWriter {
 			if(!xrefs.isEmpty())
 				line +="[";
 			
-			for(Xref xref: xrefs){
-				line += xref.getIdref();
+			Iterator<Xref> xrefsIterator = xrefs.iterator();
+			while (xrefsIterator.hasNext()) {
+			    line += xrefsIterator.next().getIdref();
+			    if (xrefsIterator.hasNext()) {
+			        line += ", ";
+			    }
 			}
 	
 			if(!xrefs.isEmpty())
