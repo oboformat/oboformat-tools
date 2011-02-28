@@ -122,30 +122,25 @@ public class OBOFormatWriter {
 	}
 	
 	
-	private void writeClauseWithQoutedString(Clause clause, BufferedWriter writer) throws IOException{
+	private void writeClauseWithQuotedString(Clause clause, BufferedWriter writer) throws IOException{
 		String line = clause.getTag() + ": ";
 		
 		boolean  first = true;
-		for(Object value: clause.getValues()){
-			if(first)
-				line += "\"";
-
-			line += value;
-			
-			if(first)
-				line += "\"";
-			
-			line += " ";
-			
-			first = false;
-		}
+		Iterator<Object> valuesIterator = clause.getValues().iterator();
+        while (valuesIterator.hasNext()) {
+            if (first) { line += "\""; }
+            line += valuesIterator.next();
+            if (first) { line += "\""; }
+            if (valuesIterator.hasNext()) { line += " "; }
+            first = false;
+        }
 		
 		Collection<Xref> xrefs = clause.getXrefs();
 		
 		if(xrefs != null){
 		
 			if(!xrefs.isEmpty())
-				line +="[";
+				line += " [";
 			
 			Iterator<Xref> xrefsIterator = xrefs.iterator();
 			while (xrefsIterator.hasNext()) {
@@ -165,18 +160,22 @@ public class OBOFormatWriter {
 	
 	public void writeDef(Clause clause, BufferedWriter writer) throws IOException{
 		
-		writeClauseWithQoutedString(clause, writer);
+		writeClauseWithQuotedString(clause, writer);
 	}
 	
 	public void writeSynonym(Clause clause, BufferedWriter writer) throws IOException{
-		writeClauseWithQoutedString(clause, writer);
+		writeClauseWithQuotedString(clause, writer);
 	}
 	
 	public void write(Clause clause, BufferedWriter writer) throws IOException{
 		String line = clause.getTag() + ": ";
 		
-		for(Object value: clause.getValues()){
-			line += value + " ";
+		Iterator<Object> valuesIterator = clause.getValues().iterator();
+		while (valuesIterator.hasNext()) {
+		    line += valuesIterator.next();
+		    if (valuesIterator.hasNext()) {
+		        line += " ";
+		    }
 		}
 		
 		Collection<Xref> xrefs = clause.getXrefs();
@@ -184,11 +183,15 @@ public class OBOFormatWriter {
 		if(xrefs != null){
 		
 			if(!xrefs.isEmpty())
-				line +="[";
+				line += " [";
 			
-			for(Xref xref: xrefs){
-				line += xref.getIdref();
-			}
+			Iterator<Xref> xrefsIterator = xrefs.iterator();
+            while (xrefsIterator.hasNext()) {
+                line += xrefsIterator.next().getIdref();
+                if (xrefsIterator.hasNext()) {
+                    line += ", ";
+                }
+            }
 	
 			if(!xrefs.isEmpty())
 				line +="]";
