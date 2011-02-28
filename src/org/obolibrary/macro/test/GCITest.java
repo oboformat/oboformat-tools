@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.oboformat.model.Frame;
@@ -54,7 +55,7 @@ public class GCITest extends TestCase {
 		
 		IRI outputStream = IRI.create("file:///tmp/"+fn+".owl");
 		System.out.println("saving to "+outputStream);
-		OWLOntologyFormat format = new RDFXMLOntologyFormat();
+		OWLOntologyFormat format = new ManchesterOWLSyntaxOntologyFormat();
 		manager.saveOntology(outputOntology, format, outputStream);
 
 		return outputOntology;
