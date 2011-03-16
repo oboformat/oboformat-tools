@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,7 +53,7 @@ public class OBORunner {
 	static Set<String> omitOntsToDownload = new HashSet<String>();
 
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
-		OBOFormatDanglingReferenceException{
+		OBOFormatDanglingReferenceException, URISyntaxException{
 
 		Collection<String> paths = new Vector<String>();
 		String outFile = null;
@@ -134,9 +137,10 @@ public class OBORunner {
 			buildAllOboOwlFiles(buildDir);
 		}
 
-		
+
+		outFile = getURI(outFile);
 		for (String iri : paths) {
-			
+			iri = getURI(iri);
 			if (isOboToOwl) {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
@@ -187,7 +191,7 @@ public class OBORunner {
 
 				System.out.println("saving to "+ outputFilePath);
 				
-				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outputFilePath)));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(new URI( outputFilePath ))));
 				
 				OBOFormatWriter oboWriter = new OBOFormatWriter();
 				
@@ -215,6 +219,17 @@ public class OBORunner {
 
 	}
 
+	private static String getURI(String path){
+		if(path.startsWith("http://") || path.startsWith("file:///"))
+			return  path;
+			
+		File f = new File(path);
+		
+		return f.toURI().toString();
+		
+	}
+	
+	
 	public static void showMemory() {
 		System.gc();
 		System.gc();
