@@ -144,7 +144,8 @@ public class OBORunner {
 			if (isOboToOwl) {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
-				OBODoc obodoc = p.parse(iri);
+				
+				OBODoc obodoc = p.parseURL(iri);
 				
 				if(!allowDangling)
 					p.checkDanglingReferences(obodoc);
