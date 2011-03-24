@@ -112,7 +112,7 @@
 						<include name="*.jar" />
 					</fileset>
 				</path>
-				<!--<map from="${runtimedir}/" to="" />-->
+				<map from="${runtimedir}/" to="" />
 			</pathconvert>
 			<replace file="${main_jar_manifest}">
 				<replacefilter token="$BUILDNUM$" value="${build.number}" />

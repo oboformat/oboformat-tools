@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
-Class-Path: /Users/shahidmanzoor/work/lbnl/oboformat/oboformat/lib/junit.jar /Users/shahidmanzoor/work/lbnl/oboformat/oboformat/lib/log4j-1.2.15.jar /Users/shahidmanzoor/work/lbnl/oboformat/oboformat/lib/oboformat.jar /Users/shahidmanzoor/work/lbnl/oboformat/oboformat/lib/owlapi-bin.jar
+Class-Path: junit.jar log4j-1.2.15.jar oboformat.jar owlapi-bin.jar
 Main-Class: org.obolibrary.cli.OBORunner
 Specification-Title: oboparser
 Sealed: true
 Specification-Version: $VERSION$
 Specification-Vendor: OBO Foundry
 Implementation-Title: oboparser
-Implementation-Version: build224_${build_date}
+Implementation-Version: build225_${build_date}
 Implementation-Vendor: OBO Foundry
