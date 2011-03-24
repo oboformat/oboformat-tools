@@ -1,0 +1,1 @@
+java -Xmx2048M -jar lib\oboformat.jar %*
