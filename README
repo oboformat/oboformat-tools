@@ -35,7 +35,7 @@ Alternative syntaxes like this:
   
  Windows users can run the obo2owl as:
  
- 	java -jar lib\oboformat.jar -o test_resources\caro.owl test_resources\caro.obo  
+ 	bin\obolib-obo2owl.bat -o test_resources\caro.owl test_resources\caro.obo  
 
 LIMITATIONS
 
