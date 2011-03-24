@@ -103,7 +103,7 @@ public class OBORunner {
 			else if (opt.equals("--omit-download")) {
 				omitOntsToDownload.add(args[i]);
 				i++;
-			}else if(opt.equals("--allowdangling")){
+			}else if(opt.equals("--allowdangling") || opt.equals("--allow-dangling")){
 				allowDangling = true;
 			}else if (opt.equals("-b") || opt.equals("--build")) {
 				buildObo = true;
