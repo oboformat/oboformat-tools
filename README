@@ -32,6 +32,10 @@ You may find it convenient to do this:
 Alternative syntaxes like this:
 
   obolib-obo2owl cell.obo --to manchester -o file://`pwd`/cell.owl
+  
+ Windows users can run the obo2owl as:
+ 
+ 	java -jar lib\oboformat.jar -o test_resources\caro.owl test_resources\caro.obo  
 
 LIMITATIONS
 

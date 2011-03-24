@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Class-Path: $RUNTIMECLASSPATH$
-Main-Class: oboparser.Main
+Main-Class: org.obolibrary.cli.OBORunner
 Specification-Title: oboparser
 Sealed: true
 Specification-Version: $VERSION$

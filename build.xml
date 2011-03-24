@@ -108,11 +108,11 @@
 			<copy file="${main_jar_manifest_template}" tofile="${main_jar_manifest}" overwrite="true" />
 			<pathconvert property="runtime_classpath" pathsep=" ">
 				<path>
-					<fileset dir="${runtimedir}">
+					<fileset dir="${librarydir}">
 						<include name="*.jar" />
 					</fileset>
 				</path>
-				<map from="${runtimedir}/" to="" />
+				<!--<map from="${runtimedir}/" to="" />-->
 			</pathconvert>
 			<replace file="${main_jar_manifest}">
 				<replacefilter token="$BUILDNUM$" value="${build.number}" />
