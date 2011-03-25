@@ -1,23 +1,21 @@
 package org.obolibrary.oboformat.parser;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.FrameMergeException;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
-import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 /**
@@ -29,6 +27,8 @@ public class OBOFormatParser {
 	//final String DATA_VERSION = "data-version";
 	//final String ID = "id";
 	//final String NAME = "name";
+    
+    public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
 	
 	SimpleDateFormat headerDateFormat = new SimpleDateFormat("dd:MM:yyyy HH:mm");
 	SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
@@ -151,7 +151,8 @@ public class OBOFormatParser {
 			return line.substring(pos).indexOf(c);
 		}
 		
-		public String toString() {
+		@Override
+        public String toString() {
 			return line + "//" + pos+" LINE:"+lineNo;
 		}
 
@@ -192,8 +193,7 @@ public class OBOFormatParser {
 	public OBODoc parse(String fn) throws IOException {
 		if (fn.startsWith("http:"))
 			return parse(new URL(fn));
-		 BufferedReader in
-		   = new BufferedReader(new FileReader(fn));
+		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fn), DEFAULT_CHARACTER_ENCODING));
 		 return parse(in);
 	}	
 
@@ -205,7 +205,7 @@ public class OBOFormatParser {
 	 * @throws IOException
 	 */
 	public OBODoc parse(URL url) throws IOException {
-	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), DEFAULT_CHARACTER_ENCODING));
 	    return parse(in);
 	}	
 
@@ -218,8 +218,7 @@ public class OBOFormatParser {
 	 */
 	public OBODoc parseURL(String urlstr) throws IOException {
 		URL url = new URL(urlstr);
-	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-		 return parse(in);
+		return parse(url);
 	}	
 
 	
