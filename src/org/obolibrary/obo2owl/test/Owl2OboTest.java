@@ -25,12 +25,12 @@ public class Owl2OboTest extends TestCase {
 		Logger.getRootLogger().setLevel(Level.ERROR);
 		Obo2Owl obo2owl = new Obo2Owl();
 		
-		OWLOntology ontology = obo2owl.convert("test_resources/temp.obo");
+		OWLOntology ontology = obo2owl.convert("test_resources/caro.obo");
 		
 		Owl2Obo bridge = new Owl2Obo();
 		
 		OBODoc doc = bridge.convert(ontology);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test_resources/temp_converted.obo")));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("test_resources/caro_converted.obo")));
 		
 		OBOFormatWriter oboWriter = new OBOFormatWriter();
 		
