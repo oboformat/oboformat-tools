@@ -487,7 +487,7 @@ public class Obo2Owl {
 
 	protected void add(OWLAxiom axiom) {
 		if (axiom == null) {
-			System.err.println("no axiom");
+			LOG.error("no axiom");
 			return;
 		}
 		//System.out.println("adding:"+axiom);
@@ -496,7 +496,7 @@ public class Obo2Owl {
 			manager.applyChange(addAx);
 		}
 		catch (Exception e) {			
-			System.err.println(e+"\nCOULD NOT TRANSLATE AXIOM");
+			LOG.error(e+"\nCOULD NOT TRANSLATE AXIOM");
 		}
 	}
 
@@ -716,7 +716,7 @@ public class Obo2Owl {
 //		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
 		
 		if (clause.getValue() == null) {
-			System.err.println("Problem:"+clause);
+			LOG.error("Problem:"+clause);
 		}
 
 		OWLAxiom ax = null;

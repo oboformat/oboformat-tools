@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -23,6 +24,8 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
  *
  */
 public class OBOFormatParser {
+	
+	static final Logger LOG = Logger.getLogger(OBOFormatParser.class); 
 	
 	//final String DATA_VERSION = "data-version";
 	//final String ID = "id";
@@ -238,9 +241,7 @@ public class OBOFormatParser {
 				return obodoc;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(e);
-			System.err.println("Line:"+s.getLineNo());
+			LOG.error("Line:"+s.getLineNo(), e);
 		}
 		return null;
 	}
@@ -262,7 +263,7 @@ public class OBOFormatParser {
 			return true;
 		}
 		else {
-			System.err.println("UNPARSED:"+s);
+			LOG.warn("UNPARSED:"+s);
 			return false;
 		}
 		
@@ -445,7 +446,7 @@ public class OBOFormatParser {
 		}
 		else {
 			if (cl.getTag() != null) {
-				System.err.println("problem parsing tag:"+s);
+				LOG.warn("problem parsing tag:"+s);
 			}
 				
 		}
@@ -600,7 +601,7 @@ public class OBOFormatParser {
 			return false;
 		
 		if (t.equals("is_metadata")) {
-			System.err.println("is_metadata DEPRECATED; switching to is_metadata_tag");
+			LOG.info("is_metadata DEPRECATED; switching to is_metadata_tag");
 			t = OboFormatTag.TAG_IS_METADATA_TAG.getTag();
 		}
 		
@@ -989,7 +990,7 @@ public class OBOFormatParser {
 			id = id.replaceAll(" *$", "");
 			if (id.contains(" ")) {
 				// TODO
-				System.err.println("accepting bad xref with spaces:"+id);
+				LOG.warn("accepting bad xref with spaces:"+id);
 			}
 			Xref xref = new Xref(id);
 			cl.addXref(xref);
@@ -1010,7 +1011,7 @@ public class OBOFormatParser {
 		if (id != null) {
 			id = id.replaceAll(" +\\Z", "");
 			if (id.contains(" ")) {
-				System.err.println("accepting bad xref with spaces:<"+id+">");
+				LOG.warn("accepting bad xref with spaces:<"+id+">");
 			}
 			Xref xref = new Xref(id);
 			//cl.addXref(xref);
@@ -1059,7 +1060,7 @@ public class OBOFormatParser {
 				 v = getParseUntilAdv("\"");
 			}
 			else {
-				System.err.println("qualifier values should be enclosed in quotes. You have: "+q+"="+s.rest());
+				LOG.warn("qualifier values should be enclosed in quotes. You have: "+q+"="+s.rest());
 				// TODO - warn
 				v = getParseUntil(" ,}");
 			}

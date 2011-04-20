@@ -169,7 +169,6 @@ public class Owl2Obo {
 				tr((OWLSubPropertyChainOfAxiom)ax);
 			}else{
 				if(!(ax instanceof OWLAnnotationAssertionAxiom)){
-					System.err.println("Cann't Translate axiom: " + ax);
 					LOG.warn("The axiom is not translated: " + ax);
 				}
 			}

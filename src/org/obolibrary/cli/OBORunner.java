@@ -8,29 +8,23 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
-import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -48,116 +42,66 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
  */
 public class OBORunner {
 
-	protected final static Logger logger = Logger.getLogger(OBORunner.class);
-	static Set<String> ontsToDownload = new HashSet<String>();
-	static Set<String> omitOntsToDownload = new HashSet<String>();
-
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
 		OBOFormatDanglingReferenceException, URISyntaxException{
 
-		Collection<String> paths = new Vector<String>();
-		String outFile = null;
-		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		boolean buildObo = false;
-		String buildDir = null;
-		String defaultOnt = null;
-		boolean isOboToOwl = true;
-		boolean allowDangling =false;
-		String outputdir = ".";
-//		String outsufix = "";
-		String version = null;
-		
-		
-		int i=0;
-
-		while (i < args.length) {
-			String opt = args[i];
-			System.out.println("processing arg: "+opt);
-			i++;
-			if (opt.equals("-h") || opt.equals("--help")) {
-				usage();
-				System.exit(0);
-			}
-			else if (opt.equals("--default-ontology")) {
-				defaultOnt = args[i];
-				i++;
-			}
-			else if (opt.equals("-o") || opt.equals("--out")) {
-				outFile = args[i];
-				i++;
-			}
-			else if (opt.equals("--owl2obo")) {
-				isOboToOwl = false;
-			}else if (opt.equals("--outdir")) {
-				outputdir = args[i];
-				i++;
-			}
-			else if (opt.equals("--owlversion")) {
-				version = args[i];
-				i++;
-			}
-			else if (opt.equals("--download")) {
-				ontsToDownload.add(args[i]);
-				i++;
-			}
-			else if (opt.equals("--omit-download")) {
-				omitOntsToDownload.add(args[i]);
-				i++;
-			}else if(opt.equals("--allowdangling") || opt.equals("--allow-dangling")){
-				allowDangling = true;
-			}else if (opt.equals("-b") || opt.equals("--build")) {
-				buildObo = true;
-				buildDir = args[i];
-				i++;
-			}
-			else if (opt.equals("-t") || opt.equals("--to")) {
-				String to = args[i];
-				i++;
-				if (to.equals("owlxml")) {
-					format = new OWLXMLOntologyFormat();
-				}
-				else if (to.contains("manchester")) {
-					format = new ManchesterOWLSyntaxOntologyFormat();
-				}
-				else {
-					System.err.println("don't know format '"+to+"' -- reverting to default: "+format);
-				}
-			}
-			else {
-				paths.add(opt);
-			}
+		OBORunnerConfiguration config = OBORunnerConfigCLIReader.readConfig(args);
+		if (config.showHelp.getValue()) {
+			usage();
+			System.exit(0);
 		}
-
-		if (ontsToDownload.size() > 0 && !buildObo) {
-			System.err.println("must specify dir with -b DIR");
+		
+		Logger logger = Logger.getLogger(OBORunner.class);
+		
+		String buildDir = config.buildDir.getValue();
+		if (config.ontsToDownload.getValue().size() > 0 && buildDir == null) {
+			logger.error("must specify dir with -b DIR");
+			System.exit(1);
+		}
+		
+		if (config.outFile.isEmpty() && config.outputdir.isEmpty()) {
+			logger.error("must specify at least one fo the following: outFile OR outputdir");
+			usage();
 			System.exit(1);
 		}
 
-		if (buildObo) {
-			buildAllOboOwlFiles(buildDir);
+		if (buildDir != null) {
+			buildAllOboOwlFiles(buildDir, config, logger);
 		}
+		
+		runConversion(config, logger);
+	}
 
-
-		outFile = getURI(outFile);
-		for (String iri : paths) {
+	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws IOException,
+			OBOFormatDanglingReferenceException, OWLOntologyCreationException, OWLOntologyStorageException,
+			URISyntaxException {
+		
+		String outFileConfigValue = config.outFile.getValue();
+		// getURI throws NPE if the input is null
+		// BUT the outFile may be optional, if an outputfolder is specified in the config
+		String outFile = outFileConfigValue != null ? getURI(outFileConfigValue) : null;
+		
+		for (String iri : config.paths.getValue()) {
 			iri = getURI(iri);
-			if (isOboToOwl) {
+			if (config.isOboToOwl.getValue()) {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
 				
 				OBODoc obodoc = p.parseURL(iri);
 				
-				if(!allowDangling)
+				if(!config.allowDangling.getValue())
 					p.checkDanglingReferences(obodoc);
 
-				if (defaultOnt != null) {
-					obodoc.addDefaultOntologyHeader(defaultOnt);
+				String defaultOntology = config.defaultOnt.getValue();
+				if (defaultOntology != null) {
+					obodoc.addDefaultOntologyHeader(defaultOntology);
 				}
 
 				Obo2Owl bridge = new Obo2Owl();
 				OWLOntologyManager manager = bridge.getManager();
 				OWLOntology ontology = bridge.convert(obodoc);
 				
+				String version = config.version.getValue();
 				if(version != null){
 					addVersion(ontology, version, manager);
 				}
@@ -165,19 +109,19 @@ public class OBORunner {
 				String outputURI = outFile;
 				String ontologyId = Owl2Obo.getOntologyId(ontology);
 				if(outputURI == null){
-					outputURI = new File(outputdir,   ontologyId+ ".owl").toURI().toString();
+					outputURI = new File(config.outputdir.getValue(), ontologyId+ ".owl").toURI().toString();
 				}
 				
 				IRI outputStream = IRI.create(outputURI);
-				//format = new OWLXMLOntologyFormat();
-				//OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-				System.out.println("saving to "+ ontologyId + "," +outputStream+" via "+format);
+				OWLOntologyFormat format = config.format.getValue();
+				logger.info("saving to "+ ontologyId + "," +outputStream+" via "+format);
 				manager.saveOntology(ontology, format, outputStream);
 			}
 			else {
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
 				OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(iri));
 				
+				String version = config.version.getValue();
 				if(version != null){
 					addVersion(ontology, version, manager);
 				}
@@ -190,7 +134,7 @@ public class OBORunner {
 					outputFilePath =  Owl2Obo.getOntologyId(ontology)  + ".obo";
 				}
 
-				System.out.println("saving to "+ outputFilePath);
+				logger.info("saving to "+ outputFilePath);
 				
 				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(new URI( outputFilePath ))));
 				
@@ -201,7 +145,6 @@ public class OBORunner {
 				writer.close();
 			}
 		}
-
 	}
 
 	private static void usage() {
@@ -249,9 +192,12 @@ public class OBORunner {
 	 * @param dir
 	 * @throws IOException
 	 */
-	private static void buildAllOboOwlFiles(String dir) throws IOException {
+	protected static void buildAllOboOwlFiles(String dir, OBORunnerConfiguration config, Logger logger) throws IOException {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
+		Set<String> ontsToDownload = config.ontsToDownload.getValue();
+		Set<String> omitOntsToDownload = config.omitOntsToDownload.getValue();
+		
 		for (String ont : ontmap.keySet()) {
 			if (ontsToDownload.size() > 0 && !ontsToDownload.contains(ont))
 				continue;
@@ -263,44 +209,27 @@ public class OBORunner {
 					String url = ontmap.get(ont);
 					long initTime = System.nanoTime();
 					String ontId = ont.toLowerCase();
-					System.out.println("converting: "+ont+" from: "+url+" using default ont:"+ontId);
+					logger.info("converting: "+ont+" from: "+url+" using default ont:"+ontId);
 					Obo2Owl.convertURL(url,dir+"/"+ontId+".owl",ontId);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
 
-					System.out.println("TIME_TO_CONVERT "+ont+" "+
+					logger.info("TIME_TO_CONVERT "+ont+" "+
 							+ (totalTime / 1000000d) + " ms");
 
-				} catch (OWLOntologyCreationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					fails.add(ont);
-				} catch (OWLOntologyStorageException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					fails.add(ont);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					fails.add(ont);
-				} catch (Error e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					fails.add(ont);
 				}catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.warn(e.getMessage(), e);
 					fails.add(ont);
 				}
 			}
 			else {
 				fails.add(ont);
-				System.out.println("did not convert: "+ont);
+				logger.warn("did not convert: "+ont);
 			}
 		}
-		System.out.println("DONE!");
+		logger.info("DONE!");
 		for (String fail : fails)
-			System.out.println("FAIL:"+fail);
+			logger.warn("FAIL:"+fail);
 	}
 
 	/**
