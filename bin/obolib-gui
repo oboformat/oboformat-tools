@@ -1,5 +1,5 @@
 #!/bin/bash
 # Set the classname of the Java class to execute
-export CLASSNAME=org.obolibrary.cli.OBORunner
+export CLASSNAME=org.obolibrary.cli.OBORunnerGui
 
 sh -c "./obolib-basic $@"
