@@ -1165,7 +1165,7 @@ public class OBOFormatParser {
 			return true;
 		if (s.eof())
 			return true;
-		throw new Error("expected newline instead of: "+s.rest());
+		throw new Error("expected newline instead of: "+s.rest()+" on line "+s.lineNo);
 	}
 	
 	protected boolean parseZeroOrMoreWsOptCmtNl() {
