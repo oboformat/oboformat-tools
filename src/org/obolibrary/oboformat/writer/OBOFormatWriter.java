@@ -137,10 +137,11 @@ public class OBOFormatWriter {
 		
 		Collection<Xref> xrefs = clause.getXrefs();
 		
+		// if the xrefs value is null, then there should *never* be xrefs at this location
+		// not that the value may be a non-null empty list - here we still want to write []
 		if(xrefs != null){
 		
-			if(!xrefs.isEmpty())
-				line += " [";
+			line += " [";
 			
 			Iterator<Xref> xrefsIterator = xrefs.iterator();
 			while (xrefsIterator.hasNext()) {
@@ -150,8 +151,7 @@ public class OBOFormatWriter {
 			    }
 			}
 	
-			if(!xrefs.isEmpty())
-				line +="]";
+			line +="]";
 		}
 		
 		writeLine(line, writer);
