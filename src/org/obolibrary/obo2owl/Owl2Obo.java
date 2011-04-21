@@ -5,9 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import org.apache.log4j.Logger;
-import org.obolibrary.oboformat.model.*;
+import org.obolibrary.oboformat.model.Clause;
+import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
+import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -390,6 +394,7 @@ public class Owl2Obo {
 			}else if(_tag == OboFormatTag.TAG_SYNONYM){
 				String scope = null;
 				String type = null;
+				clause.setXrefs(new Vector<Xref>());
 				for(OWLAnnotation aan: aanAx.getAnnotations()){
 					String propId = owlObjectToTag(aan.getProperty());
 					
@@ -645,6 +650,14 @@ public class Owl2Obo {
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
 			String indvId = getIdentifier(indv);
+			
+			// TODO: full specify this in the spec document.
+			// we may want to allow full IDs for subsets in future.
+			// here we would have a convention that an unprefixed subsetdef/synonymtypedef
+			// gets placed in a temp ID space, and only this id space is stripped
+			indvId = indvId.replaceFirst(".*:", "");
+			c.addValue(indvId);
+
 			c.addValue(indvId);
 			
 			String nameValue = "";
@@ -673,6 +686,12 @@ public class Owl2Obo {
 
 			OWLNamedIndividual indv =(OWLNamedIndividual) ax.getIndividual();
 			String indvId = getIdentifier(indv);
+			
+			// TODO: full specify this in the spec document.
+			// we may want to allow full IDs for subsets in future.
+			// here we would have a convention that an unprefixed subsetdef/synonymtypedef
+			// gets placed in a temp ID space, and only this id space is stripped
+			indvId = indvId.replaceFirst(".*:", "");
 			c.addValue(indvId);
 			
 			String nameValue = "";
