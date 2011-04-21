@@ -189,7 +189,7 @@ public class OBOFormatParser {
 	/**
 	 * Parses a local file to an OBODoc
 	 * 
-	 * @param filename
+	 * @param fn
 	 * @return parsed obo document
 	 * @throws IOException
 	 */
@@ -203,7 +203,7 @@ public class OBOFormatParser {
 	/**
 	 * Parses a remote URL to an OBODoc
 	 * 
-	 * @param filename
+	 * @param url
 	 * @return parsed obo document
 	 * @throws IOException
 	 */
@@ -215,7 +215,7 @@ public class OBOFormatParser {
 	/**
 	 * Parses a remote URL to an OBODoc
 	 * 
-	 * @param filename
+	 * @param urlstr
 	 * @return parsed obo document
 	 * @throws IOException
 	 */
@@ -229,7 +229,7 @@ public class OBOFormatParser {
 	 * 
 	 * 
 	 * @param reader
-	 * @returnparsed obo document
+	 * @return parsed obo document
 	 * @throws IOException
 	 */
 	public OBODoc parse(BufferedReader reader) throws IOException {

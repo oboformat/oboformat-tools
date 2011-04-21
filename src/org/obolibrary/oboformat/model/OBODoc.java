@@ -100,7 +100,7 @@ public class OBODoc {
 	 * Looks up the ID prefix to IRI prefix mapping.
 	 * Header-Tag: idspace
 	 * 
-	 * @param obo prefix
+	 * @param prefix prefix
 	 * @return IRI prefix as string
 	 */
 	public String getIDSpace(String prefix) {

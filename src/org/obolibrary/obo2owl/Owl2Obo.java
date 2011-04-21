@@ -205,7 +205,7 @@ public class Owl2Obo {
 		
 	}
 	
-	private void trNaryPropertyAxiom(OWLNaryPropertyAxiom ax, String tag){
+	private void trNaryPropertyAxiom(OWLNaryPropertyAxiom<OWLObjectPropertyExpression> ax, String tag){
 		Set<OWLObjectPropertyExpression> set = ax.getProperties();
 		
 		if(set.size()>1){
