@@ -1,6 +1,6 @@
 @echo off
 
-SET OBORUNNERMAIN=org.obolibrary.cli.OBORunner
+SET OBORUNNERMAIN=org.obolibrary.cli.OBORunnerGui
 
 CALL obolib-basic.bat %*
 
