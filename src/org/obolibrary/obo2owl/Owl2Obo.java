@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
@@ -48,6 +49,7 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
@@ -366,10 +368,14 @@ public class Owl2Obo {
 		String tag = owlObjectToTag(prop);
 
 		if (tag != null) {
-			String value = ((OWLLiteral) aanAx.getValue()).getLiteral();
-			//if ("id".equals(tag))
-			//	frame.setId(value);
-
+			
+			String value = aanAx.getValue().toString();
+			if(aanAx.getValue() instanceof OWLLiteral){
+				value = ((OWLLiteral) aanAx.getValue()).getLiteral();
+			}else if(aanAx.getValue() instanceof IRI){
+				value =getIdentifier((IRI)aanAx.getValue());
+			}
+			
 			Clause clause = new Clause();
 			clause.setTag(tag);
 			clause.addValue(value);
@@ -725,8 +731,8 @@ public class Owl2Obo {
 				c.setTag(OboFormatTag.TAG_IS_A.getTag());
 				c.setValue(getIdentifier(sup));
 				f.addClause(c);
-			} else if (sup instanceof OWLObjectSomeValuesFrom) {
-				OWLObjectSomeValuesFrom r = (OWLObjectSomeValuesFrom) sup;
+			} else if (sup instanceof OWLObjectSomeValuesFrom ||sup instanceof OWLObjectAllValuesFrom ) {
+				OWLQuantifiedRestriction r = (OWLQuantifiedRestriction) sup;
 
 				Clause c = new Clause();
 				c.setTag(OboFormatTag.TAG_RELATIONSHIP.getTag());
