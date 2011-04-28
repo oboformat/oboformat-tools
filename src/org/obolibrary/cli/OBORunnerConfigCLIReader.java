@@ -15,7 +15,7 @@ public class OBORunnerConfigCLIReader {
 		while (i < args.length) {
 			String opt = args[i];
 			i++;
-			for (Variable<?> variable : variables) {
+outer:		for (Variable<?> variable : variables) {
 				Iterable<String> parameters = variable.getParameters();
 				if (parameters != null) {
 					for (String parameter : parameters) {
@@ -29,9 +29,21 @@ public class OBORunnerConfigCLIReader {
 							if (!success) {
 								logger.warn(variable.getSetValueFailure());
 							}
-							break;
+							break outer;
 						}
 					}
+				}
+				else {
+					String value = opt;
+					if (variable.doesReadValue()) {
+						value = args[i];
+						i++;
+					}
+					boolean success = variable.setValue(value);
+					if (!success) {
+						logger.warn(variable.getSetValueFailure());
+					}
+					break outer;
 				}
 			}
 		}

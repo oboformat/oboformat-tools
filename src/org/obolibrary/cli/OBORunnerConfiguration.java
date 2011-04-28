@@ -95,11 +95,6 @@ public class OBORunnerConfiguration {
 			this.value.add(value);
 			return true;
 		}
-
-		@Override
-		public boolean doesReadValue() {
-			return true;
-		}
 	};
 
 	public Iterable<Variable<?>> getVariables() {
@@ -149,6 +144,11 @@ public class OBORunnerConfiguration {
 		public boolean isEmpty() {
 			return value == null;
 		}
+
+		@Override
+		public String toString() {
+			return getName()+":"+getValue();
+		}
 	}
 
 	private abstract class ParamterVariable<T> extends Variable<T> {
@@ -169,7 +169,7 @@ public class OBORunnerConfiguration {
 	private class StringParamterVariable extends ParamterVariable<String> {
 
 		protected StringParamterVariable(String name, String defaultValue, String... parameters) {
-			super(name, defaultValue);
+			super(name, defaultValue, parameters);
 		}
 
 		@Override
