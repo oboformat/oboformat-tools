@@ -2,4 +2,7 @@
 # Set the classname of the Java class to execute
 export CLASSNAME=org.obolibrary.cli.OBORunner
 
-sh -c "./obolib-basic $@ --owl2obo"
+PATH_TO_ME=`which $0`;
+PATH_TO_ME=`echo $PATH_TO_ME | sed -e "s/\(.*\)\/.*/\1/g"`
+
+sh -c "$PATH_TO_ME/obolib-basic $@ --owl2obo"
