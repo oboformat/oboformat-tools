@@ -46,6 +46,8 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 	private OWLEntityChecker entityChecker;
 	
+	private Owl2Obo owl2Obo = null;
+	
 	public MacroExpansionVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology, OWLOntologyManager manager) {
 		this.dataFactory = dataFactory;
 		this.inputOntology = inputOntology;
@@ -58,6 +60,7 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
                         new SimpleShortFormProvider() ) );
 		
 		outputManager = OWLManager.createOWLOntologyManager();
+		
 		
 		try{
 			outputOntology = outputManager.createOntology(inputOntology.getOntologyID());
@@ -185,6 +188,23 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		
 		return outputOntology;
 	}
+	
+	private String getId(IRI iri){
+		String iriString = iri.toString();
+		String id = null;
+		
+		String s[] =iriString.split("#");
+		
+		if(s.length>1){
+			id = s[1];
+		}else{
+			int index = iriString.lastIndexOf("/");
+			id = iriString.substring(index+1);
+		}
+		
+		return id;
+		
+	}
 
 	public Set<OWLAxiom> expand(OWLAnnotationAssertionAxiom ax){
 		
@@ -197,8 +217,8 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 			if(DEBUG)
 				log.debug("Template to Expand" + expandTo);
 			
-			expandTo = expandTo.replaceAll("\\?X", Owl2Obo.getIdentifier((IRI)ax.getSubject()).replace(":", "_"));
-			expandTo = expandTo.replaceAll("\\?Y", Owl2Obo.getIdentifier((IRI) ax.getValue() ).replace(":", "_"));
+			expandTo = expandTo.replaceAll("\\?X", getId((IRI)ax.getSubject()));
+			expandTo = expandTo.replaceAll("\\?Y", getId((IRI) ax.getValue() ));
 
 			if(DEBUG)
 				log.debug("Expanding " + expandTo);
@@ -308,7 +328,7 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 					String tStr = expandExpressionMap.get(iri);
 					
 					System.out.println("t: "+tStr);
-					String exStr = tStr.replaceAll("\\?Y", Owl2Obo.getIdentifier( templateVal).replaceAll(":", "_"));
+					String exStr = tStr.replaceAll("\\?Y", getId( templateVal));
 					System.out.println("R: "+exStr);
 
 					try {

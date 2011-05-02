@@ -10,11 +10,13 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 
 /**
@@ -23,6 +25,8 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
  *
  */
 public class OBOFormatWriter {
+	
+	private static Logger LOG = Logger.getLogger(OBOFormatWriter.class);
 	
 	public OBOFormatWriter(){
 		
@@ -113,6 +117,8 @@ public class OBOFormatWriter {
 				writeDef(clause, writer);
 			else if(clause.getTag().equals("synonym"))
 				writeSynonym(clause, writer);
+			else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
+				writePropertyValue(clause, writer);
 			else
 				write(clause, writer);
 		}
@@ -152,6 +158,8 @@ public class OBOFormatWriter {
 			}
 	
 			line +="]";
+		}else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag())){
+			line  += " []";
 		}
 		
 		writeLine(line, writer);
@@ -162,6 +170,31 @@ public class OBOFormatWriter {
 		
 		writeClauseWithQuotedString(clause, writer);
 	}
+
+	public void writePropertyValue(Clause clause, BufferedWriter writer) throws IOException{
+		
+		String line = clause.getTag() + ": ";
+
+		Collection cols = clause.getValues();
+		
+		if(cols.size()<2){
+			LOG.warn("The " + OboFormatTag.TAG_PROPERTY_VALUE.getTag() + " has incorrect number of values: " + clause);
+			return;
+		}
+			
+		Iterator itr = cols.iterator();
+		line +=  itr.next() + " ";
+		
+		String val = itr.next().toString();
+		
+		if(val.contains(" ") || !val.contains(":"))
+			val = " \"" + val + "\"";
+		
+		line += val;
+		
+		writeLine(line, writer);
+	}
+	
 	
 	public void writeSynonym(Clause clause, BufferedWriter writer) throws IOException{
 		writeClauseWithQuotedString(clause, writer);
@@ -180,9 +213,11 @@ public class OBOFormatWriter {
 		
 		Collection<Xref> xrefs = clause.getXrefs();
 		
+		
+		
 		if(xrefs != null){
 		
-			if(!xrefs.isEmpty())
+		//	if(!xrefs.isEmpty())
 				line += " [";
 			
 			Iterator<Xref> xrefsIterator = xrefs.iterator();
@@ -193,7 +228,7 @@ public class OBOFormatWriter {
                 }
             }
 	
-			if(!xrefs.isEmpty())
+		//	if(!xrefs.isEmpty())
 				line +="]";
 		}
 		

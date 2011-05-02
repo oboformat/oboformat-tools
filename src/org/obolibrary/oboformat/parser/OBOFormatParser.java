@@ -848,7 +848,25 @@ public class OBOFormatParser {
 	}
 
 	private boolean parsePropertyValue(Clause cl) {
-		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
+		
+		
+		if(parseIdRef(cl) && parseOneOrMoreWs()){
+		
+			if(s.peekCharIs('\"')){
+				s.consume("\"");
+				String desc = getParseUntilAdv("\"");
+				cl.addValue(desc);
+				return true;
+			}else{
+				return parseIdRef(cl);
+			}
+			
+		}
+			
+		return false;
+		
+		
+	//	return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
 	}
 
 	/**
