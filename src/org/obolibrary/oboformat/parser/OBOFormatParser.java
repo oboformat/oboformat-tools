@@ -7,7 +7,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
@@ -269,7 +271,9 @@ public class OBOFormatParser {
 		
 	}
 	
-	public void checkDanglingReferences(OBODoc doc) throws OBOFormatDanglingReferenceException{
+	public List<String> checkDanglingReferences(OBODoc doc) throws OBOFormatDanglingReferenceException{
+		
+		List<String> danglingReferences = new ArrayList<String>();
 		
 		//check term frames 
 		for(Frame f: doc.getTermFrames()){
@@ -285,10 +289,18 @@ public class OBOFormatParser {
 						||_tag == OboFormatTag.TAG_IS_A){
 					
 					if(c.getValues().size() >1){
-						checkRelation(c.getValue().toString(), tag, f.getId(), doc);
-						checkClassReference(c.getValue2().toString(), tag, f.getId(), doc);
-					}else
-						checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+						String error = checkRelation(c.getValue().toString(), tag, f.getId(), doc);
+						if(error != null)
+							danglingReferences.add(error);
+						error =checkClassReference(c.getValue2().toString(), tag, f.getId(), doc);
+						if(error != null)
+							danglingReferences.add(error);
+					}else{
+						String error =checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+						if(error != null){
+							danglingReferences.add(error);
+						}
+					}
 				}
 			}
 		}
@@ -310,37 +322,52 @@ public class OBOFormatParser {
 						||_tag == OboFormatTag.TAG_DISJOINT_OVER
 						){
 					
-					checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+					String error= checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+					if(error != null)
+						danglingReferences.add(error);
 				}else if(_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN
 								|| _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN
 								|| _tag == OboFormatTag.TAG_RELATIONSHIP
 					){
-					checkRelation(c.getValue().toString(),tag, f.getId(), doc);
-					checkRelation(c.getValue2().toString(),tag, f.getId(), doc);
+					String error = checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+					if(error != null){
+						danglingReferences.add(error);
+					}
+					error =checkRelation(c.getValue2().toString(),tag, f.getId(), doc);
+					if(error != null)
+						danglingReferences.add(error);
 				}else if(_tag == OboFormatTag.TAG_DOMAIN 
 						||_tag == OboFormatTag.TAG_RANGE
 						){
-						checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+						String error = checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+						
+						if(error != null){
+							danglingReferences.add(error);
+						}
 				}
 			}
 		}
 		
-		
+		return danglingReferences;
 	}
 
-	private void checkRelation(String relId, String tag, String frameId, OBODoc doc) throws OBOFormatDanglingReferenceException{
+	private String checkRelation(String relId, String tag, String frameId, OBODoc doc){
 		if(doc.getTypedefFrame(relId) == null){
-			throw new OBOFormatDanglingReferenceException("The relation '" + relId+ "' reference in" +
-					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not delclared");
+			return "The relation '" + relId+ "' reference in" +
+					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not delclared";
 		}
+		
+		return null;
 	}
 	
-	private void checkClassReference(String classId, String tag, String frameId, OBODoc doc)
-		throws OBOFormatDanglingReferenceException{
+	private String checkClassReference(String classId, String tag, String frameId, OBODoc doc)
+	{
 		if(doc.getTermFrame(classId) == null){
-			throw new OBOFormatDanglingReferenceException("The class '" + classId+ "' reference in" +
-					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not delclared");
+			 return "The class '" + classId+ "' reference in" +
+					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not delclared";
 		}
+		
+		return null;
 	}
 	
 	public boolean parseHeaderFrame(Frame h) {

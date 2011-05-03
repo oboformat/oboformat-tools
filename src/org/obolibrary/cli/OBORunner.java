@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -89,8 +90,12 @@ public class OBORunner {
 				
 				OBODoc obodoc = p.parseURL(iri);
 				
-				if(!config.allowDangling.getValue())
-					p.checkDanglingReferences(obodoc);
+				if(config.allowDangling.getValue()){
+					List<String> errors= p.checkDanglingReferences(obodoc);
+					for(String error: errors){
+						System.out.println("Danglaing Reference Error: " + error);
+					}
+				}
 
 				String defaultOntology = config.defaultOnt.getValue();
 				if (defaultOntology != null) {
