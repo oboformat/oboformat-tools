@@ -7,8 +7,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
@@ -76,14 +82,27 @@ public class OBOFormatWriter {
 		writer.write(ln+"\n");
 	}
 	
+	private List<String> duplicateTags(Set<String> src){
+		List<String> tags = new ArrayList<String>(src.size());
+		
+		for(String tag: src){
+			tags.add(tag);
+		}
+		
+		return tags;
+	}
+	
 	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
 	
 		Clause c = frame.getClause("format-version");
 		if(c != null)
 			write(c, writer);
 		
+		List<String> tags = duplicateTags(frame.getTags());
 		
-		for(String tag: frame.getTags()){
+		Collections.sort(tags, new HeaderTagsComparator());
+		
+		for(String tag: tags){
 
 			if(tag.equals("format-version"))
 				continue;
@@ -99,18 +118,29 @@ public class OBOFormatWriter {
 	}
 	
 	public void write(Frame frame, BufferedWriter writer) throws IOException{
+
+		Comparator<String> comparator = null;
 		
 		if(frame.getType() == FrameType.TERM){
 			writeLine("[Term]", writer);
+		
+			comparator = new TermsTagsComparator();
 		}else if (frame.getType() == FrameType.TYPEDEF){
 			writeLine("[Typedef]", writer);
+			comparator = new TypeDefTagsComparator();
 		}
 		
 		if(frame.getId() != null){
 			writeLine("id: " + frame.getId(), writer);
 		}
 		
-		for(Clause clause: frame.getClauses()){
+		List<String> tags = duplicateTags(frame.getTags());
+		Collections.sort(tags, comparator);
+		
+		for(String tag: tags){
+//		for(Clause clause: frame.getClauses()){
+			Clause clause = frame.getClause(tag);
+
 			if(clause.getTag().equals("id"))
 				continue;
 			else if(clause.getTag().equals("def"))
@@ -235,4 +265,169 @@ public class OBOFormatWriter {
 		writeLine(line, writer);
 		
 	}
+	
+	private static class HeaderTagsComparator implements Comparator<String>{
+
+		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
+		
+		private static Hashtable<String, Integer> buildTagsPriorities(){
+			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
+			
+			table.put("ontology",5);
+			table.put("data-version",10);
+			table.put("date",15);
+			table.put("saved-by",20);
+			table.put("auto-generated-by",25);
+			table.put("import",30);
+			table.put("subsetdef",35);
+			table.put("synonymtypedef",40);
+			table.put("default-namespace",45);
+			table.put("idspace",50);
+			table.put("treat-xrefs-as-equivalent",55);
+			table.put("treat-xrefs-as-genus-differentia",60);
+			table.put("treat-xrefs-as-relationship",65);
+			table.put("treat-xrefs-as-is_a",70);
+			table.put("remark",75);
+	        
+	        
+			return table;
+		}
+		
+		public int compare(String o1, String o2) {
+			Integer i1 = tagsPriorities.get(o1);
+			Integer i2 = tagsPriorities.get(o2);
+
+			if(i1 == null || i2 == null){
+				return -1;
+			}
+			
+			
+			return i1.compareTo(i2);
+		}
+		
+	}
+	
+	
+	
+	
+	private static class TermsTagsComparator implements Comparator<String>{
+
+		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
+		
+		private static Hashtable<String, Integer> buildTagsPriorities(){
+			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
+			
+	        table.put("id",5);
+	        table.put("is_anonymous",10);
+	        table.put("name",15);
+	        table.put("namespace",20); 
+	        table.put("alt_id",25);
+	        table.put("def",30);
+	        table.put("comment",35);
+	        table.put("subset",40);
+	        table.put("synonym",45);
+	        table.put("xref",50);
+	        table.put("builtin",55);
+	        table.put("property_value",60); 
+	        table.put("is_a",65);
+	        table.put("intersection_of",70); 
+	        table.put("intersection_of",75);
+	        table.put("union_of",80);
+	        table.put("equivalent_to",85);
+	        table.put("disjoint_from",90);
+	        table.put("relationship",95);
+	        table.put("created_by",100);
+	        table.put("creation_date",105);
+	        table.put("is_obsolete",110);
+	        table.put("replaced_by",115);
+	        table.put("consider",120);
+	        
+			return table;
+		}
+		
+		public int compare(String o1, String o2) {
+			Integer i1 = tagsPriorities.get(o1);
+			Integer i2 = tagsPriorities.get(o2);
+
+			if(i1 == null || i2 == null){
+				return -1;
+			}
+			
+			return i1.compareTo(i2);
+		}
+		
+	}
+
+	
+	
+	private static class TypeDefTagsComparator implements Comparator<String>{
+
+		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
+		
+		private static Hashtable<String, Integer> buildTagsPriorities(){
+			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
+
+			table.put("id",0);
+			table.put("is_anonymous",0);
+			table.put("name",0);
+			table.put("namespace",0); 
+			table.put("alt_id",0);
+			table.put("def",0);
+			table.put("comment",0);
+			table.put("subset",0); 
+			table.put("synonym",0); 
+			table.put("xref",0); 
+			table.put("property_value",0); 
+			table.put("domain",0); 
+			table.put("range",0); 
+			table.put("builtin",0);
+			table.put("is_anti_symmetric",0);
+			table.put("is_cyclic",0);
+			table.put("is_reflexive",0);
+			table.put("is_symmetric",0);
+			table.put("is_transitive",0);
+			table.put("is_functional",0);
+			table.put("is_inverse_functional",0);
+			table.put("is_a",0);
+			table.put("intersection_of",0); 
+			table.put("union_of",0);
+			table.put("equivalent_to",0); 
+			table.put("disjoint_from",0); 
+			table.put("inverse_of",0); 
+			table.put("transitive_over",0);
+			table.put("holds_over_chain",0);
+			table.put("equivalent_to_chain",0);
+			table.put("disjoint_over",0); 
+			table.put("relationship",0); 
+			table.put("created_by",0); 
+			table.put("creation_date",0); 
+			table.put("is-obsolete",0);
+			table.put("replaced_by",0); 
+			table.put("consider",0);
+			table.put("expand_assertion_to",0); 
+			table.put("expand_expression_to",0); 
+			table.put("is_metadata_tag",0);
+			table.put("is_class_level_tag",0);      
+
+			return  table;
+		}
+		
+		public int compare(String o1, String o2) {
+			Integer i1 = tagsPriorities.get(o1);
+			Integer i2 = tagsPriorities.get(o2);
+
+			if(i1 == null || i2 == null){
+				return -1;
+			}
+			
+			return i1.compareTo(i2);
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
 }
