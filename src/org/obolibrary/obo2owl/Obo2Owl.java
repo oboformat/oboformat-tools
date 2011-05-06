@@ -979,7 +979,7 @@ public class Obo2Owl {
 			value = value.toString();
 		}
 		//System.out.println("v="+value);
-		return fac.getOWLTypedLiteral((String)value); // TODO
+		return fac.getOWLLiteral((String)value); // TODO
 	}
 
 	private IRI oboIdToIRI(String id) {
