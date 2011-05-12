@@ -215,6 +215,11 @@ public class OBORunner {
 					long initTime = System.nanoTime();
 					String ontId = ont.toLowerCase();
 					logger.info("converting: "+ont+" from: "+url+" using default ont:"+ontId);
+					if (url == null) {
+						logger.warn("no url for "+ont);
+						fails.add(ont);
+						continue;
+					}
 					Obo2Owl.convertURL(url,dir+"/"+ontId+".owl",ontId);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
@@ -222,6 +227,9 @@ public class OBORunner {
 					logger.info("TIME_TO_CONVERT "+ont+" "+
 							+ (totalTime / 1000000d) + " ms");
 
+				}catch (Error e) {
+					logger.warn(e.getMessage(), e);
+					fails.add(ont);
 				}catch (Exception e) {
 					logger.warn(e.getMessage(), e);
 					fails.add(ont);
@@ -292,8 +300,10 @@ public class OBORunner {
 			}
 			else if (tag.equals("format")) {
 				// danger or circularity, just for testing now
+				//if (!parts[1].equals("obo"))
+				//	urlmap.put(ns, "http://purl.org/obo/obo/"+ns+".obo");
 				if (!parts[1].equals("obo"))
-					urlmap.put(ns, "http://purl.org/obo/obo/"+ns+".obo");
+					urlmap.remove(ns);
 			}
 
 		}

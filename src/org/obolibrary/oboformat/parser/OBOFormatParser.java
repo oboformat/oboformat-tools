@@ -107,6 +107,8 @@ public class OBOFormatParser {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.err.println("lineNo: "+lineNo);
+				throw new Error("uh-oh");
 			}
 		}
 		
