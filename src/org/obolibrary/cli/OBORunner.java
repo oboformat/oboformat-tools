@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
@@ -109,6 +110,13 @@ public class OBORunner {
 				String version = config.version.getValue();
 				if(version != null){
 					addVersion(ontology, version, manager);
+				}
+				
+				if (config.isExpandMacros.getValue()) {
+					//System.out.println("EXPANDING MACROS");
+					MacroExpansionVisitor mev = 
+						new MacroExpansionVisitor(manager.getOWLDataFactory(),ontology, manager);
+					ontology = mev.expandAll();					
 				}
 				
 				String outputURI = outFile;

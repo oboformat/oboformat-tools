@@ -346,15 +346,58 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 		return dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), filler.accept(this));
 	}
 
+	public OWLClassExpression visit(OWLObjectHasValue desc) {
+		OWLIndividual filler = desc.getValue();
+		OWLObjectPropertyExpression p = desc.getProperty();
+		if (p instanceof OWLObjectProperty) {
+			IRI iri = ((OWLObjectProperty)p).getIRI();
+			IRI templateVal = null;
+			if (expandExpressionMap.containsKey(iri)) {
+				System.out.println("svf "+p+" "+filler);
+				if (filler instanceof OWLObjectOneOf) {
+					Set<OWLIndividual> inds = ((OWLObjectOneOf)filler).getIndividuals();
+					if (inds.size() == 1) {
+						System.out.println("**svf "+p+" "+inds.iterator().next());
+						OWLIndividual ind = inds.iterator().next();
+						if (ind instanceof OWLNamedIndividual) {
+							templateVal = ((OWLNamedObject)ind).getIRI();
+						}
+					}
+					
+				}
+				if (filler instanceof OWLNamedObject) {
+					 templateVal =  ((OWLNamedObject)filler).getIRI();
+				}
+				if (templateVal != null) {
+					System.out.println("TEMPLATEVAL: "+templateVal.toString());
+
+					String tStr = expandExpressionMap.get(iri);
+					
+					System.out.println("t: "+tStr);
+					String exStr = tStr.replaceAll("\\?Y", getId( templateVal));
+					System.out.println("R: "+exStr);
+
+					try {
+						OWLClassExpression ce = parseManchesterExpression(exStr);
+						return  dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), ce);
+
+					} catch (ParserException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			}
+		}
+		return dataFactory.getOWLObjectHasValue(desc.getProperty(), filler);
+	}
+
 
 	public OWLClassExpression visit(OWLObjectAllValuesFrom desc) {
 		return desc.getFiller().accept(this);
 	}
 
 
-	public OWLClassExpression visit(OWLObjectHasValue desc) {
-		return desc.asSomeValuesFrom().accept(this);
-	}
 
 
 	public OWLClassExpression visit(OWLObjectMinCardinality desc) {
