@@ -32,7 +32,7 @@ public class OBORunnerConfiguration {
 		}
 	};
 	public final Variable<Boolean> isExpandMacros = new ParamterVariable<Boolean>("Expand OWL Macros",
-			false, "-x","--expannd-macros") {
+			false, "-x","--expand-macros") {
 
 		@Override
 		public boolean setValue(String value) {
