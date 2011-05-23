@@ -34,6 +34,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	private static final long serialVersionUID = -1694788715411761694L;
 	
 	final JCheckBox danglingCheckbox;
+	final JCheckBox expandMacrosCheckbox;
 	final JTextArea downloadOntologies;
 	final JTextArea omitDownloadOntologies;
 	final JCheckBox downloadOntologiesCheckBox;
@@ -49,6 +50,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * Create GUI panel for advanced settings with the given default values.
 	 * 
 	 * @param allowDanglingDefault
+	 * @param expandMacrosDefault
 	 * @param defaultDownloadOntologies
 	 * @param defaultOmitDownloadOntologies
 	 * @param defaultOntologyConfigValue
@@ -56,6 +58,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * @param defaultOwlOntologyVersion
 	 */
 	public GuiAdvancedPanel(boolean allowDanglingDefault, 
+			boolean expandMacrosDefault,
 			Collection<String> defaultDownloadOntologies, 
 			Collection<String> defaultOmitDownloadOntologies,
 			String defaultOntologyConfigValue, 
@@ -64,6 +67,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	{
 		super();
 		danglingCheckbox = new JCheckBox("Allow Dangling", allowDanglingDefault);
+		expandMacrosCheckbox = new JCheckBox("Expand OWL Macros", expandMacrosDefault);
 		
 		// create Field for downloadOntologies
 		// if values are available set it and activate the field
@@ -111,7 +115,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		add(new JLabel("ADVANCED"), pos);
 		addRowGap(this, pos, 10);
 		
-		// allow Dangling checkbox
+		// ontology format panel
 		createOntologyFormatPanel(pos);
 		addRowGap(this, pos, 5);
 		
@@ -121,6 +125,10 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		
 		// flag for allow dangling
 		createDanglingPanel(pos);
+		addRowGap(this, pos, 5);
+		
+		// flag for expand macros
+		createExpandMacros(pos);
 		addRowGap(this, pos, 5);
 		
 		// download ontologies
@@ -245,5 +253,15 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 */
 	private void createDanglingPanel(GBHelper pos) {
 		add(danglingCheckbox, pos.nextRow());
+	}
+
+
+	/**
+	 * Layout for the expand macros check box.
+	 * 
+	 * @param pos
+	 */
+	private void createExpandMacros(GBHelper pos) {
+		add(expandMacrosCheckbox, pos.nextRow());
 	}
 }

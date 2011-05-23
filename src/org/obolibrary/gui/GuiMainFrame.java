@@ -174,6 +174,9 @@ public class GuiMainFrame extends JFrame {
 		// allowDangling
 		config.allowDangling.setRealValue(advancedPanel.danglingCheckbox.isSelected());
 		
+		// expand Macros
+		config.isExpandMacros.setRealValue(advancedPanel.expandMacrosCheckbox.isSelected());
+		
 		// ontsToDownloads
 		if (advancedPanel.downloadOntologiesCheckBox.isSelected()) {
 			List<String> strings = GuiTools.getStrings(advancedPanel.downloadOntologies);
@@ -245,7 +248,8 @@ public class GuiMainFrame extends JFrame {
 	private SizedJPanel getAdvancedPanel()
 	{
 		if (advancedPanel == null) {
-			advancedPanel = new GuiAdvancedPanel(config.allowDangling.getValue(), 
+			advancedPanel = new GuiAdvancedPanel(config.allowDangling.getValue(),
+					config.isExpandMacros.getValue(),
 					config.ontsToDownload.getValue(), 
 					config.omitOntsToDownload.getValue(),
 					config.defaultOnt.getValue(),
