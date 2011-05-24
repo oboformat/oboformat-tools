@@ -11,15 +11,15 @@ IF NOT DEFINED OBORUNNERMAIN (
 )
 
 
-FOR %%F IN (../lib/*.jar) DO (
+FOR %%F IN (lib/*.jar) DO (
 
   IF DEFINED cp (
 
-    SET cp=!cp!;../lib/%%F%
+    SET cp=!cp!;lib/%%F%
 
   ) ELSE (
 
-    SET cp=../lib/%%F%
+    SET cp=lib/%%F%
 
   )
 )

@@ -2,6 +2,6 @@
 
 SET OBORUNNERMAIN=org.obolibrary.cli.OBORunnerGui
 
-CALL obolib-basic.bat %*
+CALL bin\obolib-basic.bat %*
 
 (SET OBORUNNERMAIN=)
