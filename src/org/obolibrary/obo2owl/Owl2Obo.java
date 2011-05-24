@@ -49,6 +49,7 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -598,6 +599,18 @@ public class Owl2Obo {
 		} else if (entity instanceof OWLObjectProperty) {
 			//f = new Frame(FrameType.TYPEDEF);
 			f = getTypedefFrame(entity);
+		}else if (entity instanceof OWLAnnotationProperty){
+			
+			for(OWLAnnotationAssertionAxiom ax: set){
+				OWLAnnotationProperty prop = ax.getProperty();
+				String tag = owlObjectToTag(prop);
+				if(OboFormatTag.TAG_IS_METADATA_TAG.getTag().equals(tag)){
+					f = getTypedefFrame(entity);
+					break;
+				}
+			}
+			
+			
 		}
 
 		if (f != null) {

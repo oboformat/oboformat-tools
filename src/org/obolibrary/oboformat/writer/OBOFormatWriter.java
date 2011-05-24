@@ -149,6 +149,8 @@ public class OBOFormatWriter {
 				writeSynonym(clause, writer);
 			else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
 				writePropertyValue(clause, writer);
+			else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag()))
+				writeClauseWithQuotedString(clause, writer);
 			else
 				write(clause, writer);
 		}
@@ -188,7 +190,8 @@ public class OBOFormatWriter {
 			}
 	
 			line +="]";
-		}else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag())){
+		}else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) ||
+				OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag())){
 			line  += " []";
 		}
 		
