@@ -138,21 +138,25 @@ public class OBOFormatWriter {
 		Collections.sort(tags, comparator);
 		
 		for(String tag: tags){
-//		for(Clause clause: frame.getClauses()){
-			Clause clause = frame.getClause(tag);
+			
+			for( Clause clause : frame.getClauses(tag)){
 
-			if(clause.getTag().equals("id"))
-				continue;
-			else if(clause.getTag().equals("def"))
-				writeDef(clause, writer);
-			else if(clause.getTag().equals("synonym"))
-				writeSynonym(clause, writer);
-			else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
-				writePropertyValue(clause, writer);
-			else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag()))
-				writeClauseWithQuotedString(clause, writer);
-			else
-				write(clause, writer);
+				if(clause.getTag().equals("id"))
+					continue;
+				else if(clause.getTag().equals("def"))
+					writeDef(clause, writer);
+				else if(clause.getTag().equals("synonym"))
+					writeSynonym(clause, writer);
+				else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
+					writePropertyValue(clause, writer);
+				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag()))
+					writeClauseWithQuotedString(clause, writer);
+				else
+					write(clause, writer);
+			}
+		
+		
+		
 		}
 		
 		writeLine("", writer);
