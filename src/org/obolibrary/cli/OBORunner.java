@@ -4,13 +4,16 @@ package org.obolibrary.cli;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,7 +152,9 @@ public class OBORunner {
 
 				logger.info("saving to "+ outputFilePath);
 				
-				BufferedWriter writer = new BufferedWriter(new FileWriter(new File(new URI( outputFilePath ))));
+				FileOutputStream os = new FileOutputStream(new File(new URI( outputFilePath ))); 
+				OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+				BufferedWriter writer = new BufferedWriter(osw);
 				
 				OBOFormatWriter oboWriter = new OBOFormatWriter();
 				

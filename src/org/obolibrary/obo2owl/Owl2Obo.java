@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
@@ -49,7 +52,6 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLProperty;
 import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -243,7 +245,7 @@ public class Owl2Obo {
 	}
 	
 	private void tr(OWLSubPropertyChainOfAxiom ax){
-		System.out.println("...." + ax);
+		//System.out.println("...." + ax);
 	}
 	
 	private void tr(OWLEquivalentObjectPropertiesAxiom ax){
@@ -383,21 +385,42 @@ public class Owl2Obo {
 		return val;
 	}
 	
+	private Pattern absoulteURLPattern = Pattern.compile("<\\s*http.*?>");
+	
 	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 
 		OWLAnnotationProperty prop = aanAx.getProperty();
 		String tag = owlObjectToTag(prop);
 
+		
 //		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 		
 		if (tag != null) {
 			
 			String value = aanAx.getValue().toString();
+			
 			if(aanAx.getValue() instanceof OWLLiteral){
 				value = getLiteral((OWLLiteral) aanAx.getValue());
 			}else if(aanAx.getValue() instanceof IRI){
 				value = this.getIdentifier((IRI)aanAx.getValue()); //getIdentifier((IRI)aanAx.getValue());
 			}
+			
+			if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
+				value = aanAx.getValue().toString();
+				Matcher matcher = absoulteURLPattern.matcher(value);
+				while(matcher.find()){
+					String m = matcher.group();
+					m = m.replace("<", "");
+					m = m.replace(">", "");
+					int i = m.lastIndexOf("/");
+					m = m.substring(i+1);
+					
+					value = value.replace(matcher.group(), m);
+				}
+				
+			}
+			
+			
 			OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 			if(_tag == null){
 				Clause clause = new Clause();
@@ -406,7 +429,9 @@ public class Owl2Obo {
 				clause.addValue(propId);
 				clause.addValue(value);
 				frame.addClause(clause);
-
+				
+//				if(propId.endsWith("0000426"))
+	//				System.out.println(propId+"----- " + value);
 			}else{
 				Clause clause = new Clause();
 				clause.setTag(tag);
@@ -707,50 +732,6 @@ public class Owl2Obo {
 		
 		
 		
-/*		int index = iri.lastIndexOf("#");
-		int indexSlash = iri.lastIndexOf("/");
-		int indexUserScore = iri.lastIndexOf("_");
-		
-		if(index>0){
-			String iriPrexURI = iri.substring(0, index);
-			String idPrex= this.idSpaceMap.get(iriPrexURI);
-			if(idPrex == null){
-				if (indexSlash>-1){
-					
-					if(indexUserScore>-1){
-						idPrex = iri.substring(index, indexSlash);
-					}else{
-						idPrex = iri.substring(indexSlash, index);
-					}
-				}else{
-					if(indexUserScore>-1){
-						idPrex = iri.substring(index, indexSlash);
-					}else
-						idPrex = iri.substring(0, index);
-				}
-				
-				idSpaceMap.put(idPrex, iriPrexURI);
-			}
-		}else if(indexSlash>-1){
-			X
-			
-		}
-*/		
-		
-/*		index = iri.lastIndexOf("/");
-		
-		
-		if(index >-1){
-			iri = iri.substring(index+1);
-		}
-		
-		
-		if(index>-1)
-			iri = iri.substring(index+1);
-		
-
-		return iri;
-*/
 	}
 	
 	
