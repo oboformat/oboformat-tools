@@ -432,7 +432,7 @@ public class Owl2Obo {
 				
 //				if(propId.endsWith("0000426"))
 	//				System.out.println(propId+"----- " + value);
-			}else{
+			}else if(value.trim().length()>0){
 				Clause clause = new Clause();
 				clause.setTag(tag);
 				clause.addValue(value);
@@ -483,6 +483,8 @@ public class Owl2Obo {
 					}
 					
 				}
+			}else{
+				LOG.warn("The annotation '" +aanAx + "' is not translated");
 			}
 
 			
@@ -569,31 +571,36 @@ public class Owl2Obo {
 		} else if (ce2 instanceof OWLObjectIntersectionOf) {
 
 			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();
-			OWLClassExpression ce = list2.get(0);
-			String r = null;
-//			cls2 = getIdentifier(list.get(0));
-			cls2 = this.getIdentifier(list.get(0));
-
-
+			
+			
+			for( OWLClassExpression ce : list2){
+				String r = null;
+	//			cls2 = getIdentifier(list.get(0));
+				cls2 = this.getIdentifier(ce);
+	
+	
 				if(ce instanceof OWLObjectSomeValuesFrom ){
 					OWLObjectSomeValuesFrom ristriction = (OWLObjectSomeValuesFrom)ce;
 					r = this.getIdentifier(ristriction.getProperty());
 					cls2 = this.getIdentifier(ristriction.getFiller());
 				}
-
-			if(cls2 != null){
-				
-				Clause c = new Clause();
-				c.setTag(OboFormatTag.TAG_INTERSECTION_OF.getTag());
-				
-				if(r != null)
-					c.addValue(r);
-				
-				c.addValue(cls2);
-				f.addClause(c);
-			}else{
-				LOG.debug("Axiom ingored: " + ce2);
+	
+				if(cls2 != null){
+					
+					Clause c = new Clause();
+					c.setTag(OboFormatTag.TAG_INTERSECTION_OF.getTag());
+					
+					if(r != null)
+						c.addValue(r);
+					
+					c.addValue(cls2);
+					f.addClause(c);
+				}else{
+					LOG.debug("Axiom ingored: " + ce2);
+				}
+			
 			}
+			
 		}
 
 	}
