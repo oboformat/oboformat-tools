@@ -51,4 +51,4 @@ id: has_plasma_membrane_part
 name: has_plasma_membrane_part
 xref: RO:0002104
 is_a: has_part ! has part
-expand_expression_to: "BFO_0000051 some (GO_0005886 and BFO_0000051 some ?Y)" []
+expand_expression_to: "<http://purl.obolibrary.org/obo/BFO_0000051> some (GO_0005886 and BFO_0000051 some ?Y)" []
