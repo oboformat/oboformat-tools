@@ -973,6 +973,9 @@ public class Obo2Owl {
 			// TODO
 			value = ((Date)value).toString();
 		}
+		else if (value instanceof Boolean) {
+			return fac.getOWLLiteral((Boolean)value);
+		}
 		else if (! (value instanceof String)) {
 			// TODO
 			// e.g. boolean
