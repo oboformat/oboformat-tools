@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,36 @@ public class OBOFormatWriter {
 	
 	private static Logger LOG = Logger.getLogger(OBOFormatWriter.class);
 	
+	private static HashSet<String> tagsInformative = buildTagsInformative();
+	
+	private OBODoc oboDoc;
+	
 	public OBOFormatWriter(){
+		oboDoc = null;
+	}
+	
+	private static HashSet<String> buildTagsInformative(){
+		HashSet<String> set = new HashSet<String>();
+		
+		
+		set.add(OboFormatTag.TAG_IS_A.getTag());
+		set.add( OboFormatTag.TAG_RELATIONSHIP.getTag());
+		set.add( OboFormatTag.TAG_DISJOINT_FROM.getTag());
+		set.add( OboFormatTag.TAG_INTERSECTION_OF.getTag());
+		set.add( OboFormatTag.TAG_UNION_OF.getTag());
+		set.add( OboFormatTag.TAG_EQUIVALENT_TO.getTag());
+		set.add( OboFormatTag.TAG_REPLACED_BY.getTag());
+		set.add( OboFormatTag.TAG_PROPERTY_VALUE.getTag());
+		set.add( OboFormatTag.TAG_DOMAIN.getTag());
+		set.add( OboFormatTag.TAG_RANGE.getTag());
+		set.add( OboFormatTag.TAG_INVERSE_OF.getTag());
+		set.add( OboFormatTag.TAG_TRANSITIVE_OVER.getTag());
+		set.add( OboFormatTag.TAG_HOLDS_OVER_CHAIN.getTag());
+		set.add( OboFormatTag.TAG_EQUIVALENT_TO_CHAIN.getTag());
+		set.add( OboFormatTag.TAG_DISJOINT_OVER.getTag());
+		
+		return set;
+		
 		
 	}
 	
@@ -67,6 +97,7 @@ public class OBOFormatWriter {
 	public void write(OBODoc doc, BufferedWriter writer) throws IOException{
 		Frame headerFrame = doc.getHeaderFrame();
 		
+		this.oboDoc = doc;
 		writeHeader(headerFrame, writer);
 
 		for(Frame f: doc.getTermFrames()){
@@ -241,8 +272,27 @@ public class OBOFormatWriter {
 		String line = clause.getTag() + ": ";
 		
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
+		String idsLabel = this.oboDoc != null && tagsInformative.contains(clause.getTag()) ? "" : null;
+		
 		while (valuesIterator.hasNext()) {
-		    line += valuesIterator.next();
+			String value = valuesIterator.next() + "";
+			if(idsLabel != null){
+				Frame f= oboDoc.getTermFrame(value);
+				if(f == null){
+					f = oboDoc.getTermFrame(value);
+				}
+				
+				if(f != null){
+					Clause cl = f.getClause(OboFormatTag.TAG_NAME.getTag());
+					if(cl != null){
+						if(idsLabel.length()>0)
+							idsLabel += "\t";
+						idsLabel += cl.getValue();
+					}
+						
+				}
+			}
+		    line += value;
 		    if (valuesIterator.hasNext()) {
 		        line += " ";
 		    }
@@ -268,6 +318,11 @@ public class OBOFormatWriter {
 		//	if(!xrefs.isEmpty())
 				line +="]";
 		}
+		
+		if(idsLabel != null){
+			line += " !" +idsLabel;
+		}
+	
 		
 		writeLine(line, writer);
 		
