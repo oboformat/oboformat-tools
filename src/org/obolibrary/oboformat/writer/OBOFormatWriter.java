@@ -202,7 +202,9 @@ public class OBOFormatWriter {
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
         while (valuesIterator.hasNext()) {
             if (first) { line += "\""; }
-            line += valuesIterator.next();
+            String value = valuesIterator.next() + "";
+            value.replaceAll("\n", "\\n");
+            line += value;
             if (first) { line += "\""; }
             if (valuesIterator.hasNext()) { line += " "; }
             first = false;
@@ -279,7 +281,7 @@ public class OBOFormatWriter {
 			if(idsLabel != null){
 				Frame f= oboDoc.getTermFrame(value);
 				if(f == null){
-					f = oboDoc.getTermFrame(value);
+					f = oboDoc.getTypedefFrame(value);
 				}
 				
 				if(f != null){

@@ -374,12 +374,16 @@ public class Owl2Obo {
 		
 	}
 	
-	
+	private Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
 	private String getLiteral(OWLLiteral literal){
 		String val = literal.getLiteral();
 		
-		val = val.replaceAll("\n|\r", " ");
-		val = val.replaceAll("\"", "\\\\\"");
+		Matcher m = CRLF.matcher(val);
+		if(m.find())
+			val= m.replaceAll("\\\\n");
+		
+		//val = val.replaceAll("\n|\r", "\\\\\n");
+	//	val = val.replaceAll("\"", "\\\\\"");
 //		val = val.replaceAll("\\", "\\\\\\");
 
 		return val;
@@ -406,7 +410,8 @@ public class Owl2Obo {
 			}
 			
 			if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
-				value = aanAx.getValue().toString();
+				//value = aanAx.getValue().toString();
+				//value = getLiteral((OWLLiteral)aanAx.getValue());
 				Matcher matcher = absoulteURLPattern.matcher(value);
 				while(matcher.find()){
 					String m = matcher.group();
