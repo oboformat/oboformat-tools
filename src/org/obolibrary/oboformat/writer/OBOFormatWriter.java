@@ -125,9 +125,9 @@ public class OBOFormatWriter {
 	
 	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
 	
-		Clause c = frame.getClause("format-version");
+		/*Clause c = frame.getClause("format-version");
 		if(c != null)
-			write(c, writer);
+			write(c, writer);*/
 		
 		List<String> tags = duplicateTags(frame.getTags());
 		

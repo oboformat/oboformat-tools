@@ -241,7 +241,9 @@ public class Obo2Owl {
 	}
 
 	public void trHeaderFrame(Frame headerFrame) {
-		IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
+	//	IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
+		IRI ontIRI = owlOntology.getOntologyID().getOntologyIRI();
+
 		for (String t: headerFrame.getTags()) {
 			
 			OboFormatTag tag = OBOFormatConstants.getTag(t);

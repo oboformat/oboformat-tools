@@ -63,7 +63,7 @@ public class OBORunnerConfiguration {
 	public final Variable<String> version = new StringParamterVariable("OWL version", null, "--owlversion");
 
 	public final Variable<OWLOntologyFormat> format = new ParamterVariable<OWLOntologyFormat>("OWL ontology format",
-			new RDFXMLOntologyFormat(), "-t", "--to") {
+			new OWLXMLOntologyFormat(), "-t", "--to") {
 
 		private String failureMessage = null;
 

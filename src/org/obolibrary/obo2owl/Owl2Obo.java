@@ -527,6 +527,8 @@ public class Owl2Obo {
 		c.setValue(id);
 		f.addClause(c);
 
+
+		
 		for (OWLAnnotationAssertionAxiom aanAx : ontology
 				.getAnnotationAssertionAxioms(ontology.getOntologyID()
 						.getOntologyIRI())) {
