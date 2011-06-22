@@ -1,4 +1,4 @@
-ontology: XX
+ontology: test
 
 [Term]
 id: CL:0000034
@@ -61,7 +61,7 @@ id: XX:capable_of
 name: capable_of
 comment: note the difficulty in representing this one as a property chain on the instance level, because of the some-only pattern
 expand_expression_to: "XX_bearerOf some (XX_realizedBy only ?Y)" []
-is_class_level: true
+!is_class_level: true
 
 [Typedef]
 id: XX:spatially_disconnected_from
