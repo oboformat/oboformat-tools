@@ -41,5 +41,57 @@ public class Owl2OboTest extends TestCase {
 	}
 	
 	
+	public static void testIRTsConversion() throws Exception{
+		IRI ontologyIRI = IRI.create("http://purl.obolibrary.org/obo/test.owl");
+		
+	 	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		
+		OWLOntology ontology = manager.createOntology(ontologyIRI);
+		
+		Owl2Obo bridge  = new Owl2Obo();
+	
+		bridge.convert(ontology);
+		
+		String ontId = bridge.getOntologyId(ontology);
+		
+		assertTrue("test".equals(ontId));
+		
+		IRI iri = IRI.create("http://purl.obolibrary.org/obo/OBI_0000306");
+		
+		String id = bridge.getIdentifier(iri);
+		
+		assertTrue("OBI:0000306".endsWith(id));
+		
+		iri = 	IRI.create("http://purl.org/obo/owl/NCBITaxon#NCBITaxon_5794");
+		id = bridge.getIdentifier(iri);
+		assertTrue("NCBITaxon:5794".equals(id));
+		
+
+		iri = 	IRI.create("http://purl.obolibrary.org/obo/IAO_0000119");
+		id = bridge.getIdentifier(iri);
+		assertTrue("IAO:0000119".equals(id));
+
+		iri = 	IRI.create("http://purl.obolibrary.org/obo/caro_part_of");
+		id = bridge.getIdentifier(iri);
+		assertTrue("caro:part_of".equals(id));
+		
+
+		iri = 	IRI.create("http://purl.org/obo/owl/CL#CL_0000540");
+		id = bridge.getIdentifier(iri);
+		assertTrue("CL:0000540".equals(id));
+		
+
+		iri = 	IRI.create("http://www.obofoundry.org/ro/ro.owl#has_part");
+		id = bridge.getIdentifier(iri);
+		assertTrue("OBO_REL:has_part".equals(id));
+		
+		iri = 	IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty");
+		id = bridge.getIdentifier(iri);
+		assertTrue("owl:topObjectProperty".equals(id));
+				
+		
+	}
+	
+	
 	
 }

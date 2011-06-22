@@ -86,6 +86,10 @@ public class Owl2Obo {
 		fac = manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 	}
+	
+	public Owl2Obo(){
+		init();
+	}
 
 	private static HashMap<String, String>  initAnnotationPropertyMap() {
 		/*annotationPropertyMap = new HashMap<String, String>();
@@ -360,6 +364,10 @@ public class Owl2Obo {
 		if(sub instanceof OWLObjectProperty && sup instanceof OWLObjectProperty){
 		
 			String supId = this.getIdentifier(sup); //getIdentifier(sup);
+			
+			if(supId.startsWith("owl:")){
+				return;
+			}
 			
 			Frame f = getTypedefFrame((OWLEntity)ax.getSubProperty());
 			Clause clause = new Clause();
@@ -695,11 +703,79 @@ public class Owl2Obo {
 	
 	
 	public String getIdentifier(IRI iriId) {
+	
 		if(iriId == null)
 			return null;
 		
 		String iri = iriId.toString();
 
+		int indexSlash = iri.lastIndexOf("/");
+		
+		
+		String prefixURI = null;
+		String id = null;
+		
+		if(indexSlash>-1){
+			prefixURI = iri.substring(0, indexSlash+1);
+			id = iri.substring(indexSlash+1);
+		}else
+			id = iri;
+		
+		
+		String s[]= id.split("#");
+		
+		if(s.length>1){
+			prefixURI = prefixURI + s[0] + "#";
+			id = s[1];
+		}
+		
+		String prefix =null;
+		
+		if(prefixURI != null)
+			prefix = idSpaceMap.get(prefixURI);
+		
+		if(prefix == null && s.length>1){
+			prefix = s[0];
+		}
+
+		String prefix2 = null;
+		
+		int uderscoreIndex = id.indexOf("_");
+		String id2 = null;
+		if(uderscoreIndex>-1){
+			prefix2 = id.substring(0, uderscoreIndex);
+			id2 =  id.substring(uderscoreIndex+1);
+		}else{
+			id2 = id;
+			if(prefix != null)
+				prefix2 = prefix;
+			else
+				prefix2 = this.ontologyId;
+		}
+		
+		if(prefix2 != ontologyId && prefix != null && !prefix2.equals(prefix)){
+			 id2 = id;
+			 prefix2 = prefix;
+		}
+		
+		if(!"http://purl.obolibrary.org/obo/".equals(prefixURI) && prefix != ontologyId){
+			idSpaceMap.put(prefixURI, prefix);
+		}
+		
+		
+		return prefix2 + ":" + id2;
+		
+		
+		/*
+		if(iriId == null)
+			return null;
+		
+		String iri = iriId.toString();
+
+		if(iri.contains("topObjectProperty")){
+			System.out.println("-------------------");
+		}
+		
 		int indexSlash = iri.lastIndexOf("/");
 		
 		
@@ -743,7 +819,7 @@ public class Owl2Obo {
 		
 		return prefix2 + ":" + id2;
 		
-		
+		*/
 		
 		
 	}
