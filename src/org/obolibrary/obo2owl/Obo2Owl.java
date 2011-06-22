@@ -61,7 +61,6 @@ public class Obo2Owl {
 	@Deprecated
 	public static final String IRI_CLASS_SUBSETDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_subsetdef";
 
-	@Deprecated
 	public static final String IRI_PROP_isReversiblePropertyChain =  Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_isReversiblePropertyChain";
 	
 	private static String defaultIDSpace = "";

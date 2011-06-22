@@ -826,16 +826,16 @@ public class OBOFormatParser {
 
 	private boolean parseISODate(Clause cl) {
 		String dateStr = getParseUntil(" !{");
-		Date date;
-		try {
-			date = isoDateFormat.parse(dateStr);
-			cl.setValue(date);
+		//Date date;
+		//try {
+		//	date = isoDateFormat.parse(dateStr);
+			cl.setValue(dateStr);
 			return true;
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
-		}
+		}*/
 	}
 
 	

@@ -249,7 +249,45 @@ public class Owl2Obo {
 	}
 	
 	private void tr(OWLSubPropertyChainOfAxiom ax){
-		//System.out.println("...." + ax);
+
+		OWLObjectPropertyExpression p= ax.getSuperProperty();
+		
+		List<OWLObjectPropertyExpression> list = ax.getPropertyChain();
+	
+		if(list.size()!=2){
+			LOG.warn("The axiom '" + ax + "' is not translated.");
+			return;
+		}
+		
+		Frame f = getTypedefFrame((OWLObjectProperty)p);
+		
+		String rel1 = getIdentifier(list.get(0));
+		String rel2 = getIdentifier(list.get(1));
+		
+		if(rel1 == null || rel2 == null){
+			LOG.warn("The axiom '" + ax + "' is not translated.");
+			return;
+		}
+		
+		OboFormatTag tag = OboFormatTag.TAG_HOLDS_OVER_CHAIN;
+		
+		for(OWLAnnotation ann: ax.getAnnotations()){
+			
+			if(Obo2Owl.IRI_PROP_isReversiblePropertyChain.equals(ann.getProperty().getIRI().toString())){
+				tag = OboFormatTag.TAG_EQUIVALENT_TO_CHAIN;
+				break;
+			}
+		}
+		
+		
+		Clause clause = new Clause();
+		clause.setTag(tag.getTag());
+		clause.addValue(rel1);
+		clause.addValue(rel2);
+		f.addClause(clause);
+		
+		
+		
 	}
 	
 	private void tr(OWLEquivalentObjectPropertiesAxiom ax){
