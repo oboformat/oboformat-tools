@@ -23,6 +23,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -50,47 +51,35 @@ import junit.framework.TestCase;
 /**
  * @author cjm
  * 
- * see 5.9.3 and 8.2.2 of spec
+ * unmappable expressions should be handled gracefully.
+ * 
+ * in particular, there should be no single intersection_of tags
  * 
  * See http://code.google.com/p/oboformat/issues/detail?id=13
  *
  */
-public class EquivalentToTest extends TestCase {
+public class UnmappableExpressionsTest extends TestCase {
 
-	public EquivalentToTest() {
+	public UnmappableExpressionsTest() {
 		super();
 	}
 
-	public EquivalentToTest(String name) {
+	public UnmappableExpressionsTest(String name) {
 		super(name);
 		// TODO Auto-generated constructor stub
 	}
 
 	public static void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, URISyntaxException {
 		Logger.getRootLogger().setLevel(Level.ERROR);
-		Obo2Owl obo2owl = new Obo2Owl();
-
-		// PARSE TEST FILE
-		OWLOntology ontology = obo2owl.convert("test_resources/equivtest.obo");
-
-
-		// TEST CONTENTS OF OWL ONTOLOGY
-		if (true) {
-			Set<OWLEquivalentClassesAxiom> ecas = ontology.getAxioms(AxiomType.EQUIVALENT_CLASSES);
-			boolean ok = false;
-			for (OWLEquivalentClassesAxiom eca : ecas) {
-				System.out.println(eca);
-			}
-			//assertTrue(ecas.size() == 3);
-		}
-
-		// CONVERT BACK TO OBO
-		Owl2Obo owl2obo = new Owl2Obo();
-		OBODoc obodoc = owl2obo.convert(ontology);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create("file:test_resources/nesting.owl"));
+				
+		Owl2Obo bridge = new Owl2Obo();
+		OBODoc obodoc = bridge.convert(ontology);
 		checkOBODoc(obodoc);
 
 		// ROUNDTRIP AND TEST AGAIN
-		String fn = "/tmp/equivtest.obo";
+		String fn = "/tmp/nesting.obo";
 		OBOFormatWriter w = new OBOFormatWriter();
 		FileOutputStream os = new FileOutputStream(new File(fn));
 		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
@@ -110,51 +99,14 @@ public class EquivalentToTest extends TestCase {
 	public static void checkOBODoc(OBODoc obodoc) {
 		// OBODoc tests
 		
-		// test ECA between named classes is persisted using correct tag
+		 		
 		if (true) {
-			Frame tf = obodoc.getTermFrame("X:1");
-			Collection<Clause> cs = tf.getClauses("equivalent_to");
-			assertTrue(cs.size() == 1);
-			Object v = cs.iterator().next().getValue();
-			System.out.println("V="+v);
-			assertTrue(v.equals("X:2")); 
-		}
-		// test ECA between named class and anon class is persisted as genus-differentia intersection_of tags
-		if (true) {
-			Frame tf = obodoc.getTermFrame("X:1");
+			Frame tf = obodoc.getTermFrame("x.org:x1"); // TODO - may change
 			Collection<Clause> cs = tf.getClauses("intersection_of");
-			assertTrue(cs.size() == 2);
-			boolean okGenus = false;
-			boolean okDifferentia = false;
-			for (Clause c : cs) {
-				Collection<Object> vs = c.getValues();
-				if (vs.size() == 2) {
-					if (c.getValue().equals("R:1") && c.getValue2().equals("Z:1")) {
-						okDifferentia = true;
-					}
-					
-				}
-				else if (vs.size() == 1) {
-					if (c.getValue().equals("Y:1")) {
-						okGenus = true;
-					}
-				}
-				else {
-					assertTrue(false);
-				}
-			}
-			assertTrue(okGenus);
-			assertTrue(okDifferentia);
+			assertTrue(cs.size() != 1); // there should NEVER be a situation with single intersection tags
+			// TODO - add validation step prior to saving
 		}
-		// check reciprocal direction
-		if (true) {
-			Frame tf = obodoc.getTermFrame("X:2");
-			Collection<Clause> cs = tf.getClauses("equivalent_to");
-			assertTrue(cs.size() == 1);
-			Object v = cs.iterator().next().getValue();
-			System.out.println("V="+v);
-			assertTrue(v.equals("X:1")); 
-		}	
+
 	}
 
 	public static OBODoc parseOBOFile(String fn) throws IOException {
