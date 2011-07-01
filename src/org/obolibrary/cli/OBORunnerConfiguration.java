@@ -86,6 +86,11 @@ public class OBORunnerConfiguration {
 		public String getSetValueFailure() {
 			return failureMessage;
 		}
+		
+		@Override
+		public boolean doesReadValue() {
+			return true;
+		}
 	};
 
 	public final Variable<Set<String>> ontsToDownload = new StringSetParamterVariable("Ontologies to download",
