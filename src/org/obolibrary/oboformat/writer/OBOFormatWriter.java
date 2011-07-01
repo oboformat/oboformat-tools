@@ -100,11 +100,20 @@ public class OBOFormatWriter {
 		this.oboDoc = doc;
 		writeHeader(headerFrame, writer);
 
-		for(Frame f: doc.getTermFrames()){
+		List<Frame> termFrames = new ArrayList<Frame>();
+		termFrames.addAll(doc.getTermFrames());
+		Collections.sort(termFrames, new FramesComparator());
+		
+		List<Frame> typeDefFrames = new ArrayList<Frame>();
+		typeDefFrames.addAll(doc.getTypedefFrames());
+		Collections.sort(typeDefFrames, new FramesComparator());
+
+		
+		for(Frame f: termFrames){
 			write(f, writer);
 		}
 		
-		for(Frame f: doc.getTypedefFrames()){
+		for(Frame f: typeDefFrames){
 			write(f, writer);
 		}
 	}
@@ -490,7 +499,13 @@ public class OBOFormatWriter {
 	}
 	
 	
-	
+	private static class FramesComparator implements Comparator<Frame>{
+
+		public int compare(Frame f1, Frame f2) {
+			return f1.getId().compareTo(f2.getId());
+		}
+		
+	}
 	
 	
 	
