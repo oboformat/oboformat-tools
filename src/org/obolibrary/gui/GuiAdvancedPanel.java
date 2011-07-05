@@ -101,8 +101,8 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		
 		defaultOntologyField = createTextField(defaultOntologyConfigValue);
 		
-		formatRDFButton = new JRadioButton("RDF/XML");
-		formatOWLXMLButton = new JRadioButton("OWL/XML", true);
+		formatRDFButton = new JRadioButton("RDF/XML", true);
+		formatOWLXMLButton = new JRadioButton("OWL/XML");
 		formatManchesterButton = new JRadioButton("Manchester");
 		
 		ontologyDownloadFolderField = createTextField(defaultBuildDir);
