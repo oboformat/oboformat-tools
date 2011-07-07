@@ -297,7 +297,7 @@ public class Obo2Owl {
 					}
 				}
 			
-			}else if (tag == OboFormatTag.TAG_DATA_VERSION) {
+			}/*else if (tag == OboFormatTag.TAG_DATA_VERSION) {
 				//fac.getOWLVersionInfo();
 				Clause clause = headerFrame.getClause(t);
 				
@@ -309,7 +309,7 @@ public class Obo2Owl {
 				manager.applyChange(new AddAxiom(owlOntology, ax));
 				
 				// TODO
-			}else{
+			}*/else{
 				Collection<Clause> clauses = headerFrame.getClauses(t);
 				for(Clause clause: clauses){
 					add(trGenericClause(ontIRI, t, clause));

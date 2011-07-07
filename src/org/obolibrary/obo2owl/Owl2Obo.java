@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAsymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -436,10 +437,14 @@ public class Owl2Obo {
 	}
 	
 	private Pattern absoulteURLPattern = Pattern.compile("<\\s*http.*?>");
-	
-	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 
-		OWLAnnotationProperty prop = aanAx.getProperty();
+	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
+		tr(aanAx.getProperty(), aanAx.getValue(), aanAx.getAnnotations(), frame);
+	}	
+	
+	private void tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,  Frame frame) {
+
+//		OWLAnnotationProperty prop = aanAx.getProperty();
 		String tag = owlObjectToTag(prop);
 
 		
@@ -447,12 +452,12 @@ public class Owl2Obo {
 		
 		if (tag != null) {
 			
-			String value = aanAx.getValue().toString();
+			String value = annVal.toString();
 			
-			if(aanAx.getValue() instanceof OWLLiteral){
-				value = getLiteral((OWLLiteral) aanAx.getValue());
-			}else if(aanAx.getValue() instanceof IRI){
-				value = this.getIdentifier((IRI)aanAx.getValue()); //getIdentifier((IRI)aanAx.getValue());
+			if(annVal instanceof OWLLiteral){
+				value = getLiteral((OWLLiteral) annVal);
+			}else if(annVal instanceof IRI){
+				value = this.getIdentifier((IRI)annVal); //getIdentifier((IRI)aanAx.getValue());
 			}
 			
 			if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
@@ -490,7 +495,7 @@ public class Owl2Obo {
 				frame.addClause(clause);
 				if(_tag == OboFormatTag.TAG_DEF){
 					
-					for(OWLAnnotation aan: aanAx.getAnnotations()){
+					for(OWLAnnotation aan: qualifiers){
 						String propId = owlObjectToTag(aan.getProperty());
 						
 						if("xref".equals(propId)){
@@ -500,17 +505,17 @@ public class Owl2Obo {
 							
 						}
 					}
-				}else if(_tag == OboFormatTag.TAG_REMARK){
+				}/*else if(_tag == OboFormatTag.TAG_REMARK){
 				
-						String version = ((OWLLiteral) aanAx.getValue()).getLiteral();
+						String version = ((OWLLiteral) annVal).getLiteral();
 						clause.setTag(OboFormatTag.TAG_DATA_VERSION.getTag());
 						clause.setValue(version);
 						
-				}else if(_tag == OboFormatTag.TAG_SYNONYM){
+				}*/else if(_tag == OboFormatTag.TAG_SYNONYM){
 					String scope = null;
 					String type = null;
 					clause.setXrefs(new Vector<Xref>());
-					for(OWLAnnotation aan: aanAx.getAnnotations()){
+					for(OWLAnnotation aan: qualifiers){
 						String propId = owlObjectToTag(aan.getProperty());
 						
 						if(OboFormatTag.TAG_XREF.getTag().equals(propId)){
@@ -535,7 +540,7 @@ public class Owl2Obo {
 					
 				}
 			}else{
-				LOG.warn("The annotation '" +aanAx + "' is not translated");
+				LOG.warn("The annotation '" +prop + "' is not translated");
 			}
 
 			
@@ -575,10 +580,15 @@ public class Owl2Obo {
 
 
 		
-		for (OWLAnnotationAssertionAxiom aanAx : ontology
+/*		for (OWLAnnotationAssertionAxiom aanAx : ontology
 				.getAnnotationAssertionAxioms(ontology.getOntologyID()
 						.getOntologyIRI())) {
 			tr(aanAx, f);
+		}
+		*/
+		System.out.println(ontology.getAnnotations());
+		for(OWLAnnotation ann: ontology.getAnnotations()){
+			tr(ann.getProperty(), ann.getValue(), new HashSet<OWLAnnotation>(), f);
 		}
 
 	}
