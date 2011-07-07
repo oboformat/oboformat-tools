@@ -27,7 +27,7 @@ public class GuiTools {
 	 * @param defaultValue
 	 * @return textField
 	 */
-	static JTextField createTextField(String defaultValue) {
+	public static JTextField createTextField(String defaultValue) {
 		JTextField jTextField = new JTextField();
 		if (defaultValue != null) {
 			jTextField.setText(defaultValue);
@@ -43,7 +43,7 @@ public class GuiTools {
 	 * @param pos Layout position information
 	 * @param size height of the row in pixel 
 	 */
-	static void addRowGap(JPanel panel, GBHelper pos, int size) {
+	public static void addRowGap(JPanel panel, GBHelper pos, int size) {
 		panel.add(new Gap(10), pos.nextRow());
 	}
 	
@@ -53,7 +53,7 @@ public class GuiTools {
 	 * @param jTextArea
 	 * @return list of strings
 	 */
-	static List<String> getStrings(JTextArea jTextArea) {
+	public static List<String> getStrings(JTextArea jTextArea) {
 		Document document = jTextArea.getDocument();
 		Element paragraph = document.getDefaultRootElement();
 	    int contentCount = paragraph.getElementCount();
