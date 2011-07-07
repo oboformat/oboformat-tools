@@ -102,6 +102,11 @@ public class OBORunner {
 				}
 
 				String defaultOntology = config.defaultOnt.getValue();
+				
+				if(defaultOntology == null || defaultOntology.trim().length()==0){
+					defaultOntology = iri;
+				}
+				
 				if (defaultOntology != null) {
 					obodoc.addDefaultOntologyHeader(defaultOntology);
 				}

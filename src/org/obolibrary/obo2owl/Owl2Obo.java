@@ -742,6 +742,64 @@ public class Owl2Obo {
 	
 	public String getIdentifier(IRI iriId) {
 	
+		
+		if(iriId == null)
+			return null;
+		
+		String iri = iriId.toString();
+
+		int indexSlash = iri.lastIndexOf("/");
+		
+		
+		String prefixURI = null;
+		String id = null;
+		
+		if(indexSlash>-1){
+			prefixURI = iri.substring(0, indexSlash+1);
+			id = iri.substring(indexSlash+1);
+		}else
+			id = iri;
+		
+		
+		String s[]= id.split("#");
+		if(s.length>1){
+			prefixURI = prefixURI + s[0] + "#";
+	
+			if(!(s[1].contains("#") || s[1].contains("_"))){
+				String prefix = "";
+				
+				if("owl".equals(s[0]) || "rdf".equals(s[0]) || "rdfs".equals(s[0])){
+					prefix = s[0] + ":";
+				}
+				
+				return prefix + s[1];
+			}
+		}
+		
+		s= id.split("#_");
+		
+		if(s.length>1){
+			return s[0] + ":" + s[1];
+		}
+		
+		
+		s= id.split("_");
+		
+		if(s.length==2 && !id.contains("#")){
+			return s[0] + ":" + s[1];
+		}
+		
+		
+		return iri;
+		
+		
+		
+		
+		
+		
+		
+		/*
+		
 		if(iriId == null)
 			return null;
 		
@@ -803,6 +861,9 @@ public class Owl2Obo {
 		
 		return prefix2 + ":" + id2;
 		
+		
+		
+		*/
 		
 		/*
 		if(iriId == null)

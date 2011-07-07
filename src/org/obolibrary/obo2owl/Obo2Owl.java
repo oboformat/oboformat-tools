@@ -26,7 +26,6 @@ import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLAnonymousClassExpression;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -986,13 +985,27 @@ public class Obo2Owl {
 		return fac.getOWLLiteral((String)value); // TODO
 	}
 
-	private IRI oboIdToIRI(String id) {
+	public IRI oboIdToIRI(String id) {
 		if (id.contains(" ")) {
 			LOG.error("id contains space: "+id);
 			//throw new UnsupportedEncodingException();
 			return null;
 		}
 
+		// No conversion is required if this is already an IRI
+		if (id.startsWith("http:")) { // TODO - roundtrip from other schemes
+			return IRI.create(id);
+		}
+		else if (id.startsWith("https:")) { // TODO - roundtrip from other schemes
+			return IRI.create(id);
+		}
+		else if (id.startsWith("ftp:")) { // TODO - roundtrip from other schemes
+			return IRI.create(id);
+		}
+		else if (id.startsWith("urn:")) { // TODO - roundtrip from other schemes
+			return IRI.create(id);
+		}
+		
 		// TODO - treat_xrefs_as_equivalent
 		// special case rule for relation xrefs:
 		Frame tdf = obodoc.getTypedefFrame(id);
@@ -1017,32 +1030,23 @@ public class Obo2Owl {
 		if (idParts.length > 1) {
 			db = idParts[0];
 			localId = idParts[1];
+			if(id.contains("_")){
+				db += "#_";
+			}else
+				db += "_";
 		}
 		else if (idParts.length == 0) {
-			db = getDefaultIDSpace();
+			db = getDefaultIDSpace()+"#";
 			localId = id;
 		}
 		else { // ==1
 			// todo use owlOntology IRI
-			db = getDefaultIDSpace();
+			db = getDefaultIDSpace()+"#";
 			localId = idParts[0];
 		}
 
-		// No conversion is required if this is already an IRI
-		if (db.equals("http")) { // TODO - roundtrip from other schemes
-			return IRI.create(id);
-		}
-		else if (db.equals("https")) { // TODO - roundtrip from other schemes
-			return IRI.create(id);
-		}
-		else if (db.equals("ftp")) { // TODO - roundtrip from other schemes
-			return IRI.create(id);
-		}
-		else if (db.equals("urn")) { // TODO - roundtrip from other schemes
-			return IRI.create(id);
-		}
 
-		String uriPrefix = DEFAULT_IRI_PREFIX+db+"_";
+		String uriPrefix = DEFAULT_IRI_PREFIX+db;
 		if (idSpaceMap.containsKey(db)) {
 			uriPrefix = idSpaceMap.get(db);
 		}

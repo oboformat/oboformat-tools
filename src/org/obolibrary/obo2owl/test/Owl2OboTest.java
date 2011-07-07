@@ -57,14 +57,12 @@ public class Owl2OboTest extends TestCase {
 		assertTrue("test".equals(ontId));
 		
 		IRI iri = IRI.create("http://purl.obolibrary.org/obo/OBI_0000306");
-		
 		String id = bridge.getIdentifier(iri);
-		
 		assertTrue("OBI:0000306".endsWith(id));
 		
 		iri = 	IRI.create("http://purl.org/obo/owl/NCBITaxon#NCBITaxon_5794");
 		id = bridge.getIdentifier(iri);
-		assertTrue("NCBITaxon:5794".equals(id));
+		assertTrue("http://purl.org/obo/owl/NCBITaxon#NCBITaxon_5794".equals(id));
 		
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/IAO_0000119");
@@ -73,22 +71,21 @@ public class Owl2OboTest extends TestCase {
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/caro_part_of");
 		id = bridge.getIdentifier(iri);
-		assertTrue("caro:part_of".equals(id));
+		assertTrue("http://purl.obolibrary.org/obo/caro_part_of".equals(id));
+		
+		iri = 	IRI.create("http://purl.obolibrary.org/obo/MyOnt#_part_of");
+		id = bridge.getIdentifier(iri);
+		assertTrue("MyOnt:part_of".equals(id));
 		
 
-		iri = 	IRI.create("http://purl.org/obo/owl/CL#CL_0000540");
+		iri = 	IRI.create("http://purl.obolibrary.org/obo/MyOnt#termid");
 		id = bridge.getIdentifier(iri);
-		assertTrue("CL:0000540".equals(id));
-		
-
-		iri = 	IRI.create("http://www.obofoundry.org/ro/ro.owl#has_part");
-		id = bridge.getIdentifier(iri);
-		assertTrue("OBO_REL:has_part".equals(id));
-		
-		iri = 	IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty");
-		id = bridge.getIdentifier(iri);
-		assertTrue("owl:topObjectProperty".equals(id));
+		assertTrue("termid".equals(id));
 				
+		
+		iri =   IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty");
+        id = bridge.getIdentifier(iri);
+        assertTrue("owl:topObjectProperty".equals(id));		
 		
 	}
 	
