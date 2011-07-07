@@ -21,6 +21,21 @@ public class Xref {
 		this.annotation = annotation;
 	}
 	
+	public boolean equals(Object e) {
+		
+		if(e == null || !(e instanceof Xref))
+			return false;
+		
+		Xref other = (Xref) e;
+		
+		if (!idref.equals(other.idref))
+			return false;
+		if (annotation == null && other.annotation == null)
+			return true;
+		return annotation.equals(other.annotation);
+		
+	}
+	
 	public String toString() {
 		if (annotation == null)
 			return "<"+idref+">";

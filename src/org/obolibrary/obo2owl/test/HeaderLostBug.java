@@ -39,6 +39,8 @@ public class HeaderLostBug extends TestCase {
 		
 		Set<OWLAnnotationAssertionAxiom> axioms = ontology.getAnnotationAssertionAxioms(ontologyIRI);
 		System.out.println("Annotaiton Assertions: " + axioms);
+
+		System.out.println("ont.getAnnotation() = " + ontology.getAnnotations());
 		
 		//two tags in the header of the obo file are translated as annotation assertions, so the axioms
 		//should have two axioms in count.

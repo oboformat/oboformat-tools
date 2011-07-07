@@ -21,6 +21,16 @@ public class QualifierValue {
 		this.value = value;
 	}
 	
+	public boolean equals(Object e) {
+		if(e == null || !(e instanceof QualifierValue))
+			return false;
+		
+		QualifierValue other = (QualifierValue) e;
+		return qualifier.equals(other.getQualifier()) &&
+		value.equals(other.getValue());
+	
+	}
+	
 	public String toString() {
 		return "{"+qualifier+"="+value+"}";
 	}

@@ -98,7 +98,48 @@ public class Clause {
 		return tag+"("+sb.toString()+")";
 	}
 
+	public boolean equals(Object e) {
+		
+		if(e == null || !(e instanceof Clause))
+			return false;
+		
+		Clause other = (Clause) e;
+		
+		
+		if (!getTag().equals(other.getTag()))
+			return false;
+		
+		if (!getValues().equals(other.getValues()))
+			return false;
+	
+		
+		if (xrefs != null) {
+			if (other.getXrefs() == null)
+				return false;
+			if (!xrefs.equals(other.getXrefs()))
+				return false;
+		}
+		else {
+			if (other.getXrefs() != null && other.getXrefs().size() > 0) {
+				return false;
+			}
+		}
+		
+		if (qualifierValues != null) {
+			if (other.getQualifierValues() == null)
+				return false;
+			if (!qualifierValues.equals(other.getQualifierValues()))
+				return false;
+		}
+		else {
+			if (other.getQualifierValues() != null && other.getQualifierValues().size() > 0) {
+				return false;
+			}
+		}
+		
 
+		return true;
+	}
 
 
 }
