@@ -78,7 +78,7 @@ public class GuiTools {
 	/**
 	 * All tabbed panels should have the same preferred size.
 	 */
-	static class SizedJPanel extends JPanel {
+	public static class SizedJPanel extends JPanel {
 
 		// Generated
 		private static final long serialVersionUID = -7310308040237600280L;
@@ -119,7 +119,7 @@ public class GuiTools {
 	/**
 	 * Simplify the GridBagConstrains handling.
 	 */
-	static class GBHelper extends GridBagConstraints {
+	public static class GBHelper extends GridBagConstraints {
 
 		// Generated
 		private static final long serialVersionUID = -7193587738437725346L;
