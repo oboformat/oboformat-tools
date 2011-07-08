@@ -1042,6 +1042,9 @@ public class Obo2Owl {
 		else { // ==1
 			// todo use owlOntology IRI
 			db = getDefaultIDSpace()+"#";
+			if(id.contains("_"))
+				db += "_";
+			
 			localId = idParts[0];
 		}
 

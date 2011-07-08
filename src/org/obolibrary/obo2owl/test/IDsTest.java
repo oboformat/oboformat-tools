@@ -31,6 +31,11 @@ public class IDsTest extends TestCase {
 		System.out.println(iri);
 		assertTrue("http://purl.obolibrary.org/obo/TODO#003".equals(iri.toString()));
 
+		iri= bridge.oboIdToIRI("part_of");
+		System.out.println(iri);
+		assertTrue("http://purl.obolibrary.org/obo/TODO#_part_of".equals(iri.toString()));
+
+		
 		iri= bridge.oboIdToIRI("OBO_REL:part_of");
 		System.out.println(iri);
 		assertTrue("http://purl.obolibrary.org/obo/OBO_REL#_part_of".equals(iri.toString()));
