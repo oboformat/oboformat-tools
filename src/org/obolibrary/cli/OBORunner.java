@@ -47,6 +47,9 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
  */
 public class OBORunner {
 
+	private static Logger logger = Logger.getLogger(OBORunner.class);
+	
+	
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
 		OBOFormatDanglingReferenceException, URISyntaxException{
 
@@ -56,7 +59,6 @@ public class OBORunner {
 			System.exit(0);
 		}
 		
-		Logger logger = Logger.getLogger(OBORunner.class);
 		
 		String buildDir = config.buildDir.getValue();
 		if (config.ontsToDownload.getValue().size() > 0 && buildDir == null) {
@@ -93,12 +95,14 @@ public class OBORunner {
 				OBOFormatParser p = new OBOFormatParser();
 				
 				OBODoc obodoc = p.parseURL(iri);
+
+				List<String> errors= p.checkDanglingReferences(obodoc);
+				for(String error: errors){
+					logger.error("Danglaing Reference Error: " + error);
+				}
 				
-				if(config.allowDangling.getValue()){
-					List<String> errors= p.checkDanglingReferences(obodoc);
-					for(String error: errors){
-						System.out.println("Danglaing Reference Error: " + error);
-					}
+				if(!config.allowDangling.getValue() && !errors.isEmpty()){
+					throw new OBOFormatDanglingReferenceException("Dangling references are found during conversion");
 				}
 
 				String defaultOntology = config.defaultOnt.getValue();
