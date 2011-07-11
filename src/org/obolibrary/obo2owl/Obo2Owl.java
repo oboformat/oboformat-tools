@@ -303,7 +303,7 @@ public class Obo2Owl {
 				
 				OWLAnnotationProperty ap = trAnnotationProp(OboFormatTag.TAG_REMARK.getTag());
 				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(clause.getValue()));
-				
+			
 				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontIRI, ann);
 				
 				manager.applyChange(new AddAxiom(owlOntology, ax));

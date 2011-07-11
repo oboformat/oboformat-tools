@@ -18,9 +18,9 @@ public class OBORunnerConfigCLIReaderTest extends TestCase {
 		assertEquals("http://some.url", value.toArray()[0]);
 		assertEquals(new Boolean(true), config.isExpandMacros.getValue());
 	}
-
 	
-	public void testReadConfig2() {
+	
+	public void testReadConfig3() {
 		OBORunnerConfiguration config = OBORunnerConfigCLIReader.readConfig(new String[]{"-o","obi","--to","RDF"});
 		assertEquals(new Boolean(true), config.isOboToOwl.getValue());
 		assertEquals("obi", config.outFile.getValue());

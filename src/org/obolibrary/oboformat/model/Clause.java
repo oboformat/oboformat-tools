@@ -95,6 +95,11 @@ public class Clause {
 				sb.append(qv+" ");
 			}
 		}
+		if (xrefs != null) {
+			for (Xref x : xrefs) {
+				sb.append(x+" ");
+			}
+		}
 		return tag+"("+sb.toString()+")";
 	}
 

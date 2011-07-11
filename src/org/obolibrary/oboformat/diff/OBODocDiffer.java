@@ -1,5 +1,6 @@
 package org.obolibrary.oboformat.diff;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatParser;
 
 /**
  * Diffs two OBO Documents.
@@ -93,5 +95,19 @@ public class OBODocDiffer {
 		diffs.addAll(getDiffsAsym(ftype, f2,f1,2));
 		return diffs;
 	}
+	
+	public static void main(String[] args) throws IOException {
+		OBOFormatParser p = new OBOFormatParser();
+		OBODoc obodoc1 = p.parse(args[0]);
+		OBODoc obodoc2 = p.parse(args[1]);
+
+		OBODocDiffer dd = new OBODocDiffer();
+		List<Diff> diffs = dd.getDiffs(obodoc1, obodoc2);
+		for (Diff d : diffs) {
+			System.out.println(d);
+		}
+		
+	}
+
 
 }
