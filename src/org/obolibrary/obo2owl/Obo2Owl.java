@@ -385,6 +385,34 @@ public class Obo2Owl {
 			OWLObjectProperty p = trObjectProp(typedefFrame.getId());
 			add(fac.getOWLDeclarationAxiom(p));
 
+			String id = typedefFrame.getId();
+			Object xref = typedefFrame.getTagValue(OboFormatTag.TAG_XREF.getTag());
+			if (xref != null) {
+				String xid = ((Xref)xref).getIdref();
+
+				// RO and BFO have special status.
+				// avoid cycles (in case of self-xref)
+				if ((xid.startsWith("RO") ||
+						xid.startsWith("BFO")) &&
+						!xid.equals(id)) {
+					
+					
+				//	fac.getOWLAnnotationAssertionAxiom(prop, p.getIRI(), trLiteral(id), new HashSet<OWLAnnotation>());
+					OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
+							trTagToAnnotationProp("shorthand"),
+							p.getIRI(), 
+							trLiteral(id), 
+							new HashSet<OWLAnnotation>());
+					
+					add(ax);
+					
+					
+				//	return oboIdToIRI(xid);
+				}
+			}
+			
+			
+			
 			for (String tag : typedefFrame.getTags()) {
 				Collection<Clause> clauses = typedefFrame.getClauses(tag);
 				

@@ -722,6 +722,19 @@ public class Owl2Obo {
 
 	
 	public   String getIdentifier(OWLObject obj) {
+		
+		if(obj instanceof OWLObjectProperty){
+			OWLObjectProperty prop = (OWLObjectProperty) obj;
+			for(OWLAnnotationAssertionAxiom ax: prop.getAnnotationAssertionAxioms(this.owlOntology)){
+				String propId = getIdentifier(ax.getProperty());
+				
+				if("IAO:shorthand".equals(propId)){
+					return ((OWLLiteral)ax.getValue()).getLiteral();
+				}
+				
+			}
+		}
+		
 		if(obj instanceof OWLEntity)
 			return getIdentifier(((OWLEntity)obj).getIRI());
 		
@@ -982,7 +995,7 @@ public class Owl2Obo {
 	}
 	
 	private Frame getTypedefFrame(OWLEntity entity){
-		String id = this.getIdentifier(entity.getIRI());
+		String id = this.getIdentifier(entity);
 		Frame f = this.obodoc.getTypedefFrame(id);
 		if (f == null) {
 			f = new Frame(FrameType.TYPEDEF);
