@@ -3,17 +3,16 @@ package org.obolibrary.gui;
 import static org.obolibrary.gui.GuiTools.addRowGap;
 import static org.obolibrary.gui.GuiTools.createTextField;
 
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.Collection;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -33,6 +32,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	// generated
 	private static final long serialVersionUID = -1694788715411761694L;
 	
+	final Frame frame;
 	final JCheckBox danglingCheckbox;
 	final JCheckBox expandMacrosCheckbox;
 	final JTextArea downloadOntologies;
@@ -49,6 +49,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	/**
 	 * Create GUI panel for advanced settings with the given default values.
 	 * 
+	 * @param frame
 	 * @param allowDanglingDefault
 	 * @param expandMacrosDefault
 	 * @param defaultDownloadOntologies
@@ -57,7 +58,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * @param defaultBuildDir
 	 * @param defaultOwlOntologyVersion
 	 */
-	public GuiAdvancedPanel(boolean allowDanglingDefault, 
+	public GuiAdvancedPanel(Frame frame, boolean allowDanglingDefault, 
 			boolean expandMacrosDefault,
 			Collection<String> defaultDownloadOntologies, 
 			Collection<String> defaultOmitDownloadOntologies,
@@ -66,6 +67,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 			String defaultOwlOntologyVersion)
 	{
 		super();
+		this.frame = frame;
 		danglingCheckbox = new JCheckBox("Allow Dangling", allowDanglingDefault);
 		expandMacrosCheckbox = new JCheckBox("Expand OWL Macros", expandMacrosDefault);
 		
@@ -165,20 +167,16 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createDownloadDirPanel(GBHelper pos) {
-		final JFileChooser folderFC = new JFileChooser();
-		folderFC.setCurrentDirectory(new File("."));
-		folderFC.setDialogTitle("Work directory choose dialog");
-		folderFC.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		folderFC.setAcceptAllFileFilterUsed(false);
+		final SelectDialog dialog = SelectDialog.getFolderSelector(frame, "Work directory choose dialog"); 
+		
 		JButton selectButton = new JButton("Select");
 		selectButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				int returnVal = folderFC.showOpenDialog(GuiAdvancedPanel.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = folderFC.getSelectedFile();
-					String absolutePath = file.getAbsolutePath();
-					ontologyDownloadFolderField.setText(absolutePath);
+				dialog.show();
+				String selected = dialog.getSelectedCanonicalPath();
+				if (selected != null) {
+					ontologyDownloadFolderField.setText(selected);
 				}
 			}
 		});

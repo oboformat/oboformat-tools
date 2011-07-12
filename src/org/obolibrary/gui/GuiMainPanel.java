@@ -4,29 +4,25 @@ import static org.obolibrary.gui.GuiTools.addRowGap;
 import static org.obolibrary.gui.GuiTools.createTextField;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.gui.GuiTools.GBHelper;
@@ -42,50 +38,25 @@ public class GuiMainPanel extends SizedJPanel {
 
 	private final static Logger LOGGER = Logger.getLogger(GuiMainPanel.class); 
 	
+	final Frame frame;
 	final JList inputFileJList;
 	final JRadioButton obo2owlButton;
 	final JRadioButton owl2oboButton;
 	final JTextField outputFolderTextField;
 	final JTextField outputFileTextField;
 
-	// Can be replaced with FileNameExtensionFilter in JAVA6
-	private final static FileFilter OBO_OWL_FILE_FILTER = new FileFilter() {
-		
-		private final Set<String> extensions = new HashSet<String>(Arrays.asList("obo","owl"));
-		
-		@Override
-		public String getDescription() {
-			return "OBO & OWL files";
-		}
-		
-		@Override
-		public boolean accept(File f) {
-			if (f != null) {
-	            if (f.isDirectory()) {
-	                return true;
-	            }
-	            String fileName = f.getName();
-	            int i = fileName.lastIndexOf('.');
-	            if (i > 0 && i < fileName.length() - 1) {
-	                String extension = fileName.substring(i + 1).toLowerCase();
-	                return extensions.contains(extension);
-	            }
-	        }
-	        return false;
-		}
-	};
-	
 	/**
 	 * Constructor allows to build a panel with default values
 	 * 
+	 * @param frame
 	 * @param defaultInputFiles
 	 * @param defaultOutputFolder
 	 * @param defaultOutputFileName
 	 * @param obo2owl
 	 */
-	public GuiMainPanel(Iterable<String> defaultInputFiles, String defaultOutputFolder, String defaultOutputFileName, boolean obo2owl) {
+	public GuiMainPanel(Frame frame, Iterable<String> defaultInputFiles, String defaultOutputFolder, String defaultOutputFileName, boolean obo2owl) {
 		super();
-
+		this.frame = frame;
 		// create accessible fields
 		// add default values to these fields
 		
@@ -138,18 +109,10 @@ public class GuiMainPanel extends SizedJPanel {
 		// store the files in linked hash map, advantage: maintains insert order
 		final LinkedHashMap<String, File> files = new LinkedHashMap<String, File>();
 		
+		
+		final SelectDialog dialog = SelectDialog.getFileSelector(frame, "Input ontology file choose dialog", "OBO & OWL files", "obo","owl");
 		// use file chooser dialog for select input files
-		final JFileChooser fc = new JFileChooser();
-		String defaultInputFolder = ".";
-		if (lastAddedFile != null) {
-			File latestFile = files.get(lastAddedFile);
-			if (latestFile != null) {
-				defaultInputFolder = latestFile.getParentFile().getAbsolutePath();
-			}
-		}
-		fc.setCurrentDirectory(new File(defaultInputFolder));
-		fc.setDialogTitle("Input ontology file choose dialog");
-		fc.setFileFilter(OBO_OWL_FILE_FILTER);
+		
 		JScrollPane scrollPane = new JScrollPane(inputFileJList);
 		inputFileJList.setPreferredSize(new Dimension(350, 60));
 		
@@ -159,11 +122,11 @@ public class GuiMainPanel extends SizedJPanel {
 		fileDialogAddButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				int returnVal = fc.showOpenDialog(GuiMainPanel.this);
-	
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fc.getSelectedFile();
-					File old = files.put(file.getAbsolutePath(), file);
+				dialog.show();
+				String selected = dialog.getSelectedCanonicalPath();
+				if (selected != null) {
+					File file = new File(selected);
+					File old = files.put(selected, file);
 					// only update the model, if the file was not there before
 					if (old == null) {
 						updateInputFileData(inputFileJList, files);
@@ -205,16 +168,10 @@ public class GuiMainPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createOutputPanel(GBHelper pos) {
-		// file chooser for folders
-		final JFileChooser folderFC = new JFileChooser();
-		folderFC.setCurrentDirectory(new File(outputFolderTextField.getText()));
-		folderFC.setDialogTitle("Work directory choose dialog");
-		folderFC.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		folderFC.setAcceptAllFileFilterUsed(false);
+		final SelectDialog folderDialog = SelectDialog.getFolderSelector(frame, "Work directory choose dialog");
 		
+		final SelectDialog fileDialog = SelectDialog.getFileSelector(frame, "Output ontology file choose dialog", "OBO & OWL files", "obo","owl");
 		// file choosers for output file names
-		final JFileChooser fileFC = new JFileChooser();
-		fileFC.setFileFilter(OBO_OWL_FILE_FILTER);
 		
 		final JButton folderButton = new JButton("Select");
 		final JButton fileButton = new JButton("Select");
@@ -223,11 +180,11 @@ public class GuiMainPanel extends SizedJPanel {
 		folderButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				int returnVal = folderFC.showOpenDialog(GuiMainPanel.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = folderFC.getSelectedFile();
+				folderDialog.show();
+				String selected = folderDialog.getSelectedCanonicalPath();
+				if (selected != null) {
 					// set new folder and remove any previous file names
-					setOutputNames(file, null);
+					setOutputNames(selected, null);
 				}
 			}
 		});
@@ -236,12 +193,12 @@ public class GuiMainPanel extends SizedJPanel {
 		fileButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				fileFC.setCurrentDirectory(folderFC.getSelectedFile());
-				int returnVal = fileFC.showOpenDialog(GuiMainPanel.this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fileFC.getSelectedFile();
+				fileDialog.show();
+				String selected = fileDialog.getSelectedCanonicalPath();
+				if (selected != null) {
 					// if an output file is selected, use also its folder for the output.
-					setOutputNames(file.getParentFile(), file.getName());
+					File file = new File(selected);
+					setOutputNames(file.getParentFile().getAbsolutePath(), selected);
 				}
 			}
 		});
@@ -259,27 +216,21 @@ public class GuiMainPanel extends SizedJPanel {
 		add(fileButton, pos.nextCol().indentLeft(10));
 	}
 	
-	private void setOutputNames(File folder, String name) {
-		String absolutePath = folder.getAbsolutePath();
-		outputFolderTextField.setText(absolutePath);
+	private void setOutputNames(String folder, String name) {
+		outputFolderTextField.setText(folder);
 		outputFileTextField.setText(name == null ? "" : name);
 	}
 
-	private String lastAddedFile = null;
-
 	/**
 	 * Update the list model with a new list of files. 
-	 * Keeps also the {@link #lastAddedFile} value up-to-date.
 	 * 
 	 * @param fileList
 	 * @param files
 	 */
 	private void updateInputFileData(JList fileList, Map<String, File> files) {
 		DefaultListModel listModel = new DefaultListModel();
-		lastAddedFile = null;
 		for (String name : files.keySet()) {
 			listModel.addElement(name);
-			lastAddedFile = name;
 		}
 		fileList.setModel(listModel);
 	}

@@ -235,7 +235,7 @@ public class GuiMainFrame extends JFrame {
 	private SizedJPanel getMainPanel()
 	{
 		if (mainPanel == null) {
-			mainPanel = new GuiMainPanel(config.paths.getValue(), config.outputdir.getValue(), config.outFile.getValue(), config.isOboToOwl.getValue());
+			mainPanel = new GuiMainPanel(this, config.paths.getValue(), config.outputdir.getValue(), config.outFile.getValue(), config.isOboToOwl.getValue());
 		}
 		return mainPanel;
 	}
@@ -248,7 +248,8 @@ public class GuiMainFrame extends JFrame {
 	private SizedJPanel getAdvancedPanel()
 	{
 		if (advancedPanel == null) {
-			advancedPanel = new GuiAdvancedPanel(config.allowDangling.getValue(),
+			advancedPanel = new GuiAdvancedPanel(this, 
+					config.allowDangling.getValue(),
 					config.isExpandMacros.getValue(),
 					config.ontsToDownload.getValue(), 
 					config.omitOntsToDownload.getValue(),
