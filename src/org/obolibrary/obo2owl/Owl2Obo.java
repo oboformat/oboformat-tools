@@ -55,6 +55,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
@@ -168,6 +169,8 @@ public class Owl2Obo {
 				tr((OWLClassAssertionAxiom)ax);
 			}else if(ax instanceof OWLEquivalentObjectPropertiesAxiom) {
 				tr((OWLEquivalentObjectPropertiesAxiom)ax);
+			}else if(ax instanceof OWLSubAnnotationPropertyOfAxiom){
+				tr((OWLSubAnnotationPropertyOfAxiom)ax);
 			}else if(ax instanceof OWLSubObjectPropertyOfAxiom){
 				tr((OWLSubObjectPropertyOfAxiom)ax);
 			}else if(ax instanceof OWLObjectPropertyRangeAxiom){
@@ -397,7 +400,7 @@ public class Owl2Obo {
 	private void tr(OWLSubObjectPropertyOfAxiom ax){
 
 		OWLObjectPropertyExpression sup = ax.getSuperProperty();
-		OWLObjectPropertyExpression sub = ax.getSuperProperty();
+		OWLObjectPropertyExpression sub = ax.getSubProperty();
 
 
 		if(sub instanceof OWLObjectProperty && sup instanceof OWLObjectProperty){
@@ -420,6 +423,55 @@ public class Owl2Obo {
 
 
 	}
+	
+	private void tr(OWLSubAnnotationPropertyOfAxiom ax){
+
+		OWLAnnotationProperty sup = ax.getSuperProperty();
+		OWLAnnotationProperty sub = ax.getSubProperty();
+
+		String _tag = owlObjectToTag(sup);
+		if (_tag .equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())) {
+			Frame hf = obodoc.getHeaderFrame();
+			Clause clause = new Clause();
+			clause.setTag(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag());
+			clause.addValue(this.getIdentifier(sub));
+			clause.addValue("-");
+			hf.addClause(clause);
+			return;
+			
+		}
+		else if (_tag .equals(OboFormatTag.TAG_SUBSETDEF.getTag())) {
+			Frame hf = obodoc.getHeaderFrame();
+			Clause clause = new Clause();
+			clause.setTag(OboFormatTag.TAG_SUBSETDEF.getTag());
+			clause.addValue(this.getIdentifier(sub));
+			clause.addValue("-");
+			hf.addClause(clause);
+			return;
+			
+		}
+
+		if(sub instanceof OWLObjectProperty && sup instanceof OWLObjectProperty){
+
+			String supId = this.getIdentifier(sup); //getIdentifier(sup);
+
+			if(supId.startsWith("owl:")){
+				return;
+			}
+
+			Frame f = getTypedefFrame((OWLEntity)ax.getSubProperty());
+			Clause clause = new Clause();
+			clause.setTag(OboFormatTag.TAG_IS_A.getTag());
+			clause.addValue(supId);
+			f.addClause(clause);
+
+		}else{
+			LOG.warn("Unhandled axiom: " + ax);
+		}
+
+
+	}
+
 
 	private Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
 
@@ -591,7 +643,6 @@ public class Owl2Obo {
 			tr(aanAx, f);
 		}
 		 */
-		System.out.println(ontology.getAnnotations());
 		for(OWLAnnotation ann: ontology.getAnnotations()){
 			tr(ann.getProperty(), ann.getValue(), new HashSet<OWLAnnotation>(), f);
 		}
@@ -740,6 +791,8 @@ public class Owl2Obo {
 
 		if(obj instanceof OWLEntity)
 			return getIdentifier(((OWLEntity)obj).getIRI());
+		if(obj instanceof IRI)
+			return getIdentifier((IRI)obj);
 
 		return null;
 	}
