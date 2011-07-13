@@ -422,17 +422,20 @@ public class Owl2Obo {
 	}
 	
 	private Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
+
 	private String getLiteral(OWLLiteral literal){
 		String val = literal.getLiteral();
+	
 		
 		Matcher m = CRLF.matcher(val);
 		if(m.find())
 			val= m.replaceAll("\\\\n");
 		
 		//val = val.replaceAll("\n|\r", "\\\\\n");
-	//	val = val.replaceAll("\"", "\\\\\"");
-//		val = val.replaceAll("\\", "\\\\\\");
-
+	//	val = val.replaceAll("[\\]", "\\\\\\\\");
+		//val = val.replace("\\", "\\\\");
+		//val.re
+		
 		return val;
 	}
 	
@@ -762,8 +765,17 @@ public class Owl2Obo {
 		
 	}*/
 	
-	
+
 	public String getIdentifier(IRI iriId) {
+		String id = _getIdentifier(iriId);
+		if(id != null && id.startsWith("Error")){
+			id = null;
+		}
+		
+		return id;
+	}	
+	
+	private String _getIdentifier(IRI iriId) {
 	
 		
 		if(iriId == null)
@@ -1009,7 +1021,7 @@ public class Owl2Obo {
 
 	
 	private void tr(OWLClassAssertionAxiom ax){
-		OWLObject cls = ax.getClassExpression();
+		/*OWLObject cls = ax.getClassExpression();
 		
 		if(!(cls instanceof OWLClass))
 			return;
@@ -1083,7 +1095,7 @@ public class Owl2Obo {
 			f.addClause(c);
 		}else{
 			//TODO: individual
-		}
+		}*/
 			
 	}
 	
