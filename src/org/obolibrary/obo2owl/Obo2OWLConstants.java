@@ -29,8 +29,9 @@ public class Obo2OWLConstants {
 		IRI_OIO_hasNarrowSynonym(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "hasNarrowSynonym", "has_narrow_synonym", OboFormatTag.TAG_NARROW.getTag()),
 		IRI_OIO_hasExactSynonym(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "hasExactSynonym", "has_exact_synonym", OboFormatTag.TAG_EXACT.getTag()),
 		IRI_OIO_hasRelatedSynonym(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "hasRelatedSynonym", "has_related_synonym", OboFormatTag.TAG_RELATED.getTag()),
-		IRI_OIO_Subset(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "Subset", "subset", OboFormatTag.TAG_SUBSETDEF.getTag()),
-		IRI_OIO_SynonymType(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "SynonymType", "synonym_type", OboFormatTag.TAG_SYNONYMTYPEDEF.getTag());
+		hasSynonymType(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "hasSynonymType", "has_synonym_type", OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag()),
+		IRI_OIO_Subset(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "SubsetProperty", "subset_property", OboFormatTag.TAG_SUBSETDEF.getTag()),
+		IRI_OIO_SynonymType(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "SynonymTypeProperty", "synonym_type_property", OboFormatTag.TAG_SYNONYMTYPEDEF.getTag());
 		
 		IRI iri;
 		String namespace;

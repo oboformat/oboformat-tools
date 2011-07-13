@@ -70,6 +70,7 @@ public class OBOFormatConstants {
 		
 		// these are keywords, bot tags, but we keep them here for convenience
 		TAG_SCOPE("scope"), // implicit, in synonymtypedef
+		TAG_HAS_SYNONYM_TYPE("has_synonym_type"), // implicit, in synonym
 		TAG_BROAD("BROAD"),
 		TAG_NARROW("NARROW"),
 		TAG_EXACT("EXACT"),
