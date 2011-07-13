@@ -19,6 +19,7 @@ public class OBODoc {
 	protected Map<String,Frame> typedefFrameMap = new HashMap<String,Frame>();
 	protected Map<String,Frame> instanceFrameMap = new HashMap<String,Frame>();
 	protected Collection<Frame> annotationFrames = new LinkedList<Frame>();
+	protected Collection<OBODoc> importedOBODocs = new LinkedList<OBODoc>();
 
 	public OBODoc() {
 		super();
@@ -50,7 +51,15 @@ public class OBODoc {
 	public Frame getInstanceFrame(String id) {
 		return instanceFrameMap.get(id);
 	}
+	
 
+	public Collection<OBODoc> getImportedOBODocs() {
+		return importedOBODocs;
+	}
+
+	public void setImportedOBODocs(Collection<OBODoc> importedOBODocs) {
+		this.importedOBODocs = importedOBODocs;
+	}
 
 	public void addFrame(Frame f) throws FrameMergeException {
 		if (f.getType() == FrameType.TERM) {
@@ -119,7 +128,7 @@ public class OBODoc {
 		return false;
 	}
 	
-	public void importContents(OBODoc extDoc) throws FrameMergeException {
+	public void mergeContents(OBODoc extDoc) throws FrameMergeException {
 		for (Frame f : extDoc.getTermFrames())
 			addTermFrame(f);
 		for (Frame f : extDoc.getTypedefFrames())
