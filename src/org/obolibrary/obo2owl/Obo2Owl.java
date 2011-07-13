@@ -21,6 +21,7 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
@@ -37,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -255,25 +257,30 @@ public class Obo2Owl {
 				//fac.getOWLImportsDeclaration(importedOntologyIRI);
 			//	manager.applyChange(new AddImport(baseOnt, manager.getOWLDataFactory()
 				//		.getOWLImportsDeclaration(importedIRI)));
-			}else if (tag == OboFormatTag.TAG_SUBSETDEF){
+			} else if (tag == OboFormatTag.TAG_SUBSETDEF){
 		
+				OWLAnnotationProperty parentAnnotProp = trTagToAnnotationProp(t);
+				/*
 				OWLClass cls = clsToDeclar.get(t);
 				if(cls == null){
 					cls = trClass(trTagToIRI(t).toString());
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put(t, cls);
 				}
+				*/
 				
 				for(Clause clause: headerFrame.getClauses(t)){
 				
-					OWLIndividual indv= trIndividual(  clause.getValue().toString() );
-					add (fac.getOWLClassAssertionAxiom(cls, indv) );
+					OWLAnnotationProperty childAnnotProp = trAnnotationProp( clause.getValue().toString() );
+					add(fac.getOWLSubAnnotationPropertyOfAxiom(childAnnotProp, parentAnnotProp));
+					//OWLIndividual indv= trIndividual(  clause.getValue().toString() );
+					//add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
 					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
 					
-					add (fac.getOWLAnnotationAssertionAxiom(ap, ((OWLNamedIndividual)indv).getIRI(), trLiteral(clause.getValue2())));
+					add(fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), trLiteral(clause.getValue2())));
 				}
-			}else if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF){
+			} else if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF){
 				OWLClass cls = clsToDeclar.get(t);
 				if(cls == null){
 					cls = trClass(trTagToIRI(t).toString());
@@ -311,11 +318,18 @@ public class Obo2Owl {
 				// TODO
 			}*/else{
 				Collection<Clause> clauses = headerFrame.getClauses(t);
+				
 				for(Clause clause: clauses){
-					add(trGenericClause(ontIRI, t, clause));
+					addOntologyAnnotation(trTagToAnnotationProp(t), trLiteral(clause.getValue()));
 				}
 			}
 		}		
+	}
+	
+	protected void addOntologyAnnotation(OWLAnnotationProperty ap, OWLAnnotationValue v) {
+		OWLAnnotation ontAnn = fac.getOWLAnnotation(ap, v);
+		AddOntologyAnnotation addAnn = new AddOntologyAnnotation(owlOntology, ontAnn);
+		apply(addAnn);
 	}
 
 	public OWLClassExpression trTermFrame(Frame termFrame) {
@@ -520,12 +534,17 @@ public class Obo2Owl {
 		}
 		//System.out.println("adding:"+axiom);
 		AddAxiom addAx = new AddAxiom(owlOntology, axiom);
+		apply(addAx);
+	}
+	
+	protected void apply(OWLOntologyChange change) {
 		try {
-			manager.applyChange(addAx);
+			manager.applyChange(change);
 		}
 		catch (Exception e) {			
 			LOG.error(e+"\nCOULD NOT TRANSLATE AXIOM");
 		}
+		
 	}
 
 	private OWLAxiom trTermClause(OWLClass cls, String tag, Clause clause) {
@@ -757,11 +776,17 @@ public class Obo2Owl {
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_DEF) {
-			// TODO
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
 					sub, 
 					trLiteral(clause.getValue()), 
+					annotations);
+		}
+		else if (_tag == OboFormatTag.TAG_SUBSET) {
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trTagToAnnotationProp(tag),
+					sub, 
+					trAnnotationProp(clause.getValue().toString()).getIRI(), 
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_SYNONYM) {
