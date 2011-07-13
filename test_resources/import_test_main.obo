@@ -1,0 +1,8 @@
+ontology: import_test_imported
+import: import_test_imported.obo
+
+[Term]
+id: TEST:1
+name: nucleus
+relationship: part_of TEST:2 ! cell
+
