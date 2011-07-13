@@ -20,6 +20,7 @@ public class OBOFormatConstants {
 		TAG_DEFAULT_NAMESPACE( "default-namespace"),
 		TAG_IDSPACE( "idspace"),
 		TAG_TREAT_XREFS_AS_EQUIVALENT( "treat-xrefs-as-equivalent"),
+		TAG_TREAT_XREFS_AS_REVERSE_GENUS_DIFFERENTIA( "treat-xrefs-as-genus-differentia"),
 		TAG_TREAT_XREFS_AS_GENUS_DIFFERENTIA( "treat-xrefs-as-genus-differentia"),
 		TAG_TREAT_XREFS_AS_RELATIONSHIP( "treat-xrefs-as-relationship"),
 		TAG_TREAT_XREFS_AS_IS_A( "treat-xrefs-as-is_a"),
@@ -65,7 +66,14 @@ public class OBOFormatConstants {
 		TAG_IS_METADATA_TAG("is_metadata_tag"),
 		TAG_CONSIDER("consider"),
 		TAG_INVERSE_OF("inverse_of"),
-		TAG_IS_ASYMMETRIC("is_asymmetric");
+		TAG_IS_ASYMMETRIC("is_asymmetric"),
+		
+		// these are keywords, bot tags, but we keep them here for convenience
+		TAG_SCOPE("scope"), // implicit, in synonymtypedef
+		TAG_BROAD("BROAD"),
+		TAG_NARROW("NARROW"),
+		TAG_EXACT("EXACT"),
+		TAG_RELATED("RELATED");
 		
 		private String tag;
 		

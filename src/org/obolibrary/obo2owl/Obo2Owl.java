@@ -276,31 +276,39 @@ public class Obo2Owl {
 					//OWLIndividual indv= trIndividual(  clause.getValue().toString() );
 					//add (fac.getOWLClassAssertionAxiom(cls, indv) );
 	
-					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
+					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_COMMENT.getTag());
 					
 					add(fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), trLiteral(clause.getValue2())));
 				}
 			} else if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF){
+				OWLAnnotationProperty parentAnnotProp = this.trTagToAnnotationProp(t);
+				/*
 				OWLClass cls = clsToDeclar.get(t);
 				if(cls == null){
 					cls = trClass(trTagToIRI(t).toString());
 					add(fac.getOWLDeclarationAxiom(cls));
 					clsToDeclar.put(t, cls);
 				}
-			//	Clause clause = headerFrame.getClause(tag);
+				*/
+				//	Clause clause = headerFrame.getClause(tag);
 				
 				for(Clause clause: headerFrame.getClauses(t)){
 					Object values[] = clause.getValues().toArray();
 					
-					OWLNamedIndividual indv= (OWLNamedIndividual) trIndividual( values[0].toString()  );
-					add (fac.getOWLClassAssertionAxiom(cls, indv) );
+					//OWLNamedIndividual indv= (OWLNamedIndividual) trIndividual( values[0].toString()  );
+					OWLAnnotationProperty childAnnotProp = this.trAnnotationProp( values[0].toString() );
+					//add (fac.getOWLClassAssertionAxiom(cls, indv) );
+					add(fac.getOWLSubAnnotationPropertyOfAxiom(childAnnotProp, parentAnnotProp));
 	
 					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
-					add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[1] )));
+					add (fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), trLiteral( values[1] )));
 	
 					if(values.length>2){
-						ap = trTagToAnnotationProp("scope");
-						add (fac.getOWLAnnotationAssertionAxiom(ap, indv.getIRI(), trLiteral( values[2] )));
+						ap = trTagToAnnotationProp(OboFormatTag.TAG_SCOPE.getTag());
+						//add (fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), trLiteral( values[2] )));
+						add (fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), 
+								trTagToAnnotationProp( values[2].toString() ).getIRI()
+								));
 					}
 				}
 			
@@ -794,19 +802,19 @@ public class Obo2Owl {
 			Object[] values= clause.getValues().toArray();
 			
 			if(values.length>1){
-				OWLAnnotation ann= fac.getOWLAnnotation(trTagToAnnotationProp("scope"), trLiteral(values[1]));
-				annotations.add(ann);
+				//OWLAnnotation ann= fac.getOWLAnnotation(trTagToAnnotationProp("scope"), trLiteral(values[1]));
+				//annotations.add(ann);
 			
 			
 				if(values.length>2){
-					ann= fac.getOWLAnnotation(trTagToAnnotationProp("type"), trLiteral(values[2]));
+					OWLAnnotation ann= fac.getOWLAnnotation(trTagToAnnotationProp("type"), trLiteral(values[2]));
 					annotations.add(ann);
 					
 				}
 			}
 			
 			ax = fac.getOWLAnnotationAssertionAxiom(
-					trTagToAnnotationProp(tag),
+					trTagToAnnotationProp(values[1].toString()),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);

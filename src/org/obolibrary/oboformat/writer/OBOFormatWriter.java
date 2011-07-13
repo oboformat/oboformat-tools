@@ -297,7 +297,7 @@ public class OBOFormatWriter {
 					Clause cl = f.getClause(OboFormatTag.TAG_NAME.getTag());
 					if(cl != null){
 						if(idsLabel.length()>0)
-							idsLabel += "\t";
+							idsLabel += " ";
 						idsLabel += cl.getValue();
 					}
 						
@@ -331,7 +331,7 @@ public class OBOFormatWriter {
 		}
 		
 		if(idsLabel != null){
-			line += " !" +idsLabel;
+			line += " ! " +idsLabel;
 		}
 	
 		

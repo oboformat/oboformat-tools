@@ -70,6 +70,7 @@ public class OBORunner {
 			System.exit(1);
 		}
 
+		// If the -b option is set, then build ALL ontologies in the specified directory
 		if (buildDir != null) {
 			buildAllOboOwlFiles(buildDir, config, logger);
 		}
@@ -211,7 +212,8 @@ public class OBORunner {
 
 
 	/**
-	 * makes OWL from all selected ontologies
+	 * makes OWL from all selected ontologies.
+	 * These are downloaded from the OBO metadata file
 	 * 
 	 * 
 	 * @param dir
@@ -240,7 +242,7 @@ public class OBORunner {
 						fails.add(ont);
 						continue;
 					}
-					Obo2Owl.convertURL(url,dir+"/"+ontId+".owl",ontId);
+					Obo2Owl.convertURL(url,getURI(dir+"/"+ontId+".owl"),ontId);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
 
