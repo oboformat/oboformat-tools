@@ -98,6 +98,7 @@ public class OBOFormatWriter {
 		Frame headerFrame = doc.getHeaderFrame();
 
 		this.oboDoc = doc;
+		
 		writeHeader(headerFrame, writer);
 
 		List<Frame> termFrames = new ArrayList<Frame>();
@@ -134,21 +135,21 @@ public class OBOFormatWriter {
 
 	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
 
-		/*Clause c = frame.getClause("format-version");
-		if(c != null)
-			write(c, writer);*/
-
 		List<String> tags = duplicateTags(frame.getTags());
-
 		Collections.sort(tags, new HeaderTagsComparator());
 
 		for(String tag: tags){
 
-			if(tag.equals("format-version"))
+			if(tag.equals(OboFormatTag.TAG_FORMAT_VERSION.getTag()))
 				continue;
 
 			for(Clause clause: frame.getClauses(tag)){
-				write(clause, writer);
+				if(tag.equals(OboFormatTag.TAG_SUBSETDEF.getTag())){
+					writeSynonymtypedef(clause, writer);
+				}else if(tag.equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())){
+					writeSynonymtypedef(clause, writer);
+				}else
+					write(clause, writer);
 			}
 		}
 
@@ -203,6 +204,26 @@ public class OBOFormatWriter {
 
 	}
 
+	
+	private void writeSynonymtypedef(Clause clause, BufferedWriter writer) throws IOException{
+		String line = clause.getTag() + ": ";
+
+		boolean  first = true;
+		Iterator<Object> valuesIterator = clause.getValues().iterator();
+		Collection values = clause.getValues();
+		for(int i=0;i<values.size();i++) {
+			String value = valuesIterator.next() + "";
+			if (i==1) { line += "\""; }
+			value.replaceAll("\n", "\\n");
+			line += value;
+			if (i==1) { line += "\""; }
+			if (valuesIterator.hasNext()) { line += " "; }
+		}
+
+		writeLine(line, writer);
+
+	}
+	
 
 	private void writeClauseWithQuotedString(Clause clause, BufferedWriter writer) throws IOException{
 		String line = clause.getTag() + ": ";
@@ -245,6 +266,7 @@ public class OBOFormatWriter {
 
 	}
 
+	
 	public void writeDef(Clause clause, BufferedWriter writer) throws IOException{
 
 		writeClauseWithQuotedString(clause, writer);
@@ -346,6 +368,7 @@ public class OBOFormatWriter {
 		private static Hashtable<String, Integer> buildTagsPriorities(){
 			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
+			table.put(OboFormatTag.TAG_FORMAT_VERSION.getTag(),0);
 			table.put("ontology",5);
 			table.put("data-version",10);
 			table.put("date",15);
@@ -370,10 +393,11 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null || i2 == null){
-				return -1;
-			}
-
+			if(i1 == null)
+				i1 = 10000;
+			
+			if(i2 == null)
+				i2 = 10000;
 
 			return i1.compareTo(i2);
 		}
@@ -422,9 +446,11 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null || i2 == null){
-				return -1;
-			}
+			if(i1 == null)
+				i1 = 10000;
+			
+			if(i2 == null)
+				i2 = 10000;
 
 			return i1.compareTo(i2);
 		}
@@ -489,9 +515,11 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null || i2 == null){
-				return -1;
-			}
+			if(i1 == null)
+				i1 = 10000;
+			
+			if(i2 == null)
+				i2 = 10000;
 
 			return i1.compareTo(i2);
 		}
