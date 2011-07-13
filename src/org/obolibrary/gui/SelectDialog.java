@@ -66,6 +66,12 @@ public abstract class SelectDialog {
 		else {
 			// try native
 			final FileDialog dialog = new FileDialog(frame, title, FileDialog.LOAD);
+			/*
+			 * Extracted from the javadoc:
+			 * 
+			 * Filename filters do not function in Sun's reference
+			 * implementation for Microsoft Windows.
+			 */
 			dialog.setFilenameFilter(new SuffixFilenameFilter(extensions));
 			
 			return new SelectDialog() {
