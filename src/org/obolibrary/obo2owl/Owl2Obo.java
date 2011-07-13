@@ -428,24 +428,45 @@ public class Owl2Obo {
 
 		OWLAnnotationProperty sup = ax.getSuperProperty();
 		OWLAnnotationProperty sub = ax.getSubProperty();
-
+		
 		String _tag = owlObjectToTag(sup);
 		if (_tag .equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())) {
+			String name = "";
+			String scope = "";
+			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
+				String tg = owlObjectToTag(axiom.getProperty());
+				if(OboFormatTag.TAG_NAME.getTag().equals(tg)){
+					name = getLiteral((OWLLiteral)axiom.getValue());
+				}else if(OboFormatTag.TAG_SCOPE.getTag().equals(tg)){
+					scope = owlObjectToTag(axiom.getValue());
+				}
+			}
+		
 			Frame hf = obodoc.getHeaderFrame();
 			Clause clause = new Clause();
 			clause.setTag(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag());
 			clause.addValue(this.getIdentifier(sub));
-			clause.addValue("-");
+			clause.addValue(name);
+			clause.addValue(scope);
 			hf.addClause(clause);
 			return;
 			
 		}
 		else if (_tag .equals(OboFormatTag.TAG_SUBSETDEF.getTag())) {
+			String comment = "";
+			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
+				String tg = owlObjectToTag(axiom.getProperty());
+				if(OboFormatTag.TAG_COMMENT.getTag().equals(tg)){
+					comment = getLiteral((OWLLiteral)axiom.getValue());
+					break;
+				}
+			}
+
 			Frame hf = obodoc.getHeaderFrame();
 			Clause clause = new Clause();
 			clause.setTag(OboFormatTag.TAG_SUBSETDEF.getTag());
 			clause.addValue(this.getIdentifier(sub));
-			clause.addValue("-");
+			clause.addValue(comment);
 			hf.addClause(clause);
 			return;
 			
@@ -1014,11 +1035,17 @@ public class Owl2Obo {
 
 	public static String owlObjectToTag(OWLObject obj){
 
-		if(!(obj instanceof OWLNamedObject)){
-			return null;
+		IRI iriObj = null;
+		if((obj instanceof OWLNamedObject)){
+			iriObj =((OWLNamedObject) obj).getIRI();
+		}else if(obj instanceof IRI){
+			iriObj = (IRI)obj;
 		}
+		
+		if(iriObj == null)
+			return null;
 
-		String iri = ((OWLNamedObject) obj).getIRI().toString();
+		String iri = iriObj.toString();
 
 		String tag = annotationPropertyMap.get(iri);
 
@@ -1031,8 +1058,12 @@ public class Owl2Obo {
 
 		}
 		return tag;
+		
+		
 	}
 
+	
+	
 	/*
 	public static String propToTag(OWLAnnotationProperty prop) {
 		String iri = prop.getIRI().toString();
