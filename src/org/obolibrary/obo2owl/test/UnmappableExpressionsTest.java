@@ -89,16 +89,10 @@ public class UnmappableExpressionsTest extends TestCase {
 		OBOFormatParser p = new OBOFormatParser();
 		obodoc = p.parse(fn);
 		checkOBODoc(obodoc);
-		
-
-
-
-
 	}
 	
 	public static void checkOBODoc(OBODoc obodoc) {
 		// OBODoc tests
-		
 		 		
 		if (true) {
 			Frame tf = obodoc.getTermFrame("x1"); // TODO - may change
