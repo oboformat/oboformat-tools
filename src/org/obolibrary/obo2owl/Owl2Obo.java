@@ -38,7 +38,6 @@ import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
@@ -61,7 +60,6 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Owl2Obo {
 
@@ -1050,7 +1048,9 @@ public class Owl2Obo {
 		String tag = annotationPropertyMap.get(iri);
 
 		if (tag == null) {
-			String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
+			//String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
+			String prefix = Obo2OWLConstants.OIOVOCAB_IRI_PREFIX;
+
 			if (iri.startsWith(prefix)) {
 				tag =  iri.substring(prefix.length());
 			}

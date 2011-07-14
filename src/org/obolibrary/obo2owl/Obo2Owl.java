@@ -32,7 +32,6 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -57,10 +56,8 @@ public class Obo2Owl {
 	@Deprecated
 	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
 
-	@Deprecated
-	public static final String IRI_CLASS_SYNONYMTYPEDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
-	@Deprecated
-	public static final String IRI_CLASS_SUBSETDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_subsetdef";
+//	public static final String IRI_CLASS_SYNONYMTYPEDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
+//	public static final String IRI_CLASS_SUBSETDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_subsetdef";
 
 	public static final String IRI_PROP_isReversiblePropertyChain =  Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_isReversiblePropertyChain";
 
@@ -998,7 +995,9 @@ public class Obo2Owl {
 			iri = annotationPropertyMap.get(tag);
 		}
 		else {
-			iri = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+"IAO_"+tag);
+			//iri = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+"IAO_"+tag);
+			iri = IRI.create(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX+tag);
+
 		}
 
 		return iri;
