@@ -517,9 +517,9 @@ public class OBOFormatParser {
 			// frequently escape. We should either allow spaces in the spec
 			// (with complicates parsing) or forbid them and reject all obo documents
 			// that do not conform. Unfortunately that would limit the utility of
-			// this parser, so for now we allow spaces. maybe make it strict again
+			// this parser, so for now we allow spaces. We may make it strict again
 			// when community is sufficiently forewarned.
-			// (alternatively add smarts to OE to translate the spaces to underscores,
+			// (alternatively we may add smarts to OE to translate the spaces to underscores,
 			// so it's a one-off translation)
 			//
 			//return parseIdRef(cl);
@@ -1197,6 +1197,9 @@ public class OBOFormatParser {
 		parseZeroOrMoreWs();
 		String v = getParseUntil("!{");
 
+		// strip whitespace from the end - TODO
+		v = v.replaceAll("\\s$", "");
+		
 		cl.setValue(v);
 		//s.advanceLine();
 		return true;
