@@ -101,7 +101,7 @@ public class UnmappableExpressionsTest extends TestCase {
 		
 		 		
 		if (true) {
-			Frame tf = obodoc.getTermFrame("x.org:x1"); // TODO - may change
+			Frame tf = obodoc.getTermFrame("x1"); // TODO - may change
 			Collection<Clause> cs = tf.getClauses("intersection_of");
 			assertTrue(cs.size() != 1); // there should NEVER be a situation with single intersection tags
 			// TODO - add validation step prior to saving
