@@ -791,10 +791,15 @@ public class Obo2Owl {
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_SUBSET) {
+			Object v = clause.getValue();
+			if (v == null) {
+				// TODO: Throw Exceptions
+				System.out.println("Cannot translate: "+clause);
+			}
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
 					sub, 
-					trAnnotationProp(clause.getValue().toString()).getIRI(), 
+					trAnnotationProp(v.toString()).getIRI(), 
 					annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_SYNONYM) {
@@ -813,6 +818,9 @@ public class Obo2Owl {
 					annotations.add(ann);
 
 				}
+			}
+			else {
+				System.err.println("Warning: not enough values in"+clause);
 			}
 
 			ax = fac.getOWLAnnotationAssertionAxiom(
