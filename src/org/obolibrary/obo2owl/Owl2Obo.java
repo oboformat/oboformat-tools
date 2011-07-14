@@ -1,5 +1,6 @@
 package org.obolibrary.obo2owl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -697,6 +698,7 @@ public class Owl2Obo {
 
 			if(id == null){
 				LOG.debug("Axiom ignored: " + ce2);
+				return;
 			}else{
 
 				Clause c = new Clause();
@@ -710,7 +712,7 @@ public class Owl2Obo {
 
 			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();
 
-
+			List<Clause> clauses = new ArrayList<Clause>();
 			for( OWLClassExpression ce : list2){
 				String r = null;
 				//			cls2 = getIdentifier(list.get(0));
@@ -732,12 +734,15 @@ public class Owl2Obo {
 						c.addValue(r);
 
 					c.addValue(cls2);
-					f.addClause(c);
+					clauses.add(c);
+					//f.addClause(c);
 				}else{
 					LOG.debug("Axiom ingored: " + ce2);
+					return;
 				}
-
 			}
+			
+			f.setClauses(clauses);
 
 		}
 
@@ -793,13 +798,16 @@ public class Owl2Obo {
 
 	}
 
+	public  String getIdentifier(OWLObject obj) {
+		return getIdentifierFromObject(obj, this.owlOntology);
+	}	
 
-	public String getIdentifier(OWLObject obj) {
+	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont) {
 
 		if(obj instanceof OWLObjectProperty){
 			OWLObjectProperty prop = (OWLObjectProperty) obj;
-			for(OWLAnnotationAssertionAxiom ax: prop.getAnnotationAssertionAxioms(this.owlOntology)){
-				String propId = getIdentifier(ax.getProperty());
+			for(OWLAnnotationAssertionAxiom ax: prop.getAnnotationAssertionAxioms(ont)){
+				String propId = getIdentifierFromObject(ax.getProperty(), ont);
 
 				if("IAO:shorthand".equals(propId)){
 					return ((OWLLiteral)ax.getValue()).getLiteral();
@@ -838,7 +846,7 @@ public class Owl2Obo {
 	}*/
 
 
-	public String getIdentifier(IRI iriId) {
+	public static String getIdentifier(IRI iriId) {
 		String id = _getIdentifier(iriId);
 		if(id != null && id.startsWith("Error")){
 			id = null;
@@ -847,7 +855,7 @@ public class Owl2Obo {
 		return id;
 	}	
 
-	private String _getIdentifier(IRI iriId) {
+	private static String _getIdentifier(IRI iriId) {
 
 
 		if(iriId == null)
