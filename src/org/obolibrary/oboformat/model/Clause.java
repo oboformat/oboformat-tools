@@ -14,6 +14,19 @@ public class Clause {
 
 
 
+	public Clause(String tag) {
+		super();
+		this.tag = tag;
+	}
+	public Clause(String tag, String value) {
+		super();
+		this.tag = tag;
+		this.setValue(value);
+	}
+
+	public Clause() {
+		super();
+	}
 	public String getTag() {
 		return tag;
 	}
