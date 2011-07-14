@@ -1,6 +1,7 @@
 package org.obolibrary.oboformat.parser;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,7 +9,9 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -38,6 +41,8 @@ public class OBOFormatParser {
 	SimpleDateFormat headerDateFormat = new SimpleDateFormat("dd:MM:yyyy HH:mm");
 	SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
+	private boolean followImport;
+	
 	protected enum ParseState {
 		HEADER, BODY
 	}
@@ -241,14 +246,40 @@ public class OBOFormatParser {
 
 		OBODoc obodoc = new OBODoc();
 		try {
-			if (parseOBODoc(obodoc))
+			if (parseOBODoc(obodoc)){
+				Frame hf= obodoc.getHeaderFrame();
+				List<OBODoc> imports = new LinkedList<OBODoc>();
+				if(hf != null){
+					for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
+						String path = cl.getValue() + "";
+						OBODoc doc = new OBODoc();
+						if(followImport){
+							
+						}else{
+							Frame importHeaer = new Frame(FrameType.HEADER);
+							Clause ontologyCl = new Clause();
+							ontologyCl.setTag(OboFormatTag.TAG_ONTOLOGY.getTag());
+							ontologyCl.setValue(path);
+							importHeaer.addClause(ontologyCl);
+							doc.setHeaderFrame(importHeaer);
+						}
+						imports.add(doc);
+					}
+					
+					obodoc.setImportedOBODocs(imports);
+				}
+
 				return obodoc;
+			}
 		}
 		catch (Exception e) {
 			LOG.error("Line:"+s.getLineNo(), e);
 		}
+		
+		
 		return null;
 	}
+	
 	
 	// ----------------------------------------
 	// GRAMMAR

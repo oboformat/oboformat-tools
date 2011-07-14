@@ -1,5 +1,6 @@
 package org.obolibrary.obo2owl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -21,6 +22,7 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -234,9 +236,42 @@ public class Obo2Owl {
 			trTermFrame(f);
 		}
 		// TODO - individuals
+		
+		for(OBODoc importDoc: obodoc.getImportedOBODocs()){
+			//if proxy doc just put import statment
+			if(importDoc.getTermFrames().isEmpty() && importDoc.getTypedefFrames().isEmpty()){
+				Frame importHf = importDoc.getHeaderFrame();
+				Clause ontCl = importHf.getClause(OboFormatTag.TAG_ONTOLOGY.getTag());
+				String path= ontCl.getValue() + "";
+				
+				if(path.endsWith(".obo")){
+					path = path.substring(0, path.length()-4) + ".owl";
+				}
+				
+				path = getURI(path);
+				
+				IRI importIRI = IRI.create(path);
+				AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
+				manager.applyChange(ai);
+				
+			}
+			
+		}
+		
 		return owlOntology;
 	}
 
+	private  String getURI(String path){
+		if(path.startsWith("http://") || path.startsWith("file:///"))
+			return  path;
+			
+		File f = new File(path);
+		
+		return f.toURI().toString();
+		
+	}
+	
+	
 	public void trHeaderFrame(Frame headerFrame) {
 		//	IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
 		IRI ontIRI = owlOntology.getOntologyID().getOntologyIRI();
