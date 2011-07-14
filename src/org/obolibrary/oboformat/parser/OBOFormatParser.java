@@ -1087,6 +1087,7 @@ public class OBOFormatParser {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{");
 		if (id != null) {
+			id = id.trim();
 			if (id.contains(" ")) {
 				LOG.warn("accepting bad xref with spaces:<"+id+">");
 			}
