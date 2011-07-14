@@ -32,6 +32,8 @@ public class Xref {
 			return false;
 		if (annotation == null && other.annotation == null)
 			return true;
+		if (annotation == null || other.annotation == null)
+			return false;
 		return annotation.equals(other.annotation);
 		
 	}
