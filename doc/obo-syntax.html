@@ -190,8 +190,8 @@ a translation to the OWL DL abstract syntax.</p>
 <p>
   The first part of this document describes the syntax of OBO Format
   using BNF. OBO Files are parsed into abstract OBO documents. A
-  mapping is provided between abstract OBO documents and OWL2 and the
-  IAO ontology-metadata ontology.
+  mapping is provided between abstract OBO documents and OWL2 and
+  community metadata vocabularies.
 </p>
 
 <h2><a name="1.1"></a>1.1 Relationship to previous translations</h2>
@@ -369,7 +369,7 @@ tag-value qualifiers.
 <span class="nonterminal">EOL</span> ::=  <span class="nonterminal">ws*</span> [ <span class="nonterminal">QualifierBlock</span> ] <span class="nonterminal">ws*</span> [ <span class="nonterminal">HiddenComment</span> ] <span class="nonterminal">ws*</span> <span class="nonterminal">NewLineChar</span>
 <span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> } 
 <span class="nonterminal">HiddenComment</span> ::= '!' { ( <span class="nonterminal">Char</span> - <span class="nonterminal">NewlineChar</span> ) } 
-<span class="nonterminal">QualifierList</span>  ::= <span class="terminal">Qualifier</span> {',' {ws} <span class="terminal">Qualifier</span> }
+<span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' {ws} <span class="terminal">Qualifier</span> }
 <span class="nonterminal">Qualifier</span> ::= <span class="nonterminal">Rel-ID</span> '=' <span class="nonterminal">QuotedString</span> 
 </p>
 
@@ -388,9 +388,10 @@ tag-value qualifiers.
 <span class="nonterminal">Rel-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Instance-ID</span> ::=  <span class="nonterminal">ID</span>
 <!-- TODO: URLs -->
-<span class="nonterminal">ID</span> ::=  <span class="nonterminal">Prefixed-ID</span> | <span class="nonterminal">Unprefixed-ID</span>
+<span class="nonterminal">ID</span> ::=  <span class="nonterminal">Prefixed-ID</span> | <span class="nonterminal">Unprefixed-ID</span> | <span class="nonterminal">URL-as-ID</span>
 
-<span class="nonterminal">Unprefixed-ID</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="nonterminal">':'</span> ) }
+<span class="nonterminal">URL-as-ID</span> ::=   ( <span class="terminal">http:</span> | <span class="terminal">https:</span> ) { <span class="nonterminal">NonWsChar</span> }
+<span class="nonterminal">Unprefixed-ID</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="terminal">':'</span> ) }
 <span class="nonterminal">Prefixed-ID</span> ::=  <span class="nonterminal">Canonical-Prefixed-ID</span> | <span class="nonterminal">NonCanonical-Prefixed-ID</span> 
 </p>
 
@@ -617,12 +618,16 @@ classes).</p >
 Document. These structural constraints hold on an abstract OBO
 Document - the result of parsing a physical OBO document file.</p>
 
-<h3><a name="4.1"></a>4.1 Combining Frames</h3>
+<h3><a name="4.1"></a>4.1 Frame Identifiers</h3>
 
 <p>
   Each frame in an abstract OBO document can be accessed by its
-  identifier - the value of the <b>id</b> tag.
+  identifier - the value of the <b>id</b> tag. A frame can only of one
+  type. A document containing two frames of different types with
+  the same id is illegal.
 </p>
+
+<h3><a name="4.1.1"></a>4.1.1 Merging frames during parsing</h3>
 
 <p>
   Although it is strongly recommended that an OBOF document does not
@@ -641,7 +646,16 @@ Document - the result of parsing a physical OBO document file.</p>
   tag-value.
 </p>
 
-<h3><a name="4.2"></a>4.2 OBO namespaces and ontology name</h3>
+<h3><a name="4.2"></a>4.2 Typedef constraints</h3>
+
+              <p>
+                If a Typedef frame has a clause is_metadata_tag(true),
+                then that Typedef id may never be used as a Rel-ID in
+                an intersection_of clause.
+              </p>
+
+
+<h3><a name="4.3"></a>4.3 OBO namespaces and ontology name</h3>
 
 <p>
   Note that OBO namespaces are not the same as OWL namespaces - the
@@ -904,8 +918,10 @@ but it will eventually "ground out" in (a fragment of) OWL DL.</p>
 <tr>
 <td valign="top" style="white-space: pre;">subsetdef(ID String)
 </td>
-<td valign="top" style="white-space: pre;">ClassAssertion(<span class="name">T</span>(subsetdef) <span class="name">T</span>(ID))
-AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) <span class="name">T</span>(String))
+<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(ID))
+SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</span>(subsetdef) )
+AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) ID)
+AnnotationAssertion(<span class="name">T</span>(comment) <span class="name">T</span>(ID) String)
 </td>
 </td>
 </tr>
@@ -913,9 +929,10 @@ AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span
 <tr>
 <td valign="top" style="white-space: pre;">synonymtypedef(ID String [Scope])
 </td>
-<td valign="top" style="white-space: pre;">ClassAssertion(<span class="name">T</span>(synonymtypedef) <span class="name">T</span>(ID))
+<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(ID))
+SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</span>(subsetdef) )
 AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) <span class="name">T</span>(String))
-AnnotationAssertion(<span class="name">T</span>(scope) <span class="name">T</span>(ID) <span class="name">T</span>(Scope))
+[AnnotationAssertion(<span class="name">T</span>(hasScope) <span class="name">T</span>(ID) <span class="name">T</span>(Scope))]
 </td>
 </td>
 </tr>
@@ -956,8 +973,7 @@ AnnotationAssertion(<span class="name">T</span>(scope) <span class="name">T</spa
 <tr>
 <td valign="top" style="white-space: pre;">Typedef(Rel-id)
 </td>
-<td>is_metadata_tag(true) OR
-is_class_level(true)
+<td>is_metadata_tag(true)
 </td>
 <td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(Rel-id)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
 </td>
@@ -966,8 +982,7 @@ is_class_level(true)
 <tr>
 <td valign="top" style="white-space: pre;">Typedef(Rel-id)
 </td>
-<td>NOT (is_metadata_tag(true) OR
-is_class_level(true) )
+<td>NOT (is_metadata_tag(true))
 </td>
 
 <td valign="top" style="white-space: pre;">ObjectProperty(<span class="name">T</span>(Rel-id)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
@@ -1013,7 +1028,13 @@ is_class_level(true) )
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers)
+<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_class_level(true) &isin; TypedefFrames[Rel-ID]
+</td>
+<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(Qualifiers) <span class="name">T</span>(Class-ID) <span class="name">T</span>(Rel-ID) <span class="name">T</span>(Target-Class-ID) )</td>
+</tr>
+
+<tr>
+<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_class_level(true) &notin; TypedefFrames[Rel-ID]
 </td>
 <td valign="top" style="white-space: pre;">SubClassOf(<span class="name">T</span>(Qualifiers) <span class="name">T</span>(Class-ID) <span class="name">T</span>(rel(Rel-ID TargetClass-ID Qualifiers)) )</td>
 </tr>
@@ -1412,13 +1433,23 @@ is_transitive(Rel1-ID)</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">synonym(String Scope Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann(Scope Xrefs Qualifiers)) <span class="name">T</span>(synonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre;">synonym(String 'EXACT' [Type] Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(exactSynonyn) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">synonym(String Scope Type Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann(Scope Type Xrefs Qualifiers)) <span class="name">T</span>(synonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre;">synonym(String 'NARROW' [Type] Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(narrowSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+</tr>
+
+<tr>
+<td valign="top" style="white-space: pre;">synonym(String 'RELATED' [Type] Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(relatedSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+</tr>
+
+<tr>
+<td valign="top" style="white-space: pre;">synonym(String 'BROAD' [Type] Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(broadSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
@@ -1483,12 +1514,12 @@ is_transitive(Rel1-ID)</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">ann(Scope Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">ann( Xrefs Qualifiers)</td>
 <td valign="top" style="white-space: pre;">Annotation( <span class="name">T</span>(synonym-scope) <span class="name">T</span>(Scope)) <span class="name">T</span>(Xrefs Qualifiers)</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">ann(Scope Type Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre;">ann( Type Xrefs Qualifiers)</td>
 <td valign="top" style="white-space: pre;">Annotation( <span class="name">T</span>(synonym-type) <span class="name">T</span>(Type)) <span class="name">T</span>(Scope Xrefs Qualifiers)</td>
 </tr>
 
@@ -1500,6 +1531,23 @@ is_transitive(Rel1-ID)</td>
 </table>
 
 <h3><a name="5.8"></a>5.8 Translation of Annotation Vocabulary</h3>
+
+<p>
+ Annotation properties are drawn from the followling vocabularies:
+                <ul>
+                  <li>
+                    IAO  - http://purl.obolibrary.org/obo/IAO_
+                  </li>
+                  <li>
+                    oboInOwl  - http://www.geneontology.org/formats/oboInOwl#
+                  </li>
+                  <li>
+                    rdfs  - http://www.w3.org/2000/01/rdf-schema#
+                  </li>
+
+                </ul>
+</p>
+
 
 <table border="1" cellspacing="0">
 <caption><a id="translation-q" name="translationQ" />
@@ -1548,11 +1596,6 @@ is_transitive(Rel1-ID)</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">synonym</td>
-<td valign="top" style="white-space: pre;">obo:IAO_0000118</td>
-</tr>
-
-<tr>
 <td valign="top" style="white-space: pre;">is_anti_symmetric</td>
 <td valign="top" style="white-space: pre;">obo:IAO_0000427</td>
 </tr>
@@ -1565,67 +1608,68 @@ is_transitive(Rel1-ID)</td>
 
 <tr>
 <td valign="top" style="white-space: pre;">consider</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:consider</td>
 </tr>
 
+
 <tr>
-<td valign="top" style="white-space: pre;">synonym-scope</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">hasScope</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasScope</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym-type</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasSynonymType</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">scope-EXACT</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">exactSynonym</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasExactSynonym</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">scope-NARROW</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">narrowSynonym</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasNarrowSynonym</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">scope-BROAD</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">broadSynonym</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasBroadSynonym</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">scope-RELATED</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">relatedSynonym</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasRelatedSynonym</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonymtypedef</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:SynonymTypeProperty</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">xref</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:xref</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">subsetdef</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:SubsetProperty</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">subset</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:subset</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">alt_id</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:hasAlternativeId</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">shorthand</td>
-<td valign="top" style="white-space: pre;">TBD</td>
+<td valign="top" style="white-space: pre;">oboInOwl:shorthand</td>
 </tr>
 
 </tbody>
@@ -1691,7 +1735,7 @@ in ontologies. These have also proven useful for NLP purposes.
 (see <a href="#4.4.1">4.4.1</a>)
 </p>
 
-<h4><a name="5.9.2"></a>5.9.2. Translation of canonical OBO identifiers</h4>
+<h4><a name="5.9.2"></a>5.9.2. Translation of identifiers</h4>
 
 <p>The following table is used when translating an OBO identifier to an IRI</p>
 
@@ -1719,6 +1763,11 @@ in ontologies. These have also proven useful for NLP purposes.
 <tr>
 <td valign="top" style="white-space: pre;">Unprefixed-ID</td>
 <td valign="top" style="white-space: pre;">OntologyIRI <b>'#' Unprefixed-ID</b></td>
+</tr>
+
+<tr>
+<td valign="top" style="white-space: pre;">URL-as-ID</td>
+<td valign="top" style="white-space: pre;"> <b>URL-as-ID</b></td>
 </tr>
 
 </tbody>
