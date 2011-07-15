@@ -644,9 +644,17 @@ public class Owl2Obo {
 
 	private void tr(OWLOntology ontology) {
 		Frame f = new Frame(FrameType.HEADER);
-
 		this.obodoc.setHeaderFrame(f);
 
+		for(IRI iri: ontology.getDirectImportsDocuments()){
+			
+			Clause c = new Clause();
+			c.setTag(OboFormatTag.TAG_IMPORT.getTag());
+			c.setValue(iri.toString());
+			f.addClause(c);
+		}
+		
+		
 		String id = getOntologyId(this.owlOntology);
 		//this.ontologyId = id;
 

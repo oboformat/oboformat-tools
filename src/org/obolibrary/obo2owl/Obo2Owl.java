@@ -254,6 +254,8 @@ public class Obo2Owl {
 				AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
 				manager.applyChange(ai);
 				
+			}else{
+				//TODO convert importDoc to OWLOntology
 			}
 			
 		}
