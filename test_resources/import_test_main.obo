@@ -1,4 +1,4 @@
-ontology: import_test_imported
+ontology: import_test_main
 import: import_test_imported.obo
 
 [Term]
