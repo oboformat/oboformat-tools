@@ -17,6 +17,7 @@ relationship: releases_neurotransmitter TEST:a
 id: part_of
 name: part_of
 xref: BFO:0000050
+xref: OBO_REL:part_of
 
 [Typedef]
 id: has_part
