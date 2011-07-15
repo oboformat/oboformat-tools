@@ -149,6 +149,9 @@ public class Frame {
 		if (iClauses.size() == 1) {
 			throw new FrameStructureException(this, "single intersection_of tags are not allowed");
 		}
+		if (getClauses(OboFormatTag.TAG_INTERSECTION_OF.getTag()).size() > 1) {
+			throw new FrameStructureException(this, "multiple def tags not allowed");	
+		}
 		
 	}
 
