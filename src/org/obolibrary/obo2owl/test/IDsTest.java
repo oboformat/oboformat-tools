@@ -59,11 +59,11 @@ public class IDsTest extends TestCase {
 		
 		
 		iri= bridge.oboIdToIRI("part_of");
-		assertTrue("http://purl.obolibrary.org/obo/test#_part_of".equals(iri.toString()));
+		assertTrue("http://purl.obolibrary.org/obo/test#part_of".equals(iri.toString()));
 
 		//OWL 2 obo 
 		oboId = owl2Obo.getIdentifier(iri);
-		assertTrue("test:part_of".equals(oboId));
+		assertTrue("part_of".equals(oboId));
 		
 		
 		iri= bridge.oboIdToIRI("OBO_REL:part_of");

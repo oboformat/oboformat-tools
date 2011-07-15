@@ -875,12 +875,17 @@ public class Owl2Obo {
 		}else
 			id = iri;
 
+		String s[]= id.split("#_");
 
-		String s[]= id.split("#");
 		if(s.length>1){
-			prefixURI = prefixURI + s[0] + "#";
+			return s[0] + ":" + s[1];
+		}
+		
+		s= id.split("#");
+		if(s.length>1){
+//			prefixURI = prefixURI + s[0] + "#";
 
-			if(!(s[1].contains("#") || s[1].contains("_"))){
+//			if(!(s[1].contains("#") || s[1].contains("_"))){
 				String prefix = "";
 
 				if("owl".equals(s[0]) || "rdf".equals(s[0]) || "rdfs".equals(s[0])){
@@ -889,18 +894,13 @@ public class Owl2Obo {
 
 				return prefix + s[1];
 			}
-		}
+//		}
 
-		s= id.split("#_");
-
-		if(s.length>1){
-			return s[0] + ":" + s[1];
-		}
 
 
 		s= id.split("_");
 
-		if(s.length==2 && !id.contains("#")){
+		if(s.length==2 && !id.contains("#") && !s[1].contains("_")){
 			return s[0] + ":" + s[1];
 		}
 
