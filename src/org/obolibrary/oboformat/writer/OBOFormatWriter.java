@@ -3,9 +3,13 @@ package org.obolibrary.oboformat.writer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +42,8 @@ public class OBOFormatWriter {
 	private static HashSet<String> tagsInformative = buildTagsInformative();
 
 	private OBODoc oboDoc;
+
+	private boolean isCheckStructure = true;
 
 	public OBOFormatWriter(){
 		oboDoc = null;
@@ -86,6 +92,7 @@ public class OBOFormatWriter {
 	}
 
 
+
 	public void write(BufferedReader reader, BufferedWriter writer) throws IOException{
 		OBOFormatParser parser = new OBOFormatParser();
 		OBODoc doc = parser.parse(reader);
@@ -93,12 +100,24 @@ public class OBOFormatWriter {
 		write(doc, writer);
 	}
 
+	public void write(OBODoc doc, String outFile) throws IOException, URISyntaxException{
+
+		FileOutputStream os = new FileOutputStream(new File( outFile )); 
+		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+		BufferedWriter bw = new BufferedWriter(osw);
+		write(doc,bw);
+	}
+
 
 	public void write(OBODoc doc, BufferedWriter writer) throws IOException{
+
+		if (isCheckStructure) {
+			doc.check();
+		}
 		Frame headerFrame = doc.getHeaderFrame();
 
 		this.oboDoc = doc;
-		
+
 		writeHeader(headerFrame, writer);
 
 		List<Frame> termFrames = new ArrayList<Frame>();
@@ -204,7 +223,7 @@ public class OBOFormatWriter {
 
 	}
 
-	
+
 	private void writeSynonymtypedef(Clause clause, BufferedWriter writer) throws IOException{
 		String line = clause.getTag() + ": ";
 
@@ -223,7 +242,7 @@ public class OBOFormatWriter {
 		writeLine(line, writer);
 
 	}
-	
+
 
 	private void writeClauseWithQuotedString(Clause clause, BufferedWriter writer) throws IOException{
 		String line = clause.getTag() + ": ";
@@ -266,7 +285,7 @@ public class OBOFormatWriter {
 
 	}
 
-	
+
 	public void writeDef(Clause clause, BufferedWriter writer) throws IOException{
 
 		writeClauseWithQuotedString(clause, writer);
@@ -395,7 +414,7 @@ public class OBOFormatWriter {
 
 			if(i1 == null)
 				i1 = 10000;
-			
+
 			if(i2 == null)
 				i2 = 10000;
 
@@ -448,7 +467,7 @@ public class OBOFormatWriter {
 
 			if(i1 == null)
 				i1 = 10000;
-			
+
 			if(i2 == null)
 				i2 = 10000;
 
@@ -517,7 +536,7 @@ public class OBOFormatWriter {
 
 			if(i1 == null)
 				i1 = 10000;
-			
+
 			if(i2 == null)
 				i2 = 10000;
 

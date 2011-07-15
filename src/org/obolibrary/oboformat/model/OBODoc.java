@@ -147,6 +147,17 @@ public class OBODoc {
 			hf.addClause(ontClause);
 		}
 	}
+	
+	public void check() throws FrameStructureException {
+		getHeaderFrame().check();
+		for (Frame f : getTermFrames())
+			f.check();
+		for (Frame f : getTypedefFrames())
+			f.check();
+		for (Frame f : getInstanceFrames())
+			f.check();
+		
+	}
 
 
 	public String toString() {

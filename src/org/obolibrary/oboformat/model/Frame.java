@@ -6,11 +6,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+
 public class Frame {
 	
 	public enum FrameType {
 		HEADER, TERM, TYPEDEF, INSTANCE, ANNOTATION
 	}
+	
 	
 	protected Collection<Clause> clauses;
 	protected String id;
@@ -76,7 +79,6 @@ public class Frame {
 		return tagClauses.iterator().next(); // TODO - throw if > 1
 	}
 
-
 	public void setClauses(Collection<Clause> clauses) {
 		this.clauses = clauses;
 	}
@@ -140,6 +142,14 @@ public class Frame {
 			addClause(c);
 		}
 		// note we do not perform a document structure check at this point
+	}
+	
+	public void check() throws FrameStructureException {
+		Collection<Clause> iClauses = getClauses(OboFormatTag.TAG_INTERSECTION_OF.getTag());
+		if (iClauses.size() == 1) {
+			throw new FrameStructureException(this, "single intersection_of tags are not allowed");
+		}
+		
 	}
 
 }
