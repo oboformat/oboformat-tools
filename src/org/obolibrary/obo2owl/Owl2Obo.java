@@ -692,6 +692,9 @@ public class Owl2Obo {
 			return;
 		}
 
+		List<Clause> equivalenceAxiomClauses = new ArrayList<Clause>();
+
+		
 		if (cls2 != null) {
 			Clause c = new Clause();
 			c.setTag(OboFormatTag.TAG_EQUIVALENT_TO.getTag());
@@ -712,14 +715,12 @@ public class Owl2Obo {
 				c.setTag(OboFormatTag.TAG_UNION_OF.getTag());
 				//c.setValue(getIdentifier(list2.get(0)));
 				c.setValue(id);
-
-				f.addClause(c);
+				equivalenceAxiomClauses.add(c);
 			}
 		} else if (ce2 instanceof OWLObjectIntersectionOf) {
 
 			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();
 
-			List<Clause> clauses = new ArrayList<Clause>();
 			for( OWLClassExpression ce : list2){
 				String r = null;
 				//			cls2 = getIdentifier(list.get(0));
@@ -741,18 +742,22 @@ public class Owl2Obo {
 						c.addValue(r);
 
 					c.addValue(cls2);
-					clauses.add(c);
-					//f.addClause(c);
+					equivalenceAxiomClauses.add(c);
 				}else{
 					LOG.debug("Axiom ingored: " + ce2);
 					return;
 				}
 			}
 			
-			f.setClauses(clauses);
 
 		}
 
+		// Only add clauses if the *entire* equivalence axiom can be translated
+		for (Clause c : equivalenceAxiomClauses) {
+			f.addClause(c);
+		}
+
+		
 	}
 
 	private void tr(OWLDisjointClassesAxiom ax) {
