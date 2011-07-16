@@ -35,6 +35,7 @@ public class BFOROXrefTest extends TestCase {
 		boolean okOboRel = false;
 		
 		for (Clause c : xrcs) {
+			System.out.println(c.getValue().toString());
 			if (c.getValue().toString().equals("BFO:0000050")) {
 				okBfo = true;
 			}

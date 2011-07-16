@@ -1064,7 +1064,7 @@ public class OBOFormatParser {
 	private boolean parseXref(Clause cl) {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{");
-		if (id != null) {
+		if (id != null && !(id.equals(""))) {
 			id = id.replaceAll(" *$", "");
 			if (id.contains(" ")) {
 				// TODO

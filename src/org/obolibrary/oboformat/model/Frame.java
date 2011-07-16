@@ -92,7 +92,7 @@ public class Frame {
 		for (Clause cl: clauses) {
 			sb.append(cl.toString());
 		}
-		return "Frame("+sb.toString()+")";
+		return "Frame("+id+" "+sb.toString()+")";
 	}
 
 	public Object getTagValue(String tag) {

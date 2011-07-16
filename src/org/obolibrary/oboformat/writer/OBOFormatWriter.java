@@ -106,6 +106,7 @@ public class OBOFormatWriter {
 		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
 		write(doc,bw);
+		bw.close();
 	}
 
 

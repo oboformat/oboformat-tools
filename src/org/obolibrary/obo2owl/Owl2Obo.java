@@ -581,6 +581,9 @@ public class Owl2Obo {
 						}
 					}
 				}
+				else if (_tag == OboFormatTag.TAG_XREF) {
+					clause.setValue(new Xref(value));
+				}
 				else if(_tag == OboFormatTag.TAG_EXACT ||
 						_tag == OboFormatTag.TAG_NARROW ||
 						_tag == OboFormatTag.TAG_BROAD ||

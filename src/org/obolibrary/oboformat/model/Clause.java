@@ -101,19 +101,33 @@ public class Clause {
 			return tag+"=null";
 		StringBuffer sb = new StringBuffer();
 		for (Object ob : values) {
-			sb.append(ob);
+			sb.append(" "+ob);
 		}
 		if (qualifierValues != null) {
+			sb.append("{");
 			for (QualifierValue qv : qualifierValues) {
 				sb.append(qv+" ");
 			}
+			sb.append("}");
 		}
 		if (xrefs != null) {
+			sb.append("[");
 			for (Xref x : xrefs) {
 				sb.append(x+" ");
 			}
+			sb.append("]");
+			
 		}
 		return tag+"("+sb.toString()+")";
+	}
+	
+	private boolean collectionsEquals(Collection c1, Collection c2) {
+		if (c1 == null || c1.size() == 0) {
+			return (c2 == null || c2.size() == 0);
+		}
+		if (c1 == null || c2 == null)
+			return false;
+		return c1.equals(c2);
 	}
 
 	public boolean equals(Object e) {
@@ -130,7 +144,10 @@ public class Clause {
 		if (!getValues().equals(other.getValues()))
 			return false;
 	
-		
+		if (!collectionsEquals(xrefs, other.getXrefs())) {
+			return false;
+		}
+		/*
 		if (xrefs != null) {
 			if (other.getXrefs() == null)
 				return false;
@@ -142,6 +159,7 @@ public class Clause {
 				return false;
 			}
 		}
+		*/
 		
 		if (qualifierValues != null) {
 			if (other.getQualifierValues() == null)
