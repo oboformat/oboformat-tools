@@ -11,6 +11,8 @@ subsetdef: unvetted "unvetted"
 synonymtypedef: systematic_synonym "Systematic synonym" EXACT
 ontology: subset_test
 
+! Note that the gosubset_prok assignment deliberately has a space character at the end;
+! Leave this here, it is for testing purposes
 [Term]
 id: GO:0008150
 name: biological_process
@@ -23,7 +25,7 @@ subset: goslim_candida
 subset: goslim_pir
 subset: goslim_plant
 subset: goslim_yeast
-subset: gosubset_prok
+subset: gosubset_prok 
 synonym: "biological process" EXACT []
 synonym: "biological process unknown" NARROW []
 synonym: "physiological process" EXACT []

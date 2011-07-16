@@ -1,3 +1,5 @@
+ontology: rel_xref_test
+
 [Term]
 id: TEST:a
 name: a
