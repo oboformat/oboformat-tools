@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,6 +56,17 @@ public class RoundTripTest extends TestCase {
 		
 		Owl2Obo revbridge = new Owl2Obo();
 		OBODoc obodoc2 = revbridge.convert(oo);
+		
+		OBOFormatWriter ow = new OBOFormatWriter();
+		try {
+			ow.write(obodoc2, "/tmp/roundtrip.obo");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		OBODocDiffer dd = new OBODocDiffer();
 		List<Diff> diffs = dd.getDiffs(obodoc, obodoc2);
