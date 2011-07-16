@@ -8,6 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
+import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
@@ -31,6 +32,12 @@ public class DanglingOwl2OboTest extends TestCase {
 		Owl2Obo bridge = new Owl2Obo();
 		
 		OBODoc doc = bridge.convert(ontology);
+		
+		Frame f = doc.getTermFrame("UBERON:0000020");
+		System.out.println("F="+f);
+		Clause rc = f.getClause("name");
+		assertTrue(rc.getValue().equals("sense organ"));
+
 		
 		OBOFormatWriter oboWriter = new OBOFormatWriter();
 		
