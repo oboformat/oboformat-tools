@@ -1,0 +1,88 @@
+format-version: 1.2
+ontology: pr
+synonymtypedef: PSI-MOD-label "Unique short label curated by PSI-MOD" EXACT
+
+[Term]
+id: GO:0032991
+name: macromolecular complex
+namespace: cellular_component
+def: "A stable assembly of two or more macromolecules, i.e. proteins, nucleic acids, carbohydrates or lipids, in which the constituent parts function together." [GOC:mah]
+is_a: snap:Object  ! object
+
+[Term]
+id: GO:0043234
+name: protein complex
+namespace: cellular_component
+def: "Any macromolecular complex composed of two or more polypeptide subunits, which may or may not be identical. Protein complexes may have other associated non-protein prosthetic groups, such as nucleotides, metal ions or carbohydrate groups." [GOC:go_curators]
+comment: Note that although at some level almost all cellular components can be thought of as protein complexes, this term is intended to exclude structures composed of the same repeating subunit or subunits, for example microtubules. Protein complexes encompassed by this term are generally not structural, and usually have a defined set of subunits.
+synonym: "protein-protein complex" EXACT []
+is_a: GO:0032991  ! macromolecular complex
+
+[Term]
+id: GO:0070443
+name: mad-max complex
+namespace: cellular_component
+def: "A transcriptional repressor complex that consists of a heterodimer of the bHLH-ZIP proteins Mad and Max." [PMID:8224841]
+is_a: GO:0043234  ! protein complex
+relationship: has_part PR:000010211 {cardinality="1"} ! protein max
+relationship: has_part PR:000025988 {cardinality="1"} ! max dimerization protein
+
+[Term]
+id: PR:000000001
+name: protein
+namespace: protein
+def: "An amino acid chain that is produced de novo by ribosome-mediated translation of a genetically-encoded mRNA." [PRO:DAN, PRO:WCB]
+comment: Proteins descended from a common ancestor can be classified into families and superfamilies composed of products of evolutionarily-related genes. The domain architecture of a protein is described by the order of its constituent domains. Proteins with the same domains in the same order are defined as homeomorphic [PRO:WCB].
+is_a: PR:000018263  ! amino acid chain
+
+[Term]
+id: PR:000010211
+name: protein max
+namespace: protein
+def: "A protein that is a translation product of the MAX gene or a 1:1 ortholog thereof. The prototypical protein contains a Helix-loop-helix DNA-binding domain (PF00010)." [PRO:DNx]
+comment: Category=gene. Flag=automatic.
+synonym: "MAX" RELATED []
+synonym: "Myn" RELATED []
+synonym: "bHLHd4" EXACT []
+synonym: "class D basic helix-loop-helix protein 4" EXACT []
+synonym: "myc-associated factor X" EXACT []
+synonym: "myc-binding novel HLH/LZ protein" EXACT []
+synonym: "protein myn" EXACT []
+xref: PIRSF:PIRSF038026
+is_a: PR:000000001  ! protein
+
+[Term]
+id: PR:000018263
+name: amino acid chain
+namespace: protein
+def: "A polymer of amino acids linked by peptide bonds." [PRO:DAN]
+synonym: "peptide" NARROW []
+synonym: "polypeptide" NARROW []
+is_a: snap:Object  ! object
+
+[Term]
+id: PR:000025988
+name: max dimerization protein
+namespace: protein
+def: "A protein with a core domain composition consisting of a helix-loop-helix DNA-binding domain (PF00010). Proteins in this class antigonize the effects of myc proteins." [PMID:16620026]
+comment: Category=family.
+xref: PIRSF:PIRSF015841
+is_a: PR:000000001  ! protein
+
+[Term]
+id: snap:MaterialEntity
+name: material_entity
+namespace: protein
+
+[Term]
+id: snap:Object
+name: object
+namespace: protein
+is_a: snap:MaterialEntity  ! material_entity
+
+[Typedef]
+id: has_part
+name: has_part
+namespace: protein
+is_transitive: true
+
