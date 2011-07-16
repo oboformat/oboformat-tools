@@ -599,7 +599,6 @@ public class Owl2Obo {
 						
 						}else if(OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag().equals(propId)){
 							type = getIdentifier(aan.getValue());
-							System.out.println("   TYPE: "+aan.getValue()+" --> "+type);
 						}
 					}
 
@@ -817,7 +816,9 @@ public class Owl2Obo {
 			for(OWLAnnotationAssertionAxiom ax: prop.getAnnotationAssertionAxioms(ont)){
 				String propId = getIdentifierFromObject(ax.getProperty(), ont);
 
-				if("IAO:shorthand".equals(propId)){
+				// see BFOROXrefTest
+				// 5.9.3. Special Rules for Relations
+				if(propId.equals("shorthand")){
 					return ((OWLLiteral)ax.getValue()).getLiteral();
 				}
 
