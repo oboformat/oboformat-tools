@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.obolibrary.obo2owl.Obo2Owl;
+import org.obolibrary.obo2owl.Owl2Obo;
+import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
@@ -23,6 +25,31 @@ public class BFOROXrefTest extends TestCase {
 
 	public static void testConvertXPs() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		OWLOntology owlOnt = convertOBOFile("rel_xref_test.obo");
+		
+		Owl2Obo revbridge = new Owl2Obo();
+		OBODoc d2 = revbridge.convert(owlOnt);
+		
+		Frame part_of = d2.getTypedefFrame("part_of");
+		Collection<Clause> xrcs = part_of.getClauses("xref");
+		boolean okBfo = false;
+		boolean okOboRel = false;
+		
+		for (Clause c : xrcs) {
+			if (c.getValue().toString().equals("BFO:0000050")) {
+				okBfo = true;
+			}
+			if (c.getValue().toString().equals("OBO_REL:part_of")) {
+				okOboRel = true;
+			}
+		}
+		assertTrue(okBfo);
+		assertTrue(okOboRel);
+		
+		Frame a = d2.getTermFrame("TEST:a");
+		Clause rc = a.getClause("relationship");
+		assertTrue(rc.getValue().equals("part_of"));
+		assertTrue(rc.getValue2().equals("TEST:b"));
+
 	}
 	
 	public static OBODoc parseOBOFile(String fn) throws IOException {
