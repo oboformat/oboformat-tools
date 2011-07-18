@@ -3,8 +3,10 @@ package org.obolibrary.oboformat.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -43,11 +45,73 @@ public class OBODoc {
 		return instanceFrameMap.values();
 	}
 	public Frame getTermFrame(String id) {
-		return termFrameMap.get(id);
+		return getTermFrame(id, false);
 	}
+
+	public Frame getTermFrame(String id, boolean followImport) {
+		//this set is check for cycles
+		Set<String> set = new HashSet<String>();
+		set.add(this.toString());
+		return _getTermFrame(id, followImport, set);
+	}
+
+	
+	private Frame _getTermFrame(String id, boolean followImport, Set<String> visitedDocs) {
+		Frame f = termFrameMap.get(id);
+		
+		if(f!= null){
+			return f;
+		}else if(followImport){
+			for(OBODoc doc: importedOBODocs){
+				
+				if( !visitedDocs.contains(doc.toString())){
+					visitedDocs.add(doc.toString());
+					f = doc.getTermFrame(id, followImport);
+				}
+				
+				if(f != null)
+					return f;
+			}
+		}
+		
+		return null;
+	}
+	
+	
 	public Frame getTypedefFrame(String id) {
-		return typedefFrameMap.get(id);
+		return getTypedefFrame(id, false);
 	}
+
+	public Frame getTypedefFrame(String id, boolean followImports) {
+		Set<String> set = new HashSet<String>();
+		set.add(this.toString());
+		return _getTypedefFrame(id, followImports, set);
+
+	}
+	
+	private Frame _getTypedefFrame(String id, boolean followImports, Set<String> visitedDocs) {
+		Frame f = typedefFrameMap.get(id);
+		
+		if(f!= null){
+			return f;
+		}else if(followImports){
+			for(OBODoc doc: importedOBODocs){
+				
+				if( !visitedDocs.contains(doc.toString())){
+					visitedDocs.add(doc.toString());
+					f = doc.getTypedefFrame(id, followImports);
+				}
+				
+				if(f != null)
+					return f;
+			}
+		}
+		
+		return null;
+		
+	}
+	
+	
 	public Frame getInstanceFrame(String id) {
 		return instanceFrameMap.get(id);
 	}

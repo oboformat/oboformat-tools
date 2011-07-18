@@ -6,11 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +39,8 @@ public class OBOFormatParser {
 	SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
 	private boolean followImport;
+	
+	private Object location;
 	
 	protected enum ParseState {
 		HEADER, BODY
@@ -195,6 +194,14 @@ public class OBOFormatParser {
 		this.s.reader = r;
 	}
 
+	public void setFollowImports(boolean followImports){
+		this.followImport = followImports;
+	}
+	
+	public boolean getFollowImports(){
+		return this.followImport;
+	}
+	
 	/**
 	 * Parses a local file to an OBODoc
 	 * 
@@ -205,6 +212,8 @@ public class OBOFormatParser {
 	public OBODoc parse(String fn) throws IOException {
 		if (fn.startsWith("http:"))
 			return parse(new URL(fn));
+		
+		 this.location = fn;
 		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fn), DEFAULT_CHARACTER_ENCODING));
 		 return parse(in);
 	}	
@@ -217,6 +226,7 @@ public class OBOFormatParser {
 	 * @throws IOException
 	 */
 	public OBODoc parse(URL url) throws IOException {
+		this.location = url;
 	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), DEFAULT_CHARACTER_ENCODING));
 	    return parse(in);
 	}	
@@ -254,6 +264,21 @@ public class OBOFormatParser {
 						String path = cl.getValue() + "";
 						OBODoc doc = new OBODoc();
 						if(followImport){
+							OBOFormatParser parser = new OBOFormatParser();
+							
+							if(this.location != null){
+								if(location instanceof URL){
+									URL url = (URL) this.location;
+									String p = url.toString();
+									int index= p.lastIndexOf("/");
+									path = p.substring(0, index+1) + path;
+									doc = parseURL(path);
+								}else{
+									File f = new File(this.location + "");
+									f = new File(f.getParent(), path);
+									doc = parser.parse(f.getAbsolutePath());
+								}
+							}
 							
 						}else{
 							Frame importHeaer = new Frame(FrameType.HEADER);
@@ -385,7 +410,7 @@ public class OBOFormatParser {
 	}
 
 	private String checkRelation(String relId, String tag, String frameId, OBODoc doc){
-		if(doc.getTypedefFrame(relId) == null){
+		if(doc.getTypedefFrame(relId, followImport) == null){
 			return "The relation '" + relId+ "' reference in" +
 					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not delclared";
 		}
@@ -395,7 +420,7 @@ public class OBOFormatParser {
 	
 	private String checkClassReference(String classId, String tag, String frameId, OBODoc doc)
 	{
-		if(doc.getTermFrame(classId) == null){
+		if(doc.getTermFrame(classId, followImport) == null){
 			 return "The class '" + classId+ "' reference in" +
 					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not delclared";
 		}

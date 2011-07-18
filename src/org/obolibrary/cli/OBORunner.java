@@ -92,7 +92,7 @@ public class OBORunner {
 			if (config.isOboToOwl.getValue()) {
 				//showMemory();
 				OBOFormatParser p = new OBOFormatParser();
-				
+				p.setFollowImports(true);
 				OBODoc obodoc = p.parseURL(iri);
 
 				List<String> errors= p.checkDanglingReferences(obodoc);
