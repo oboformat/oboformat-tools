@@ -1044,10 +1044,17 @@ public class Obo2Owl {
 	private OWLAnnotationProperty trTagToAnnotationProp(String tag) {
 		IRI iri = trTagToIRI(tag);
 		OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(iri);
+		
 
 		if (!apToDeclare.contains(ap)) {
 			apToDeclare.add(ap);
 			add(fac.getOWLDeclarationAxiom(ap));
+	
+			Obo2OWLVocabulary vocab = Obo2OWLConstants.getVocabularyObj(tag);
+			if(vocab != null){
+				add (fac.getOWLAnnotationAssertionAxiom(fac.getRDFSLabel(), iri, trLiteral( vocab.getLabel()) ) );
+			}
+
 		}
 
 		return ap;

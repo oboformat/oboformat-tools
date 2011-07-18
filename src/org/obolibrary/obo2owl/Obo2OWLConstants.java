@@ -1,5 +1,8 @@
 package org.obolibrary.obo2owl;
 
+import java.util.HashSet;
+import java.util.Hashtable;
+
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.IRI;
 
@@ -77,6 +80,20 @@ public class Obo2OWLConstants {
 		public String getMappedTag(){
 			return this.mappedTag;
 		}
+	}
+	
+	private static Hashtable<String, Obo2OWLVocabulary> tagsToVocab;
+
+	static{
+		tagsToVocab = new Hashtable<String, Obo2OWLVocabulary>();
+		
+		for(Obo2OWLVocabulary vocab: Obo2OWLVocabulary.values()){
+			tagsToVocab.put(vocab.mappedTag, vocab);
+		}
+	}
+	
+	public static Obo2OWLVocabulary getVocabularyObj(String tag){
+		return tagsToVocab.get(tag);
 	}
 	
 }
