@@ -15,6 +15,7 @@ import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.FrameStructureException;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
@@ -56,6 +57,14 @@ public class RoundTripTest extends TestCase {
 		
 		Owl2Obo revbridge = new Owl2Obo();
 		OBODoc obodoc2 = revbridge.convert(oo);
+		
+		try {
+			obodoc2.check();
+		} catch (FrameStructureException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			assertTrue(false);
+		}
 		
 		OBOFormatWriter ow = new OBOFormatWriter();
 		try {
