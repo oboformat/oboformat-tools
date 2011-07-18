@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,13 +77,18 @@ public class Obo2Owl {
 	private Map<String, OWLAnnotationProperty> typedefToAnnotationProperty;
 
 	public Obo2Owl() {
-		init();
+		init(null);
 	}
 
-	private void init() {
+	
+	private void init(OWLOntologyManager manager) {
 		idSpaceMap = new HashMap<String,String>();
-		manager = OWLManager.createOWLOntologyManager();
-		fac = manager.getOWLDataFactory();
+		if(manager == null)
+			this.manager = OWLManager.createOWLOntologyManager();
+		else
+			this.manager = manager;
+		
+		fac = this.manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 		clsToDeclar = new Hashtable<String, OWLClass>();
 		typedefToAnnotationProperty = new Hashtable<String, OWLAnnotationProperty>();
@@ -196,11 +202,48 @@ public class Obo2Owl {
 
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
-		init();
+		init(null);
 		return tr();
 	}
 
+	private OWLOntology convert(OBODoc obodoc, OWLOntologyManager manager) throws OWLOntologyCreationException {
+		this.obodoc = obodoc;
+		init(manager);
+		return tr();
+	}
+	
+	
 	private OWLOntology tr() throws OWLOntologyCreationException {
+		
+		List<IRI> importIRIs = new ArrayList<IRI>();
+		Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
+		for(OBODoc importDoc: obodoc.getImportedOBODocs()){
+			//if proxy doc just put import statment
+			if(importDoc.getTermFrames().isEmpty() && importDoc.getTypedefFrames().isEmpty()){
+				Frame importHf = importDoc.getHeaderFrame();
+				Clause ontCl = importHf.getClause(OboFormatTag.TAG_ONTOLOGY.getTag());
+				String path= ontCl.getValue() + "";
+				
+				if(path.endsWith(".obo")){
+					path = path.substring(0, path.length()-4) + ".owl";
+				}
+				
+				path = getURI(path);
+				
+				IRI importIRI = IRI.create(path);
+				importIRIs.add(importIRI);
+				//AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
+				//manager.applyChange(ai);
+				
+			}else{
+				//TODO convert importDoc to OWLOntology
+				Obo2Owl bridge = new Obo2Owl();
+				OWLOntology ont = bridge.convert(importDoc, this.manager);
+				ontologies.add(ont);
+			}
+			
+		}		
+		
 		Frame hf = obodoc.getHeaderFrame();
 		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY.getTag());
 		if (ontClause != null) {
@@ -211,15 +254,27 @@ public class Obo2Owl {
 				ontIRI = IRI.create(ontOboId);
 			}
 			else {
-				ontIRI = IRI.create(DEFAULT_IRI_PREFIX+ontOboId+".owl");
+				ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+ontOboId+".owl");
 			}
 
-			owlOntology = manager.createOntology(ontIRI);
+			if(ontologies.size()>0){
+				owlOntology = manager.createOntology(ontIRI, ontologies);
+			}else{
+				owlOntology = manager.createOntology(ontIRI);
+			}
 		}
 		else {
 			defaultIDSpace = "TODO";
+			IRI ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX + defaultIDSpace);
+
 			// TODO - warn
-			owlOntology = manager.createOntology();
+			
+			if(ontologies.size()>0){
+				owlOntology = manager.createOntology(ontIRI, ontologies);
+			}else{
+				owlOntology = manager.createOntology(ontIRI);
+			}
+				
 		}
 		trHeaderFrame(hf);
 
@@ -236,29 +291,12 @@ public class Obo2Owl {
 			trTermFrame(f);
 		}
 		// TODO - individuals
-		
-		for(OBODoc importDoc: obodoc.getImportedOBODocs()){
-			//if proxy doc just put import statment
-			if(importDoc.getTermFrames().isEmpty() && importDoc.getTypedefFrames().isEmpty()){
-				Frame importHf = importDoc.getHeaderFrame();
-				Clause ontCl = importHf.getClause(OboFormatTag.TAG_ONTOLOGY.getTag());
-				String path= ontCl.getValue() + "";
-				
-				if(path.endsWith(".obo")){
-					path = path.substring(0, path.length()-4) + ".owl";
-				}
-				
-				path = getURI(path);
-				
-				IRI importIRI = IRI.create(path);
-				AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
-				manager.applyChange(ai);
-				
-			}else{
-				//TODO convert importDoc to OWLOntology
-			}
-			
+
+		for(IRI importIRI: importIRIs){
+			AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
+			manager.applyChange(ai);
 		}
+		
 		
 		return owlOntology;
 	}
