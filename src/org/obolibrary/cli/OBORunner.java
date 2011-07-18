@@ -174,7 +174,7 @@ public class OBORunner {
 	}
 
 	private static void usage() {
-		System.out.println("obolib-obo2owl [--to SYNTAX, --allowdangling] -o FILEPATH-URI OBO-FILE");
+		System.out.println("obolib-obo2owl [--to SYNTAX, --allowdangling --followimports] -o FILEPATH-URI OBO-FILE");
 		System.out.println("obolib-obo2owl -b BUILDPATH-URI");
 		System.out.println("\n");
 		System.out.println("Converts obo files to OWL. If -b option is used, entire\n");
