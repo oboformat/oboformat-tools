@@ -46,6 +46,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	final JRadioButton formatOWLXMLButton;
 	final JRadioButton formatManchesterButton;
 	final JTextField owlOntologyVersion;
+	final JCheckBox strictCheckBox;
 
 	/**
 	 * Create GUI panel for advanced settings with the given default values.
@@ -65,12 +66,16 @@ public class GuiAdvancedPanel extends SizedJPanel {
 			Collection<String> defaultOmitDownloadOntologies,
 			String defaultOntologyConfigValue, 
 			String defaultBuildDir, 
-			String defaultOwlOntologyVersion, boolean followImports)
+			String defaultOwlOntologyVersion, boolean followImports, boolean strictConversion)
 	{
 		super();
 		this.frame = frame;
 		danglingCheckbox = new JCheckBox("Allow Dangling", allowDanglingDefault);
+		
 		followImportsCheckBox = new JCheckBox("Follow Imports", followImports);
+
+		strictCheckBox = new JCheckBox("Strict Conversion", strictConversion);
+		
 		expandMacrosCheckbox = new JCheckBox("Expand OWL Macros", expandMacrosDefault);
 		
 		// create Field for downloadOntologies
@@ -135,6 +140,9 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		createFollowImportsPanel(pos);
 		addRowGap(this, pos, 5);
 		
+		createStrictPanel(pos);
+		addRowGap(this, pos, 5);
+
 		// flag for expand macros
 		createExpandMacros(pos);
 		addRowGap(this, pos, 5);
@@ -261,6 +269,10 @@ public class GuiAdvancedPanel extends SizedJPanel {
 
 	private void createFollowImportsPanel(GBHelper pos) {
 		add(followImportsCheckBox, pos.nextRow());
+	}
+
+	private void createStrictPanel(GBHelper pos) {
+		add(strictCheckBox, pos.nextRow());
 	}
 	
 

@@ -60,6 +60,15 @@ public class OBORunnerConfiguration {
 		}
 	};
 	
+	public final Variable<Boolean> strictConversion = new ParamterVariable<Boolean>("Strict Conversion", false,
+			"--strictconversion", "--strict-conversion") {
+
+		@Override
+		public boolean setValue(String value) {
+			this.value = true;
+			return true;
+		}
+	};
 	
 	protected final Variable<Boolean> showHelp = new ParamterVariable<Boolean>("show help",false,"-h","--help"){
 

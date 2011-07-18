@@ -174,7 +174,11 @@ public class GuiMainFrame extends JFrame {
 		// allowDangling
 		config.allowDangling.setRealValue(advancedPanel.danglingCheckbox.isSelected());
 		
+		//followimports
 		config.followImports.setRealValue(advancedPanel.followImportsCheckBox.isSelected());
+		
+		//strickconversion
+		config.strictConversion.setRealValue(advancedPanel.strictCheckBox.isSelected());
 		
 		// expand Macros
 		config.isExpandMacros.setRealValue(advancedPanel.expandMacrosCheckbox.isSelected());
@@ -258,7 +262,9 @@ public class GuiMainFrame extends JFrame {
 					config.defaultOnt.getValue(),
 					config.buildDir.getValue(),
 					config.version.getValue(),
-					config.followImports.getValue());
+					config.followImports.getValue(),
+					config.strictConversion.getValue()
+			);
 		}
 		return advancedPanel;
 	}

@@ -78,7 +78,8 @@ public class Owl2Obo {
 	private String ontologyId;
 	//private String ontologyId;
 
-
+	private boolean strictConversion;
+	
 	private void init() {
 		idSpaceMap = new HashMap<String, String>();
 		idSpaceMap.put("http://www.obofoundry.org/ro/ro.owl#", "OBO_REL");
@@ -124,6 +125,14 @@ public class Owl2Obo {
 
 	}
 
+	public void setStrictConversion(boolean b){
+		this.strictConversion = b;
+	}
+	
+	public boolean getStrictConversion(){
+		return this.strictConversion;
+	}
+	
 	public OWLOntologyManager getManager() {
 		return manager;
 	}
@@ -194,7 +203,16 @@ public class Owl2Obo {
 				tr((OWLSubPropertyChainOfAxiom)ax);
 			}else{
 				if(!(ax instanceof OWLAnnotationAssertionAxiom)){
-					LOG.warn("The axiom is not translated: " + ax);
+					String logErr = "the axiom is not translated : " + ax;
+					String err = "The conversion is halted as the axiom is not translated: " + ax;
+					if(strictConversion){
+						logErr = err;
+					}
+					
+					LOG.warn(logErr);
+					
+					if(strictConversion)
+						throw new RuntimeException(err);
 				}
 			}
 			// tr(ax);
@@ -246,7 +264,17 @@ public class Owl2Obo {
 			trObjectProperty(prop, tag, disjointFrom);
 
 		}else{
-			LOG.warn("Unhandeled axiom: " + ax);
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 		}
 
 	}
@@ -268,7 +296,17 @@ public class Owl2Obo {
 		String rel2 = getIdentifier(list.get(1));
 
 		if(rel1 == null || rel2 == null){
-			LOG.warn("The axiom '" + ax + "' is not translated.");
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 			return;
 		}
 
@@ -417,7 +455,17 @@ public class Owl2Obo {
 			f.addClause(clause);
 
 		}else{
-			LOG.warn("Unhandled axiom: " + ax);
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 		}
 
 
@@ -486,7 +534,17 @@ public class Owl2Obo {
 			f.addClause(clause);
 
 		}else{
-			LOG.warn("Unhandled axiom: " + ax);
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 		}
 
 
@@ -620,6 +678,7 @@ public class Owl2Obo {
 				}
 			}else{
 				LOG.warn("The annotation '" +prop + "' is not translated");
+				
 			}
 
 
@@ -691,7 +750,17 @@ public class Owl2Obo {
 		Frame f = getTermFrame((OWLEntity) ce1);
 
 		if (f == null) {
-			LOG.warn("Cann't Translate axion: " + ax);
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 			return;
 		}
 
@@ -710,7 +779,17 @@ public class Owl2Obo {
 			String id = this.getIdentifier(list2.get(0));
 
 			if(id == null){
-				LOG.debug("Axiom ignored: " + ce2);
+				String logErr = "the axiom is not translated : " + ax;
+				String err = "The conversion is halted as the axiom is not translated: " + ax;
+				if(strictConversion){
+					logErr = err;
+				}
+				
+				LOG.warn(logErr);
+				
+				if(strictConversion)
+					throw new RuntimeException(err);
+				
 				return;
 			}else{
 
@@ -747,8 +826,16 @@ public class Owl2Obo {
 					c.addValue(cls2);
 					equivalenceAxiomClauses.add(c);
 				}else{
-					LOG.debug("Axiom ingored: " + ce2);
-					return;
+					String logErr = "the axiom is not translated : " + ax;
+					String err = "The conversion is halted as the axiom is not translated: " + ax;
+					if(strictConversion){
+						logErr = err;
+					}
+					
+					LOG.warn(logErr);
+					
+					if(strictConversion)
+						throw new RuntimeException(err);
 				}
 			}
 			
@@ -1104,7 +1191,7 @@ public class Owl2Obo {
 	}*/
 
 	private Frame getTermFrame(OWLEntity entity) {
-		String id = this.getIdentifier(entity.getIRI());
+		String id = getIdentifier(entity.getIRI());
 		Frame f = this.obodoc.getTermFrame(id);
 		if (f == null) {
 			f = new Frame(FrameType.TERM);
@@ -1225,8 +1312,16 @@ public class Owl2Obo {
 				String fillerId = this.getIdentifier(r.getFiller());
 
 				if(fillerId == null){
-					LOG.debug("The axiom is not translated: " + ax);
-					return;
+					String logErr = "the axiom is not translated : " + ax;
+					String err = "The conversion is halted as the axiom is not translated: " + ax;
+					if(strictConversion){
+						logErr = err;
+					}
+					
+					LOG.warn(logErr);
+					
+					if(strictConversion)
+						throw new RuntimeException(err);
 				}
 
 				Clause c = new Clause();
@@ -1237,10 +1332,30 @@ public class Owl2Obo {
 				c.addValue(fillerId);
 				f.addClause(c);
 			} else {
-				LOG.warn("Cann't translate axiom: " + ax);
+				String logErr = "the axiom is not translated : " + ax;
+				String err = "The conversion is halted as the axiom is not translated: " + ax;
+				if(strictConversion){
+					logErr = err;
+				}
+				
+				LOG.warn(logErr);
+				
+				if(strictConversion)
+					throw new RuntimeException(err);
+				
 			}
 		} else {
-			LOG.warn("Cann't translate axiom: " + ax);
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+			
+			LOG.warn(logErr);
+			
+			if(strictConversion)
+				throw new RuntimeException(err);
+			
 		}
 	}
 

@@ -16,7 +16,7 @@ public class OBORunnerGui extends OBORunner {
 	public static void main(String[] args) {
 		
 		Logger rootLogger = Logger.getRootLogger();
-		final BlockingQueue<String> logQueue =  new ArrayBlockingQueue<String>(100);
+		final BlockingQueue<String> logQueue =  new ArrayBlockingQueue<String>(100000);
 		
 		rootLogger.addAppender(new AppenderSkeleton() {
 			
@@ -58,7 +58,9 @@ public class OBORunnerGui extends OBORunner {
 						buildAllOboOwlFiles(buildDir, config, logger);
 					}
 					runConversion(config, logger);
-				} catch (Exception e) {
+				}catch (RuntimeException e){
+					logger.error("Internal error: "+ e.getMessage(), e);
+				}catch (Exception e) {
 					logger.error("Internal error: "+ e.getMessage(), e);
 				} catch (Throwable e) {
 					logger.fatal("Internal error: "+ e.getMessage(), e);

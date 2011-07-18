@@ -151,6 +151,7 @@ public class OBORunner {
 				}
 				
 				Owl2Obo bridge = new Owl2Obo();
+				bridge.setStrictConversion(config.strictConversion.getValue());
 				OBODoc doc = bridge.convert(ontology);
 				
 				String outputFilePath = outFile;
@@ -174,7 +175,7 @@ public class OBORunner {
 	}
 
 	private static void usage() {
-		System.out.println("obolib-obo2owl [--to SYNTAX, --allowdangling --followimports] -o FILEPATH-URI OBO-FILE");
+		System.out.println("obolib-obo2owl [--to SYNTAX, --allowdangling --followimports --strictconversion] -o FILEPATH-URI OBO-FILE");
 		System.out.println("obolib-obo2owl -b BUILDPATH-URI");
 		System.out.println("\n");
 		System.out.println("Converts obo files to OWL. If -b option is used, entire\n");
