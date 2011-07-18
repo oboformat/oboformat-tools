@@ -174,6 +174,8 @@ public class GuiMainFrame extends JFrame {
 		// allowDangling
 		config.allowDangling.setRealValue(advancedPanel.danglingCheckbox.isSelected());
 		
+		config.followImports.setRealValue(advancedPanel.followImportsCheckBox.isSelected());
+		
 		// expand Macros
 		config.isExpandMacros.setRealValue(advancedPanel.expandMacrosCheckbox.isSelected());
 		
@@ -255,7 +257,8 @@ public class GuiMainFrame extends JFrame {
 					config.omitOntsToDownload.getValue(),
 					config.defaultOnt.getValue(),
 					config.buildDir.getValue(),
-					config.version.getValue());
+					config.version.getValue(),
+					config.followImports.getValue());
 		}
 		return advancedPanel;
 	}

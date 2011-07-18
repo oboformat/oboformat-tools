@@ -49,6 +49,17 @@ public class OBORunnerConfiguration {
 			return true;
 		}
 	};
+
+	public final Variable<Boolean> followImports = new ParamterVariable<Boolean>("Follow Imports", false,
+			"--followimports", "--follow-imports") {
+
+		@Override
+		public boolean setValue(String value) {
+			this.value = true;
+			return true;
+		}
+	};
+	
 	
 	protected final Variable<Boolean> showHelp = new ParamterVariable<Boolean>("show help",false,"-h","--help"){
 

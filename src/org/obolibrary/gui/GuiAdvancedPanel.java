@@ -34,6 +34,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	
 	final Frame frame;
 	final JCheckBox danglingCheckbox;
+	final JCheckBox followImportsCheckBox;
 	final JCheckBox expandMacrosCheckbox;
 	final JTextArea downloadOntologies;
 	final JTextArea omitDownloadOntologies;
@@ -64,11 +65,12 @@ public class GuiAdvancedPanel extends SizedJPanel {
 			Collection<String> defaultOmitDownloadOntologies,
 			String defaultOntologyConfigValue, 
 			String defaultBuildDir, 
-			String defaultOwlOntologyVersion)
+			String defaultOwlOntologyVersion, boolean followImports)
 	{
 		super();
 		this.frame = frame;
 		danglingCheckbox = new JCheckBox("Allow Dangling", allowDanglingDefault);
+		followImportsCheckBox = new JCheckBox("Follow Imports", followImports);
 		expandMacrosCheckbox = new JCheckBox("Expand OWL Macros", expandMacrosDefault);
 		
 		// create Field for downloadOntologies
@@ -127,6 +129,10 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		
 		// flag for allow dangling
 		createDanglingPanel(pos);
+		addRowGap(this, pos, 5);
+
+		// flag for allow dangling
+		createFollowImportsPanel(pos);
 		addRowGap(this, pos, 5);
 		
 		// flag for expand macros
@@ -253,6 +259,10 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		add(danglingCheckbox, pos.nextRow());
 	}
 
+	private void createFollowImportsPanel(GBHelper pos) {
+		add(followImportsCheckBox, pos.nextRow());
+	}
+	
 
 	/**
 	 * Layout for the expand macros check box.
