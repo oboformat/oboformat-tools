@@ -76,6 +76,9 @@ public class UnmappableExpressionsTest extends TestCase {
 				
 		Owl2Obo bridge = new Owl2Obo();
 		OBODoc obodoc = bridge.convert(ontology);
+		for (Frame f : obodoc.getTermFrames()) {
+			System.out.println(f);
+		}
 //		checkOBODoc(obodoc);
 
 		// ROUNDTRIP AND TEST AGAIN
