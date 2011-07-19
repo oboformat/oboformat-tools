@@ -10,7 +10,7 @@ public class Clause {
 	protected Collection<Object> values;
 	protected Collection<Xref> xrefs;
 	protected Collection<QualifierValue> qualifierValues =
-		 new ArrayList<QualifierValue>();
+		new ArrayList<QualifierValue>();
 
 
 
@@ -47,12 +47,12 @@ public class Clause {
 		this.values = new ArrayList<Object>(1);
 		values.add(v);
 	}
-	
+
 	public void addValue(Object v) {
 		if (values == null)
 			values = new ArrayList<Object>(1);
 		values.add(v);
-		
+
 	}
 
 
@@ -60,12 +60,12 @@ public class Clause {
 		// TODO Auto-generated method stub
 		return values.toArray()[0];
 	}
-	
+
 	public Object getValue2() {
 		// TODO Auto-generated method stub
 		return values.toArray()[1];
 	}
-	
+
 	public Collection<Xref> getXrefs() {
 		return xrefs;
 	}
@@ -73,7 +73,7 @@ public class Clause {
 	public void setXrefs(Collection<Xref> xrefs) {
 		this.xrefs = xrefs;
 	}
-	
+
 	public void addXref(Xref xref) {
 		if (xrefs == null)
 			xrefs = new Vector<Xref>();
@@ -95,7 +95,7 @@ public class Clause {
 		qualifierValues.add(qv);
 	}
 
-	
+
 	public String toString() {
 		if (values == null)
 			return tag+"=null";
@@ -116,11 +116,11 @@ public class Clause {
 				sb.append(x+" ");
 			}
 			sb.append("]");
-			
+
 		}
 		return tag+"("+sb.toString()+")";
 	}
-	
+
 	private boolean collectionsEquals(Collection c1, Collection c2) {
 		if (c1 == null || c1.size() == 0) {
 			return (c2 == null || c2.size() == 0);
@@ -131,19 +131,36 @@ public class Clause {
 	}
 
 	public boolean equals(Object e) {
-		
+
 		if(e == null || !(e instanceof Clause))
 			return false;
-		
+
 		Clause other = (Clause) e;
-		
-		
+
+
 		if (!getTag().equals(other.getTag()))
 			return false;
-		
-		if (!getValues().equals(other.getValues()))
-			return false;
-	
+
+		if (getValues().size() == 1 && other.getValues().size() == 1) {
+			// special case for comparing booleans
+			//  this is a bit of a hack - ideally owl2obo would use the correct types
+			if (!getValue().equals(other.getValue())) {
+				if (getValue().equals(Boolean.TRUE) && other.getValue().equals("true")) {
+					// special case - OK
+				}
+				else if (other.getValue().equals(Boolean.TRUE) && getValue().equals("true")) {
+					// special case - OK					
+				}
+				else {
+					return false;
+				}
+				
+			}
+		}
+		else {
+			if (!getValues().equals(other.getValues()))
+				return false;
+		}
 		if (!collectionsEquals(xrefs, other.getXrefs())) {
 			return false;
 		}
@@ -159,8 +176,8 @@ public class Clause {
 				return false;
 			}
 		}
-		*/
-		
+		 */
+
 		if (qualifierValues != null) {
 			if (other.getQualifierValues() == null)
 				return false;
@@ -172,7 +189,7 @@ public class Clause {
 				return false;
 			}
 		}
-		
+
 
 		return true;
 	}

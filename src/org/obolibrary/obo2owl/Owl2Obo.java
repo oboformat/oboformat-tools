@@ -1037,6 +1037,23 @@ public class Owl2Obo {
 		if(s.length==2 && !id.contains("#") && !s[1].contains("_")){
 			return s[0] + ":" + s[1];
 		}
+		if(s.length > 2 && !id.contains("#")) {
+			if (s[s.length-1].replaceAll("[0-9]","").length() == 0) {
+				StringBuffer sb = new StringBuffer();
+				for (int i=0; i < s.length; i++) {
+					if (i > 0) {
+						if (i == s.length -1) {
+							sb.append(":");
+						}
+						else {
+							sb.append("_");						
+						}
+					}
+					sb.append(s[i]);
+				}
+				return sb.toString();
+			}
+		}
 
 
 		return iri;

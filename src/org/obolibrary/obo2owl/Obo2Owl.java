@@ -1182,7 +1182,7 @@ public class Obo2Owl {
 		if (idParts.length > 1) {
 			db = idParts[0];
 			localId = idParts[1];
-			if(id.contains("_")){
+			if(localId.contains("_")){
 				db += "#_";
 			}else
 				db += "_";

@@ -148,12 +148,24 @@ public class EquivalentToTest extends TestCase {
 		}
 		// check reciprocal direction
 		if (true) {
-			Frame tf = obodoc.getTermFrame("X:2");
-			Collection<Clause> cs = tf.getClauses("equivalent_to");
-			assertTrue(cs.size() == 1);
-			Object v = cs.iterator().next().getValue();
-			System.out.println("V="+v);
-			assertTrue(v.equals("X:1")); 
+			Frame tf2 = obodoc.getTermFrame("X:2");
+			System.out.println(tf2);
+			Collection<Clause> cs2 = tf2.getClauses("equivalent_to");
+			Frame tf1 = obodoc.getTermFrame("X:1");
+			System.out.println(tf1);
+			Collection<Clause> cs1 = tf1.getClauses("equivalent_to");
+			boolean ok = false;
+			if (cs2.size() == 1) {
+				if (cs2.iterator().next().getValue().toString().equals("X:1")) {
+					ok = true;
+				}
+			}
+			if (cs1.size() == 1) {
+				if (cs1.iterator().next().getValue().toString().equals("X:2")) {
+					ok = true;
+				}
+			}
+			assertTrue(ok);
 		}	
 	}
 

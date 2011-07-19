@@ -40,12 +40,22 @@ public class IDsTest extends TestCase {
 		assertTrue("GO:001".equals(oboId));
 		
 		
+		iri= bridge.oboIdToIRI("My_Ont:FOO_002");
+		assertTrue("http://purl.obolibrary.org/obo/My_Ont#_FOO_002".equals(iri.toString()));
+
+		oboId = owl2Obo.getIdentifier(iri);
+				assertTrue("My_Ont:FOO_002".equals(oboId));
+	
+		
+
 		iri= bridge.oboIdToIRI("My_Ont:002");
-		assertTrue("http://purl.obolibrary.org/obo/My_Ont#_002".equals(iri.toString()));
+		assertTrue("http://purl.obolibrary.org/obo/My_Ont_002".equals(iri.toString()));
+
 
 		
 		//OWL 2 obo 
 		oboId = owl2Obo.getIdentifier(iri);
+		System.out.println("roundtrip:"+oboId);
 		assertTrue("My_Ont:002".equals(oboId));
 		
 		

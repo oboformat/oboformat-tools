@@ -134,8 +134,8 @@ public class RelationShorthandTest extends TestCase {
 			Frame tf = obodoc.getTypedefFrame("has_part");
 			Collection<Clause> cs = tf.getClauses("xref");
 			assertTrue(cs.size() == 1);
-			Object v = cs.iterator().next().getValue();
-			System.out.println("V="+v);
+			String v = cs.iterator().next().getValue().toString();
+			System.out.println("(expect BFO) V="+v);
 			assertTrue(v.equals("BFO:0000051")); // should be converted back to symbolic form
 		}
 

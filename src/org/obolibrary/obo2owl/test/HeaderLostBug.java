@@ -10,6 +10,7 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -37,14 +38,14 @@ public class HeaderLostBug extends TestCase {
 		
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
 		
+		Set<OWLAnnotation> ontAnns = ontology.getAnnotations();
 		Set<OWLAnnotationAssertionAxiom> axioms = ontology.getAnnotationAssertionAxioms(ontologyIRI);
-		System.out.println("Annotaiton Assertions: " + axioms);
 
 		System.out.println("ont.getAnnotation() = " + ontology.getAnnotations());
 		
 		//two tags in the header of the obo file are translated as annotation assertions, so the axioms
 		//should have two axioms in count.
-		assertTrue(axioms.size() == 2);
+		assertTrue(ontAnns.size() == 2);
 		
 		
 	}
