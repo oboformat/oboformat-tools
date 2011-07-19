@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 
 import org.obolibrary.cli.OBORunnerConfiguration;
 import org.obolibrary.cli.OBORunnerConfiguration.Variable;
@@ -36,6 +37,7 @@ public class GuiMainFrame extends JFrame {
 	private final OBORunnerConfiguration config;
 
 	private JTabbedPane tabbedPane;
+	private JButton runButton;
 	
 	/**
 	 * Default constructor, required only for testing the GUI as bean.
@@ -108,8 +110,8 @@ public class GuiMainFrame extends JFrame {
 	private JPanel createControlPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
-		JButton button = new JButton("Run Conversion");
-		button.addActionListener(new ActionListener() {
+		runButton = new JButton("Run Conversion");
+		runButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				// update config
@@ -117,12 +119,17 @@ public class GuiMainFrame extends JFrame {
 				if(updateConfigurationFromGUI(config)) {
 					// switch to log tab
 					tabbedPane.setSelectedComponent(logPanel);
-					// do work
-					executeConversion(config);
+					SwingUtilities.invokeLater(new Runnable() {
+						
+						public void run() {
+							// do work
+							executeConversion(config);
+						}
+					});
 				}
 			}
 		});
-		panel.add(button, BorderLayout.LINE_END);
+		panel.add(runButton, BorderLayout.LINE_END);
 		return panel;
 	}
 
@@ -280,5 +287,13 @@ public class GuiMainFrame extends JFrame {
 			logPanel = new GuiLogPanel(logQueue);
 		}
 		return logPanel;
+	}
+	
+	protected void disableRunButton() {
+		runButton.setEnabled(false);
+	}
+	
+	protected void enableRunButton() {
+		runButton.setEnabled(true);
 	}
 } 
