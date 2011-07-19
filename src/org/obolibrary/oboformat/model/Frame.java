@@ -68,6 +68,11 @@ public class Frame {
 		return cls;
 	}
 	
+	public Collection<Clause> getClauses(OboFormatTag tag) {
+		return getClauses(tag.getTag());
+	}
+
+	
 	/**
 	 * @param tag
 	 * @return null if no value set, otherwise first value
@@ -77,6 +82,10 @@ public class Frame {
 		if (tagClauses.size() == 0)
 			return null;
 		return tagClauses.iterator().next(); // TODO - throw if > 1
+	}
+
+	public Clause getClause(OboFormatTag tag) {
+		return getClause(tag.getTag());
 	}
 
 	public void setClauses(Collection<Clause> clauses) {
@@ -154,5 +163,6 @@ public class Frame {
 		}
 		
 	}
+
 
 }

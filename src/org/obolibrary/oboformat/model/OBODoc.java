@@ -124,6 +124,14 @@ public class OBODoc {
 	public void setImportedOBODocs(Collection<OBODoc> importedOBODocs) {
 		this.importedOBODocs = importedOBODocs;
 	}
+	
+	public void addImportedOBODoc(OBODoc doc) {
+		if (importedOBODocs == null) {
+			importedOBODocs = new ArrayList<OBODoc>();
+		}
+		importedOBODocs.add(doc);
+	}
+
 
 	public void addFrame(Frame f) throws FrameMergeException {
 		if (f.getType() == FrameType.TERM) {
@@ -232,5 +240,6 @@ public class OBODoc {
 		//return "OBODoc("+headerFrame+" Frames("+sb.toString()+"))";
 		return "OBODoc("+headerFrame+")";
 	}
+
 
 }

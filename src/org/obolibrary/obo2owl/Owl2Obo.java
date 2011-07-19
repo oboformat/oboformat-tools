@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLInverseFunctionalObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
@@ -193,6 +194,8 @@ public class Owl2Obo {
 				tr((OWLObjectPropertyDomainAxiom)ax);
 			}else if(ax instanceof OWLInverseFunctionalObjectPropertyAxiom){
 				tr((OWLInverseFunctionalObjectPropertyAxiom)ax);
+			}else if(ax instanceof OWLInverseObjectPropertiesAxiom){
+				tr((OWLInverseObjectPropertiesAxiom)ax);
 			}else if(ax instanceof OWLDisjointObjectPropertiesAxiom){
 				tr((OWLDisjointObjectPropertiesAxiom)ax);
 			}else if (ax instanceof OWLReflexiveObjectPropertyAxiom){
@@ -384,6 +387,15 @@ public class Owl2Obo {
 			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), "true");
 		}
 	}
+	private void tr(OWLInverseObjectPropertiesAxiom ax){
+		OWLObjectPropertyExpression prop1 = ax.getFirstProperty();
+		OWLObjectPropertyExpression prop2 = ax.getSecondProperty();
+
+		if(prop1 instanceof OWLObjectProperty && prop2 instanceof OWLObjectProperty){
+			trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2));
+		}
+	}
+	
 
 	private void tr(OWLObjectPropertyDomainAxiom ax){
 		String range = this.getIdentifier(ax.getDomain()); //getIdentifier(ax.getDomain());
