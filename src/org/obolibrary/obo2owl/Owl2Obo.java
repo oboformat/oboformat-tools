@@ -247,6 +247,19 @@ public class Owl2Obo {
 
 	}
 
+	private void trObjectProperty(OWLObjectProperty prop, String tag, Boolean value){
+		if(prop == null || value == null)
+			return;
+
+		Frame f = getTypedefFrame(prop);
+		Clause clause = new Clause();
+		clause.setTag(tag);
+
+		clause.addValue(value);
+		f.addClause(clause);
+
+	}
+
 	private void trNaryPropertyAxiom(OWLNaryPropertyAxiom<OWLObjectPropertyExpression> ax, String tag){
 		Set<OWLObjectPropertyExpression> set = ax.getProperties();
 
@@ -342,7 +355,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE);
 		}
 	}
 
@@ -375,7 +388,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE);
 		}
 
 	}
@@ -384,7 +397,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE);
 		}
 	}
 	private void tr(OWLInverseObjectPropertiesAxiom ax){
@@ -410,7 +423,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_ASYMMETRIC.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_ASYMMETRIC.getTag(), Boolean.TRUE);
 		}
 
 	}
@@ -420,7 +433,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE);
 		}
 
 	}
@@ -430,7 +443,7 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), "true");
+			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE);
 		}
 	}
 
