@@ -127,7 +127,14 @@ public class Clause {
 		}
 		if (c1 == null || c2 == null)
 			return false;
-		return c1.equals(c2);
+		if (c1.size() != c2.size())
+			return false;
+		// xrefs are stored as lists to preserve order, but order is not import for comparisons
+		for (Object x : c1) {
+			if (!c2.contains(x))
+				return false;
+		}
+		return true;
 	}
 
 	public boolean equals(Object e) {
