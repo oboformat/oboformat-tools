@@ -818,7 +818,21 @@ public class Owl2Obo {
 					throw new RuntimeException(err);
 
 				return;
-			}else{
+			}
+			else if (f.getClauses(OboFormatTag.TAG_UNION_OF).size() > 0) {
+				String logErr = "the axiom is not translated (maximimum one UnionOf EquivalenceAxiom : " + ax;
+				String err = "The conversion is halted as the axiom is not translated: " + ax;
+				if(strictConversion){
+					logErr = err;
+				}
+
+				LOG.warn(logErr);
+
+				if(strictConversion)
+					throw new RuntimeException(err);
+				
+			}
+			else{
 
 				Clause c = new Clause();
 				c.setTag(OboFormatTag.TAG_UNION_OF.getTag());
@@ -852,7 +866,21 @@ public class Owl2Obo {
 
 					c.addValue(cls2);
 					equivalenceAxiomClauses.add(c);
-				}else{
+				}
+				else if (f.getClauses(OboFormatTag.TAG_INTERSECTION_OF).size() > 0) {
+					String logErr = "the axiom is not translated (maximimum one IntersectionOf EquivalenceAxiom : " + ax;
+					String err = "The conversion is halted as the axiom is not translated: " + ax;
+					if(strictConversion){
+						logErr = err;
+					}
+
+					LOG.warn(logErr);
+
+					if(strictConversion)
+						throw new RuntimeException(err);
+					
+				}
+				else{
 					isUntranslateable = true;
 
 					String logErr = "the axiom is not translated : " + ax;
