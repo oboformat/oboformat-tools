@@ -4,7 +4,6 @@ import static org.obolibrary.gui.GuiTools.addRowGap;
 import static org.obolibrary.gui.GuiTools.createTextField;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -23,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.gui.GuiTools.GBHelper;
@@ -38,7 +39,7 @@ public class GuiMainPanel extends SizedJPanel {
 
 	private final static Logger LOGGER = Logger.getLogger(GuiMainPanel.class); 
 	
-	final Frame frame;
+	final GuiMainFrame frame;
 	final JList inputFileJList;
 	final JRadioButton obo2owlButton;
 	final JRadioButton owl2oboButton;
@@ -54,7 +55,7 @@ public class GuiMainPanel extends SizedJPanel {
 	 * @param defaultOutputFileName
 	 * @param obo2owl
 	 */
-	public GuiMainPanel(Frame frame, Iterable<String> defaultInputFiles, String defaultOutputFolder, String defaultOutputFileName, boolean obo2owl) {
+	public GuiMainPanel(GuiMainFrame frame, Iterable<String> defaultInputFiles, String defaultOutputFolder, String defaultOutputFileName, boolean obo2owl) {
 		super();
 		this.frame = frame;
 		// create accessible fields
@@ -252,5 +253,12 @@ public class GuiMainPanel extends SizedJPanel {
 		
 		// set default value for buttons
 		obo2owlButton.setSelected(isObo2Owl);
+		obo2owlButton.addChangeListener(new ChangeListener() {
+			
+			public void stateChanged(ChangeEvent e) {
+				GuiAdvancedDirectionSpecificPanel panel = frame.getSpecificAdvancedPanel();
+				panel.setObo2Owl(obo2owlButton.isSelected());
+			}
+		});
 	}
 }

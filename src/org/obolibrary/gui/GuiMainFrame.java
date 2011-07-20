@@ -32,6 +32,7 @@ public class GuiMainFrame extends JFrame {
 	private JPanel allPanel;
 	private GuiMainPanel mainPanel;
 	private GuiAdvancedPanel advancedPanel;
+	private GuiAdvancedDirectionSpecificPanel specificAdvancedPanel;
 	private GuiLogPanel logPanel;
 	private final BlockingQueue<String> logQueue;
 	private final OBORunnerConfiguration config;
@@ -97,6 +98,8 @@ public class GuiMainFrame extends JFrame {
 			tabbedPane = new JTabbedPane();
 			addTab(tabbedPane, "Input/Output", getMainPanel());
 			addTab(tabbedPane, "Advanced", getAdvancedPanel());
+			addTab(tabbedPane, "Advanced 2", getSpecificAdvancedPanel());
+			//specificAdvancedPanel
 			addTab(tabbedPane, "Logs", getLogPanel());
 		}
 		return tabbedPane;
@@ -165,10 +168,10 @@ public class GuiMainFrame extends JFrame {
 		config.defaultOnt.setValue(advancedPanel.defaultOntologyField.getText());
 		
 		// format (owlxml, manchester, rdf)
-		if (advancedPanel.formatOWLXMLButton.isSelected()) {
+		if (specificAdvancedPanel.formatOWLXMLButton.isSelected()) {
 			config.format.setValue("owlxml");
 		}
-		else if (advancedPanel.formatManchesterButton.isSelected()) {
+		else if (specificAdvancedPanel.formatManchesterButton.isSelected()) {
 			config.format.setValue("manchester");
 		}
 		else {
@@ -179,16 +182,16 @@ public class GuiMainFrame extends JFrame {
 		config.version.setValue(advancedPanel.owlOntologyVersion.getText());
 		
 		// allowDangling
-		config.allowDangling.setRealValue(advancedPanel.danglingCheckbox.isSelected());
+		config.allowDangling.setRealValue(specificAdvancedPanel.danglingCheckbox.isSelected());
 		
-		//followimports
-		config.followImports.setRealValue(advancedPanel.followImportsCheckBox.isSelected());
+		//follow imports
+		config.followImports.setRealValue(specificAdvancedPanel.followImportsCheckBox.isSelected());
 		
-		//strickconversion
+		//strict conversion
 		config.strictConversion.setRealValue(advancedPanel.strictCheckBox.isSelected());
 		
 		// expand Macros
-		config.isExpandMacros.setRealValue(advancedPanel.expandMacrosCheckbox.isSelected());
+		config.isExpandMacros.setRealValue(specificAdvancedPanel.expandMacrosCheckbox.isSelected());
 		
 		// ontsToDownloads
 		if (advancedPanel.downloadOntologiesCheckBox.isSelected()) {
@@ -258,22 +261,30 @@ public class GuiMainFrame extends JFrame {
 	 * 
 	 * @return advanced panel
 	 */
-	private SizedJPanel getAdvancedPanel()
+	private GuiAdvancedPanel getAdvancedPanel()
 	{
 		if (advancedPanel == null) {
 			advancedPanel = new GuiAdvancedPanel(this, 
-					config.allowDangling.getValue(),
-					config.isExpandMacros.getValue(),
 					config.ontsToDownload.getValue(), 
 					config.omitOntsToDownload.getValue(),
 					config.defaultOnt.getValue(),
 					config.buildDir.getValue(),
 					config.version.getValue(),
-					config.followImports.getValue(),
 					config.strictConversion.getValue()
 			);
 		}
 		return advancedPanel;
+	}
+	
+	synchronized GuiAdvancedDirectionSpecificPanel getSpecificAdvancedPanel() {
+		if (specificAdvancedPanel == null) {
+			specificAdvancedPanel = new GuiAdvancedDirectionSpecificPanel(
+					config.allowDangling.getValue(),
+					config.isExpandMacros.getValue(),
+					config.followImports.getValue(),
+					config.isOboToOwl.getValue());
+		}
+		return specificAdvancedPanel;
 	}
 
 	/**
