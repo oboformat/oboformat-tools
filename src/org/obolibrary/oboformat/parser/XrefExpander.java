@@ -15,7 +15,9 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 public class XrefExpander {
 	OBODoc sourceOBODoc;
 	OBODoc targetOBODoc;
+	String targetBase;
 	Map<String,Rule> treatMap = new HashMap<String,Rule>();
+	Map<String,OBODoc> targetDocMap = new HashMap<String,OBODoc>();
 	//Obo2Owl obo2owl;
 	//Map<String,Clause> expandMap = new HashMap<String,Clause>();
 
@@ -29,8 +31,13 @@ public class XrefExpander {
 		thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), tgtOntId));
 		targetOBODoc.setHeaderFrame(thf);
 		sourceOBODoc.addImportedOBODoc(targetOBODoc);
-		setUp();
-		
+		setUp();		
+	}
+	public XrefExpander(OBODoc src, String targetBase) throws InvalidXrefMapException {
+		sourceOBODoc = src;
+		Frame shf = src.getHeaderFrame();
+		this.targetBase = targetBase;
+		setUp();		
 	}
 	public XrefExpander(OBODoc src, OBODoc tgt) throws InvalidXrefMapException {
 		sourceOBODoc = src;
@@ -46,29 +53,44 @@ public class XrefExpander {
 		for (Clause c : sourceOBODoc.getHeaderFrame().getClauses()) {
 			String [] parts;
 			parts = c.getValue().toString().split("\\s");
+			String idSpace = parts[0];
+			if (targetBase != null) {
+				// create a new bridge ontology for every expansion macro
+				OBODoc tgt = new OBODoc();
+				Frame thf = new Frame(FrameType.HEADER);
+				thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), targetBase + "-" + idSpace.toLowerCase()));
+				tgt.setHeaderFrame(thf);
+				targetDocMap.put(idSpace, tgt);
+				sourceOBODoc.addImportedOBODoc(tgt);
+			}
 			if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag())) {
 				addRule(parts[0], new EquivalenceExpansion());
-				//				addMacro(parts[0],"is_specific_equivalent_of","Class: ?X EquivalentTo: ?Y and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
+				//				addMacro(idSpace,"is_specific_equivalent_of","Class: ?X EquivalentTo: ?Y and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
 			}
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_GENUS_DIFFERENTIA.getTag())) {
-				addRule(parts[0], new GenusDifferentiaExpansion(parts[1],parts[2]));
-				//				addMacro(parts[0],"is_generic_equivalent_of","Class: ?Y EquivalentTo: ?X and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
+				addRule(idSpace, new GenusDifferentiaExpansion(parts[1],parts[2]));
+				//				addMacro(idSpace,"is_generic_equivalent_of","Class: ?Y EquivalentTo: ?X and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
 			}
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_REVERSE_GENUS_DIFFERENTIA.getTag())) {
-				addRule(parts[0], new ReverseGenusDifferentiaExpansion(parts[1],parts[2]));
-				//				addMacro(parts[0],"is_generic_equivalent_of","Class: ?Y EquivalentTo: ?X and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
+				addRule(idSpace, new ReverseGenusDifferentiaExpansion(parts[1],parts[2]));
+				//				addMacro(idSpace,"is_generic_equivalent_of","Class: ?Y EquivalentTo: ?X and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
 			}
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_HAS_SUBCLASS.getTag())) {
-				addRule(parts[0], new HasSubClassExpansion());
+				addRule(idSpace, new HasSubClassExpansion());
 			}
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_IS_A.getTag())) {
-				addRule(parts[0], new IsaExpansion());
+				addRule(idSpace, new IsaExpansion());
 			}
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_RELATIONSHIP.getTag())) {
-				addRule(parts[0], new RelationshipExpansion(parts[1]));
+				addRule(idSpace, new RelationshipExpansion(parts[1]));
 			}
 		}
-
+	}
+	
+	public OBODoc getTargetDoc(String idSpace) {
+		if (targetOBODoc != null)
+			return targetOBODoc;
+		return targetDocMap.get(idSpace);
 	}
 
 	//	private String oboIdToIRI(String id) {
@@ -91,6 +113,7 @@ public class XrefExpander {
 		if (treatMap.containsKey(db)) {
 			throw new InvalidXrefMapException(db);
 		}
+		rule.idSpace = db;
 		treatMap.put(db, rule);
 	}
 
@@ -115,16 +138,17 @@ public class XrefExpander {
 
 	public abstract class Rule {
 		protected String xref;
+		public String idSpace;
 
 		public abstract void expand(Frame sf, String id, String xref);
 
 		protected Frame getTargetFrame(String id) {
-			Frame f = targetOBODoc.getTermFrame(id);
+			Frame f = getTargetDoc(idSpace).getTermFrame(id);
 			if (f == null) {
 				try {
 					f = new Frame();
 					f.setId(id);
-					targetOBODoc.addTermFrame(f);
+					getTargetDoc(idSpace).addTermFrame(f);
 				} catch (FrameMergeException e) {
 					// this should be impossible
 					e.printStackTrace();

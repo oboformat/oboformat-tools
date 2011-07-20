@@ -44,6 +44,40 @@ public class XrefExpanderTest extends TestCase {
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
 
+	public static void testExpandIntoSeparateBridges() throws IOException, URISyntaxException, InvalidXrefMapException {
+		OBODoc obodoc = parseOBOFile("treat_xrefs_test.obo");
+		XrefExpander x = new XrefExpander(obodoc, "bridge");
+		x.expandXrefs();
+		int n = 0;
+		for (OBODoc tdoc : obodoc.getImportedOBODocs()) {
+			//System.out.println("IMP:"+tdoc);
+			Frame hf = tdoc.getHeaderFrame();
+			if (hf == null) {
+				continue;
+			}
+			Clause impClause = hf.getClause(OboFormatTag.TAG_ONTOLOGY);
+			if (impClause == null) {
+				continue;
+			}
+			String tid = impClause.getValue().toString().replace("bridge-", "");
+			System.out.println("BRIDGE: "+tid);
+			if (tid.equals("zfa")) {
+				assertTrue(tdoc.getTermFrame("ZFA:0001689").getClauses(OboFormatTag.TAG_INTERSECTION_OF).size() == 2);
+				n++;
+			}
+			if (tid.equals("ehdaa")) {
+				assertTrue(tdoc.getTermFrame("EHDAA:571").getClause(OboFormatTag.TAG_IS_A).getValue().equals("UBERON:0002539"));
+				n++;
+			}
+			if (tid.equals("caro")) {
+				assertTrue(tdoc.getTermFrame("UBERON:0006800").getClause(OboFormatTag.TAG_IS_A).getValue().equals("CARO:0000008"));
+				n++;
+			}
+		}
+		assertTrue(n == 3);
+		//assertTrue(frame.getClause("name").getValue().equals("x1"));
+	}
+
 	
 	public static OBODoc parseOBOFile(String fn) throws IOException {
 		OBOFormatParser p = new OBOFormatParser();
