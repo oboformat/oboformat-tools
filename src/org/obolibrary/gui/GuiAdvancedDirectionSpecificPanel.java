@@ -28,6 +28,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	final JCheckBox danglingCheckbox;
 	final JCheckBox followImportsCheckBox;
 	final JCheckBox expandMacrosCheckbox;
+	final JLabel formatLabel;
 	final JRadioButton formatRDFButton;
 	final JRadioButton formatOWLXMLButton;
 	final JRadioButton formatManchesterButton;
@@ -53,6 +54,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 		formatRDFButton = new JRadioButton("RDF/XML", true);
 		formatOWLXMLButton = new JRadioButton("OWL/XML");
 		formatManchesterButton = new JRadioButton("Manchester");
+		formatLabel = new JLabel("OWL Format");
 		
 		setLayout(new GridBagLayout());
 		GBHelper pos = new GBHelper();
@@ -94,7 +96,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createOntologyFormatPanel(GBHelper pos) {
-		add(new JLabel("OWL Format"), pos.nextRow().nextCol());
+		add(formatLabel, pos.nextRow().nextCol());
 		ButtonGroup formatGroup = new ButtonGroup();
 		formatGroup.add(formatRDFButton);
 		formatGroup.add(formatOWLXMLButton);
@@ -141,6 +143,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 */
 	void setObo2Owl(boolean isObo2Owl) {
 		//OBO2OWL
+		this.formatLabel.setEnabled(isObo2Owl);
 		this.formatRDFButton.setEnabled(isObo2Owl);
 		this.formatOWLXMLButton.setEnabled(isObo2Owl);
 		this.formatManchesterButton.setEnabled(isObo2Owl);
