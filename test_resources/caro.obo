@@ -1,7 +1,6 @@
 format-version: 1.2
 date: 24:06:2010 12:33
 default-namespace: caro
-pairwise-disjoint: true
 treat-xrefs-as-equivalent: GO
 ontology: caro
 
