@@ -19,6 +19,8 @@ public class AllProductionTests extends TestCase {
 		out.addTestSuite(BFOROXrefTest.class);
 		out.addTestSuite(DanglingOwl2OboTest.class);
 		out.addTestSuite(DanglingRoundTripTest.class);
+		//TODO
+		//out.addTestSuite(DanglingRestrictionOwl2OboTest.class);
 		out.addTestSuite(EquivalentToTest.class);
 		//out.addTestSuite(FlyXPTest.class);
 		out.addTestSuite(HeaderLostBug.class);

@@ -20,7 +20,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import junit.framework.TestCase;
 
-public class DanglingOwl2OboTest extends TestCase {
+public class DanglingRestrictionOwl2OboTest extends TestCase {
 
 	public static void testConversion() throws Exception{
 
@@ -28,22 +28,26 @@ public class DanglingOwl2OboTest extends TestCase {
 		Obo2Owl obo2owl = new Obo2Owl();
 	
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
-		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create("file:test_resources/dangling_owl2_obo_test.owl"));
+		
+		// this is a test ontology that has had its imports axioms removed
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create("file:test_resources/dangling_restriction_test.owl"));
 
 		Owl2Obo bridge = new Owl2Obo();
 		
 		OBODoc doc = bridge.convert(ontology);
 		
-		Frame f = doc.getTermFrame("UBERON:0000020");
+		Frame f = doc.getTermFrame("FUNCARO:0000014");
 		System.out.println("F="+f);
 		Clause rc = f.getClause("name");
-		assertTrue(rc.getValue().equals("sense organ"));
-		Collection<Clause> ics = f.getClauses("intersection_of");
-		assertTrue(ics.size() == 2);
+		assertTrue(rc.getValue().equals("digestive system"));
+		Collection<Clause> isas = f.getClauses("is_a");
+		assertTrue(isas.size() == 1);
+		Collection<Clause> rs = f.getClauses("relationship");
+		assertTrue(rs.size() == 1);
 		
 		OBOFormatWriter oboWriter = new OBOFormatWriter();
 		
-		oboWriter.write(doc, "test_resources/dangling_owl2_obo_test.owl.obo");
+		oboWriter.write(doc, "test_resources/dangling_restriction_test.owl.obo");
 		
 	}
 }

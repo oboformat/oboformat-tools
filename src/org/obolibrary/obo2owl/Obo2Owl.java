@@ -895,8 +895,10 @@ public class Obo2Owl {
 				System.err.println("Warning: not enough values in"+clause);
 			}
 
+			// we make allowances for obof1.0, where the synonym scope is optional
+			String synScope = values.length <= 1 ? "RELATED" : values[1].toString();
 			ax = fac.getOWLAnnotationAssertionAxiom(
-					trTagToAnnotationProp(values[1].toString()),
+					trTagToAnnotationProp(synScope),
 					sub, 
 					trLiteral(clause.getValue()), 
 					annotations);

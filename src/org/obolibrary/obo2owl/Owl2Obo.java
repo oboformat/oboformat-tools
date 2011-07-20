@@ -1235,6 +1235,22 @@ public class Owl2Obo {
 		String tag = annotationPropertyMap.get(iri);
 
 		if (tag == null) {
+			
+			// hardcoded values for legacy annotation properties: (TEMPORARY)
+			if (iri.startsWith(Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_")) {
+				String legacyId = iri.replace(Obo2OWLConstants.DEFAULT_IRI_PREFIX, "");
+				if (legacyId.equals("IAO_xref")) {
+					return OboFormatTag.TAG_XREF.getTag();
+				}
+				if (legacyId.equals("IAO_id")) {
+					return OboFormatTag.TAG_ID.getTag();
+				}
+				if (legacyId.equals("IAO_namespace")) {
+					return OboFormatTag.TAG_NAMESPACE.getTag();
+				}
+				
+			}
+			
 			//String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
 			String prefix = Obo2OWLConstants.OIOVOCAB_IRI_PREFIX;
 
