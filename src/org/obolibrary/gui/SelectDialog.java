@@ -122,10 +122,13 @@ public abstract class SelectDialog {
 			};
 		}
 		else {
-			// try native
+			// try native file dialog
+			// There are two problems here:
+			// 1) Windows ignores the FilenameFilter
+			// 2) MacOS needs a special flag to allow a FileDialog to select a folder
+			
 			final FileDialog dialog = new FileDialog(frame, title, FileDialog.LOAD);
 			dialog.setFilenameFilter(new FilenameFilter() {
-				
 				public boolean accept(File dir, String name) {
 					// only show directories
 					return false;
@@ -133,25 +136,31 @@ public abstract class SelectDialog {
 			});
 			
 			return new SelectDialog() {
+				
 				File selected = null;
 				
 				@Override
 				public void show() {
-					selected = null;
-					dialog.setVisible(true);
-					String fileName = dialog.getFile();
-					String dirName = dialog.getDirectory();
-					if (fileName != null && dirName != null) {
-						File file = new File(dirName, fileName);
-						if (file.isDirectory()) {
-							selected = file;
+					System.setProperty("apple.awt.fileDialogForDirectories", "true");
+					try {
+						selected = null;
+						dialog.setVisible(true);
+						String fileName = dialog.getFile();
+						String dirName = dialog.getDirectory();
+						if (fileName != null && dirName != null) {
+							File file = new File(dirName, fileName);
+							if (file.isDirectory()) {
+								selected = file;
+							}
+							else if (file.isFile()) {
+								selected = file.getParentFile();
+							}
 						}
-						else if (file.isFile()) {
-							selected = file.getParentFile();
+						else if (dirName != null) {
+							selected = new File(dirName);
 						}
-					}
-					else if (dirName != null) {
-						selected = new File(dirName);
+					} finally {
+						System.setProperty("apple.awt.fileDialogForDirectories", "false");
 					}
 				}
 				
