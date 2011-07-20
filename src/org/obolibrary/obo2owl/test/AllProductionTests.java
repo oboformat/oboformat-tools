@@ -1,5 +1,7 @@
 package org.obolibrary.obo2owl.test;
 
+import org.obolibrary.oboformat.test.*;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -12,6 +14,8 @@ public class AllProductionTests extends TestCase {
 	
 	public static Test suite() {
 		TestSuite out = new TestSuite();
+		
+		//obo2owl tests
 		out.addTestSuite(BFOROXrefTest.class);
 		out.addTestSuite(DanglingOwl2OboTest.class);
 		out.addTestSuite(DanglingRoundTripTest.class);
@@ -34,6 +38,14 @@ public class AllProductionTests extends TestCase {
 		out.addTestSuite(UnionOfTest.class);
 		out.addTestSuite(UnmappableExpressionsTest.class);
 		out.addTestSuite(XPBridgeFileTest.class);
+		
+		// oboformat tests
+		out.addTestSuite(CAROTest.class);
+		out.addTestSuite(SimpleGOTest.class);
+		out.addTestSuite(SingleIntersectionOfTagTest.class);
+		out.addTestSuite(TagTest.class);
+		out.addTestSuite(XrefExpanderTest.class);
+		
 		return out;
 
 	}
