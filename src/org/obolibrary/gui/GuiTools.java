@@ -216,6 +216,19 @@ public class GuiTools {
 	        return duplicate;
 	    }
 	    
+	    /** 
+	     * Sets the width of the area in terms of rows.
+	     * 
+	     * Return new instance to minimize side effects.
+	     *
+	     * @return helper
+	     */
+	    public GBHelper width(int columnsWide) {
+	        GBHelper duplicate = (GBHelper)this.clone();
+	        duplicate.gridwidth = columnsWide;
+	        return duplicate;
+	    }
+	    
 	    /**
 	     * Set the fill to both. The component tries to 
 	     * fill the cell in both directions.
