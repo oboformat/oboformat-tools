@@ -302,7 +302,7 @@ public class Obo2Owl {
 	}
 
 	private  String getURI(String path){
-		if(path.startsWith("http://") || path.startsWith("file:///"))
+		if(path.startsWith("http://") || path.startsWith("file:"))
 			return  path;
 			
 		File f = new File(path);

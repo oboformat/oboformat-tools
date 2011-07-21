@@ -243,6 +243,26 @@ public class OBOFormatParser {
 		return parse(url);
 	}	
 
+	private String resolvePath(String path){
+		if(!(path.startsWith("http:") || path.startsWith("file:") || path.startsWith("https:"))){
+			//path is not absolue then guess it.
+			if(this.location != null){
+				if(location instanceof URL){
+					URL url = (URL) this.location;
+					String p = url.toString();
+					int index= p.lastIndexOf("/");
+					path = p.substring(0, index+1) + path;
+				}else{
+					File f = new File(this.location + "");
+					f = new File(f.getParent(), path);
+					path= f.toURI().toString();
+				}
+			}
+		}
+		
+		return path;
+		
+	}
 	
 	/**
 	 * 
@@ -257,30 +277,21 @@ public class OBOFormatParser {
 		OBODoc obodoc = new OBODoc();
 		try {
 			if (parseOBODoc(obodoc)){
+				
+				//handle imports
 				Frame hf= obodoc.getHeaderFrame();
 				List<OBODoc> imports = new LinkedList<OBODoc>();
 				if(hf != null){
 					for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
-						String path = cl.getValue() + "";
+						String path = resolvePath(cl.getValue() + "");
 						OBODoc doc = new OBODoc();
 						if(followImport){
+							//resolve OboDoc documents from import paths.
 							OBOFormatParser parser = new OBOFormatParser();
-							
-							if(this.location != null){
-								if(location instanceof URL){
-									URL url = (URL) this.location;
-									String p = url.toString();
-									int index= p.lastIndexOf("/");
-									path = p.substring(0, index+1) + path;
-									doc = parseURL(path);
-								}else{
-									File f = new File(this.location + "");
-									f = new File(f.getParent(), path);
-									doc = parser.parse(f.getAbsolutePath());
-								}
-							}
-							
+							doc = parser.parseURL(path);
+								
 						}else{
+							//build a proxy document which reference import path as ontology id
 							Frame importHeaer = new Frame(FrameType.HEADER);
 							Clause ontologyCl = new Clause();
 							ontologyCl.setTag(OboFormatTag.TAG_ONTOLOGY.getTag());
