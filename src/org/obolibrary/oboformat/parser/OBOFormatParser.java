@@ -284,13 +284,14 @@ public class OBOFormatParser {
 				if(hf != null){
 					for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
 						String path = resolvePath(cl.getValue() + "");
-						OBODoc doc = new OBODoc();
+						//TBD -- changing the relative path to absolute
+						cl.setValue(path);
 						if(followImport){
 							//resolve OboDoc documents from import paths.
 							OBOFormatParser parser = new OBOFormatParser();
-							doc = parser.parseURL(path);
-								
-						}else{
+							OBODoc doc = parser.parseURL(path);
+							imports.add(doc);
+						}/*else{
 							//build a proxy document which reference import path as ontology id
 							Frame importHeaer = new Frame(FrameType.HEADER);
 							Clause ontologyCl = new Clause();
@@ -298,8 +299,7 @@ public class OBOFormatParser {
 							ontologyCl.setValue(path);
 							importHeaer.addClause(ontologyCl);
 							doc.setHeaderFrame(importHeaer);
-						}
-						imports.add(doc);
+						}*/
 					}
 					
 					obodoc.setImportedOBODocs(imports);

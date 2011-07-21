@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,16 +78,13 @@ public class Obo2Owl {
 	private Map<String, OWLAnnotationProperty> typedefToAnnotationProperty;
 
 	public Obo2Owl() {
-		init(null);
+		init();
 	}
 
 	
-	private void init(OWLOntologyManager manager) {
+	private void init() {
 		idSpaceMap = new HashMap<String,String>();
-		if(manager == null)
-			this.manager = OWLManager.createOWLOntologyManager();
-		else
-			this.manager = manager;
+		this.manager = OWLManager.createOWLOntologyManager();
 		
 		fac = this.manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
@@ -202,21 +200,16 @@ public class Obo2Owl {
 
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
-		init(null);
+		init();
 		return tr();
 	}
 
-	private OWLOntology convert(OBODoc obodoc, OWLOntologyManager manager) throws OWLOntologyCreationException {
-		this.obodoc = obodoc;
-		init(manager);
-		return tr();
-	}
 	
 	
 	private OWLOntology tr() throws OWLOntologyCreationException {
 		
-		List<IRI> importIRIs = new ArrayList<IRI>();
-		Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
+	//	List<IRI> importIRIs = new ArrayList<IRI>();
+	/*	Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 		for(OBODoc importDoc: obodoc.getImportedOBODocs()){
 			//if proxy doc just put import statment
 			if(importDoc.getTermFrames().isEmpty() && importDoc.getTypedefFrames().isEmpty()){
@@ -242,7 +235,7 @@ public class Obo2Owl {
 				ontologies.add(ont);
 			}
 			
-		}		
+		}*/		
 		
 		Frame hf = obodoc.getHeaderFrame();
 		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY.getTag());
@@ -257,23 +250,14 @@ public class Obo2Owl {
 				ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+ontOboId+".owl");
 			}
 
-			if(ontologies.size()>0){
-				owlOntology = manager.createOntology(ontIRI, ontologies);
-			}else{
 				owlOntology = manager.createOntology(ontIRI);
-			}
 		}
 		else {
 			defaultIDSpace = "TODO";
 			IRI ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX + defaultIDSpace);
 
 			// TODO - warn
-			
-			if(ontologies.size()>0){
-				owlOntology = manager.createOntology(ontIRI, ontologies);
-			}else{
-				owlOntology = manager.createOntology(ontIRI);
-			}
+			owlOntology = manager.createOntology(ontIRI);
 				
 		}
 		trHeaderFrame(hf);
@@ -292,10 +276,15 @@ public class Obo2Owl {
 		}
 		// TODO - individuals
 
-		for(IRI importIRI: importIRIs){
+		for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
+			String path = getURI(cl.getValue() + "");
+
+			IRI importIRI = IRI.create(path);
 			AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
 			manager.applyChange(ai);
+
 		}
+		
 		
 		
 		return owlOntology;
