@@ -98,10 +98,14 @@ public class OBORunnerGui extends OBORunner {
 						runConversion(config, logger);
 						logger.info("Finished ontology conversion.");
 						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, "Finished ontology conversion.");
-					}catch (Exception e) {
-						logger.error("Internal error: "+ e.getMessage(), e);
+					} catch (Exception e) {
+						String message = "Internal error: "+ e.getMessage();
+						logger.error(message, e);
+						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, message, "Error", JOptionPane.ERROR_MESSAGE);
 					} catch (Throwable e) {
-						logger.fatal("Internal error: "+ e.getMessage(), e);
+						String message = "Internal error: "+ e.getMessage();
+						logger.fatal(message, e);
+						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, message, "FatalError", JOptionPane.ERROR_MESSAGE);
 					}
 					finally {
 						enableRunButton();
