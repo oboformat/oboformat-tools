@@ -333,7 +333,9 @@ public class MacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLCla
 
 					try {
 						OWLClassExpression ce = parseManchesterExpression(exStr);
-						return  dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), ce);
+
+						return ce;
+					//	return  dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), ce);
 
 					} catch (ParserException e) {
 						// TODO Auto-generated catch block
