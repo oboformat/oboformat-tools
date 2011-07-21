@@ -64,9 +64,8 @@ public class ExpandExpressionTest extends TestCase {
 		Set<OWLSubClassOfAxiom> scas = outputOntology.getSubClassAxiomsForSubClass(cls);
 		System.out.println(scas);
 		assertTrue(scas.size() == 1);
-		assertTrue(scas.toString().equals("[SubClassOf(<http://purl.obolibrary.org/obo/TEST_3> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/RO_0002104> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/BFO_0000051> ObjectIntersectionOf(<http://purl.obolibrary.org/obo/GO_0005886> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/BFO_0000051> <http://purl.obolibrary.org/obo/TEST_4>)))))]"));
+		assertTrue(scas.toString().equals("[SubClassOf(<http://purl.obolibrary.org/obo/TEST_3> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/BFO_0000051> ObjectIntersectionOf(<http://purl.obolibrary.org/obo/GO_0005886> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/BFO_0000051> <http://purl.obolibrary.org/obo/TEST_4>))))]"));
 
-		
 
 		IRI outputStream = IRI.create("file:///tmp/"+fn+".owl");
 		System.out.println("saving to "+outputStream);
