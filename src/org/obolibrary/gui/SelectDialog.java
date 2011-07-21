@@ -17,13 +17,19 @@ import org.apache.log4j.Logger;
 public abstract class SelectDialog {
 	
 	private final static Logger LOGGER = Logger.getLogger(SelectDialog.class);
-
+	public final static boolean LOAD = false;
+	public final static boolean SAVE = true;
+	
 	public abstract void show();
 	
 	public abstract File getSelected();
 	
 	public String getSelectedCanonicalPath() {
 		File selected = getSelected();
+		return getCanonical(selected);
+	}
+
+	private static String getCanonical(File selected) {
 		if (selected != null) {
 			try {
 				return selected.getCanonicalPath();
@@ -34,13 +40,18 @@ public abstract class SelectDialog {
 		return null;
 	}
 	
-	public static SelectDialog getFileSelector(final Frame frame, String title, String description, String...extensions) {
+	public static SelectDialog getFileSelector(final Frame frame, boolean write, String defaultFolder, String title, String description, String[] extensions) {
 		if (isUnix()) {
 			// due to a bug, which is fixed in JDK 7, the native AWT dialog 
 			// does not use the correct renderer: meaning it looks very ugly.
 			// http://bugs.sun.com/view_bug.do?bug_id=6913179
 			// work around: use the built-in java swing version
 			final JFileChooser fc = new JFileChooser();
+			int dialogType = JFileChooser.OPEN_DIALOG;
+			if (write) {
+				dialogType = JFileChooser.SAVE_DIALOG;
+			}
+			fc.setDialogType(dialogType);
 			fc.setDialogTitle(title);
 			fc.setFileFilter(new SuffixFileFilter(description, extensions));
 			return new SelectDialog() {
@@ -65,7 +76,11 @@ public abstract class SelectDialog {
 		}
 		else {
 			// try native
-			final FileDialog dialog = new FileDialog(frame, title, FileDialog.LOAD);
+			int mode = FileDialog.LOAD;
+			if (write) {
+				mode = FileDialog.SAVE;
+			}
+			final FileDialog dialog = new FileDialog(frame, title, mode);
 			/*
 			 * Extracted from the javadoc:
 			 * 
@@ -97,9 +112,15 @@ public abstract class SelectDialog {
 	}
 	
 	
-	public static SelectDialog getFolderSelector(final Frame frame, String title) {
+	public static SelectDialog getFolderSelector(final Frame frame, String defaultFolder, String title) {
 		if (isUnix()) {
-			final JFileChooser folderFC = new JFileChooser();
+			final JFileChooser folderFC;
+			if (defaultFolder != null) {
+				folderFC = new JFileChooser(defaultFolder);
+			}
+			else {
+				folderFC = new JFileChooser();
+			}
 			folderFC.setDialogTitle(title);
 			folderFC.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			folderFC.setAcceptAllFileFilterUsed(false);
@@ -128,6 +149,7 @@ public abstract class SelectDialog {
 			// 2) MacOS needs a special flag to allow a FileDialog to select a folder
 			
 			final FileDialog dialog = new FileDialog(frame, title, FileDialog.LOAD);
+			dialog.setDirectory(defaultFolder);
 			dialog.setFilenameFilter(new FilenameFilter() {
 				public boolean accept(File dir, String name) {
 					// only show directories

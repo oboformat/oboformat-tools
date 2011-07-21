@@ -1,17 +1,22 @@
 package org.obolibrary.gui;
 
 import static org.obolibrary.gui.GuiTools.addRowGap;
+import static org.obolibrary.gui.GuiTools.createTextField;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.obolibrary.gui.GuiTools.GBHelper;
@@ -28,11 +33,17 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	final JCheckBox danglingCheckbox;
 	final JCheckBox followImportsCheckBox;
 	final JCheckBox expandMacrosCheckbox;
-	final JLabel formatLabel;
+	final JTextField defaultOntologyField;
+	
+	final JCheckBox strictCheckBox;
+	
 	final JRadioButton formatRDFButton;
 	final JRadioButton formatOWLXMLButton;
 	final JRadioButton formatManchesterButton;
 
+	private final List<JComponent> obo2owlComponents = new ArrayList<JComponent>();
+	private final List<JComponent> owl2oboComponents = new ArrayList<JComponent>();
+	
 	/**
 	 * Create GUI panel for advanced settings specific for either 
 	 * conversion direction with the given default values.
@@ -42,19 +53,23 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param followImports
 	 * @param isObo2Owl
 	 */
-	public GuiAdvancedDirectionSpecificPanel(boolean allowDanglingDefault, 
+	public GuiAdvancedDirectionSpecificPanel(
+			boolean allowDanglingDefault, 
 			boolean expandMacrosDefault,
-			boolean followImports, 
-			boolean isObo2Owl)
+			boolean followImports,
+			String defaultOntologyConfigValue, 
+			boolean isObo2Owl,
+			boolean strictConversion)
 	{
 		super();
 		danglingCheckbox = new JCheckBox("Allow Dangling", allowDanglingDefault);
 		followImportsCheckBox = new JCheckBox("Follow Imports", followImports);
 		expandMacrosCheckbox = new JCheckBox("Expand OWL Macros", expandMacrosDefault);
+		defaultOntologyField = createTextField(defaultOntologyConfigValue);
 		formatRDFButton = new JRadioButton("RDF/XML", true);
 		formatOWLXMLButton = new JRadioButton("OWL/XML");
 		formatManchesterButton = new JRadioButton("Manchester");
-		formatLabel = new JLabel("OWL Format");
+		strictCheckBox = new JCheckBox("Strict Conversion", strictConversion);
 		
 		setLayout(new GridBagLayout());
 		GBHelper pos = new GBHelper();
@@ -73,19 +88,26 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 
 		// flag for allow dangling
 		createFollowImportsPanel(pos);
+		addRowGap(this, pos, 10);
+		
+		// flag for expand macros
+		createExpandMacros(pos);
 		addRowGap(this, pos, 20);
+		
+		// default ontology
+		createDefaultOntologyPanel(pos);
+		addRowGap(this, pos, 10);
 		
 		JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
 		separator.setSize(new Dimension(-1, 1));
 		add(separator, pos.nextRow().width(2).fill().expandW());
 		addRowGap(this, pos, 10);
 		
-		// advanced label
+		// OWL2OBO label
 		add(new JLabel("OWL2OBO"), pos.nextRow());
-		addRowGap(this, pos, 10);
 		
-		// flag for expand macros
-		createExpandMacros(pos);
+		createStrictPanel(pos);
+		addRowGap(this, pos, 5);
 		
 		setObo2Owl(isObo2Owl);
 	}
@@ -96,7 +118,9 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createOntologyFormatPanel(GBHelper pos) {
-		add(formatLabel, pos.nextRow().nextCol());
+		JLabel label = new JLabel("OWL Format");
+		obo2owlComponents.add(label);
+		add(label, pos.nextRow().nextCol());
 		ButtonGroup formatGroup = new ButtonGroup();
 		formatGroup.add(formatRDFButton);
 		formatGroup.add(formatOWLXMLButton);
@@ -105,6 +129,9 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 		formatPanel.add(formatRDFButton);
 		formatPanel.add(formatOWLXMLButton);
 		formatPanel.add(formatManchesterButton);
+		obo2owlComponents.add(formatRDFButton);
+		obo2owlComponents.add(formatOWLXMLButton);
+		obo2owlComponents.add(formatManchesterButton);
 		add(formatPanel, pos.nextRow().nextCol());
 	}
 	
@@ -114,6 +141,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createDanglingPanel(GBHelper pos) {
+		obo2owlComponents.add(danglingCheckbox);
 		add(danglingCheckbox, pos.nextRow().nextCol());
 	}
 
@@ -123,6 +151,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createFollowImportsPanel(GBHelper pos) {
+		obo2owlComponents.add(followImportsCheckBox);
 		add(followImportsCheckBox, pos.nextRow().nextCol());
 	}
 	
@@ -132,7 +161,26 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param pos
 	 */
 	private void createExpandMacros(GBHelper pos) {
-		add(expandMacrosCheckbox, pos.nextRow().nextCol().expandH());
+		obo2owlComponents.add(expandMacrosCheckbox);
+		add(expandMacrosCheckbox, pos.nextRow().nextCol());
+	}
+	
+	/**
+	 * Layout for the default ontology field.
+	 * 
+	 * @param pos
+	 */
+	private void createDefaultOntologyPanel(GBHelper pos) {
+		JLabel label = new JLabel("DefaultOntology");
+		obo2owlComponents.add(label);
+		add(label,pos.nextRow().nextCol());
+		obo2owlComponents.add(defaultOntologyField);
+		add(defaultOntologyField, pos.nextRow().nextCol().expandW().fill());
+	}
+	
+	private void createStrictPanel(GBHelper pos) {
+		owl2oboComponents.add(strictCheckBox);
+		add(strictCheckBox, pos.nextRow().nextCol().expandH());
 	}
 	
 	/**
@@ -143,14 +191,12 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 */
 	void setObo2Owl(boolean isObo2Owl) {
 		//OBO2OWL
-		this.formatLabel.setEnabled(isObo2Owl);
-		this.formatRDFButton.setEnabled(isObo2Owl);
-		this.formatOWLXMLButton.setEnabled(isObo2Owl);
-		this.formatManchesterButton.setEnabled(isObo2Owl);
-		this.danglingCheckbox.setEnabled(isObo2Owl);
-		this.followImportsCheckBox.setEnabled(isObo2Owl);
-		
+		for(JComponent component : obo2owlComponents) {
+			component.setEnabled(isObo2Owl);
+		}
 		//OWL2OBO
-		this.expandMacrosCheckbox.setEnabled(!isObo2Owl);
+		for(JComponent component : owl2oboComponents) {
+			component.setEnabled(!isObo2Owl);
+		}
 	}
 }

@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 
 import org.obolibrary.cli.OBORunnerConfiguration;
@@ -97,9 +96,8 @@ public class GuiMainFrame extends JFrame {
 		if (tabbedPane == null) {
 			tabbedPane = new JTabbedPane();
 			addTab(tabbedPane, "Input/Output", getMainPanel());
-			addTab(tabbedPane, "Advanced", getAdvancedPanel());
-			addTab(tabbedPane, "Advanced 2", getSpecificAdvancedPanel());
-			//specificAdvancedPanel
+			addTab(tabbedPane, "Advanced", getSpecificAdvancedPanel());
+			addTab(tabbedPane, "Download Ontologies", getAdvancedPanel());
 			addTab(tabbedPane, "Logs", getLogPanel());
 		}
 		return tabbedPane;
@@ -144,15 +142,13 @@ public class GuiMainFrame extends JFrame {
 	private boolean updateConfigurationFromGUI(OBORunnerConfiguration config) {
 		// config from main panel
 		// path
-		ListModel inputFileModel = mainPanel.inputFileJList.getModel();
-		for (int i = 0; i < inputFileModel.getSize(); i++) {
-			config.paths.setValue(inputFileModel.getElementAt(i).toString());
-		}
+		String inputFile = mainPanel.inputFileTextField.getText();
+		config.paths.setValue(inputFile);
 		
 		// outFile
 		config.outFile.setValue(mainPanel.outputFileTextField.getText());
-		// outputdir
-		config.outputdir.setValue(mainPanel.outputFolderTextField.getText());
+
+		// outputdir is not used in the GUI
 		
 		if (config.outFile.isEmpty() && config.outputdir.isEmpty()) {
 			renderInputError("Configuration error. Please specify at least one fo the following in the main panel: Output Folder OR Output File");
@@ -165,7 +161,7 @@ public class GuiMainFrame extends JFrame {
 		// config from advanced panel
 		
 		// defaultOnt
-		config.defaultOnt.setValue(advancedPanel.defaultOntologyField.getText());
+		config.defaultOnt.setValue(specificAdvancedPanel.defaultOntologyField.getText());
 		
 		// format (owlxml, manchester, rdf)
 		if (specificAdvancedPanel.formatOWLXMLButton.isSelected()) {
@@ -178,9 +174,6 @@ public class GuiMainFrame extends JFrame {
 			config.format.setValue("RDF");
 		}
 		
-		// version    owl versions
-		config.version.setValue(advancedPanel.owlOntologyVersion.getText());
-		
 		// allowDangling
 		config.allowDangling.setRealValue(specificAdvancedPanel.danglingCheckbox.isSelected());
 		
@@ -188,7 +181,7 @@ public class GuiMainFrame extends JFrame {
 		config.followImports.setRealValue(specificAdvancedPanel.followImportsCheckBox.isSelected());
 		
 		//strict conversion
-		config.strictConversion.setRealValue(advancedPanel.strictCheckBox.isSelected());
+		config.strictConversion.setRealValue(specificAdvancedPanel.strictCheckBox.isSelected());
 		
 		// expand Macros
 		config.isExpandMacros.setRealValue(specificAdvancedPanel.expandMacrosCheckbox.isSelected());
@@ -251,7 +244,10 @@ public class GuiMainFrame extends JFrame {
 	private SizedJPanel getMainPanel()
 	{
 		if (mainPanel == null) {
-			mainPanel = new GuiMainPanel(this, config.paths.getValue(), config.outputdir.getValue(), config.outFile.getValue(), config.isOboToOwl.getValue());
+			mainPanel = new GuiMainPanel(this, 
+					config.paths.getValue(), 
+					config.outFile.getValue(), 
+					config.isOboToOwl.getValue());
 		}
 		return mainPanel;
 	}
@@ -267,11 +263,7 @@ public class GuiMainFrame extends JFrame {
 			advancedPanel = new GuiAdvancedPanel(this, 
 					config.ontsToDownload.getValue(), 
 					config.omitOntsToDownload.getValue(),
-					config.defaultOnt.getValue(),
-					config.buildDir.getValue(),
-					config.version.getValue(),
-					config.strictConversion.getValue()
-			);
+					config.buildDir.getValue());
 		}
 		return advancedPanel;
 	}
@@ -282,7 +274,9 @@ public class GuiMainFrame extends JFrame {
 					config.allowDangling.getValue(),
 					config.isExpandMacros.getValue(),
 					config.followImports.getValue(),
-					config.isOboToOwl.getValue());
+					config.defaultOnt.getValue(),
+					config.isOboToOwl.getValue(),
+					config.strictConversion.getValue());
 		}
 		return specificAdvancedPanel;
 	}

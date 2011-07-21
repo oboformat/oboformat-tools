@@ -44,7 +44,7 @@ public class GuiTools {
 	 * @param size height of the row in pixel 
 	 */
 	public static void addRowGap(JPanel panel, GBHelper pos, int size) {
-		panel.add(new Gap(10), pos.nextRow());
+		panel.add(new Gap(size), pos.nextRow());
 	}
 	
 	/**

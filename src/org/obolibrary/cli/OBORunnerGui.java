@@ -96,7 +96,7 @@ public class OBORunnerGui extends OBORunner {
 							buildAllOboOwlFiles(buildDir, config, logger);
 						}
 						runConversion(config, logger);
-						logger.info("Finished release manager process");
+						logger.info("Finished ontology conversion.");
 						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, "Finished ontology conversion.");
 					}catch (Exception e) {
 						logger.error("Internal error: "+ e.getMessage(), e);

@@ -34,9 +34,6 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	final JCheckBox downloadOntologiesCheckBox;
 	final JCheckBox omitDownloadOntologiesCheckBox;
 	final JTextField ontologyDownloadFolderField;
-	final JTextField defaultOntologyField;
-	final JTextField owlOntologyVersion;
-	final JCheckBox strictCheckBox;
 
 	/**
 	 * Create GUI panel for advanced settings with the given default values.
@@ -44,23 +41,15 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * @param frame
 	 * @param defaultDownloadOntologies
 	 * @param defaultOmitDownloadOntologies
-	 * @param defaultOntologyConfigValue
 	 * @param defaultBuildDir
-	 * @param defaultOwlOntologyVersion
-	 * @param strictConversion
 	 */
 	public GuiAdvancedPanel(Frame frame,
 			Collection<String> defaultDownloadOntologies, 
 			Collection<String> defaultOmitDownloadOntologies,
-			String defaultOntologyConfigValue, 
-			String defaultBuildDir, 
-			String defaultOwlOntologyVersion, 
-			boolean strictConversion)
+			String defaultBuildDir)
 	{
 		super();
 		this.frame = frame;
-		
-		strictCheckBox = new JCheckBox("Strict Conversion", strictConversion);
 		
 		// create Field for downloadOntologies
 		// if values are available set it and activate the field
@@ -92,10 +81,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		}
 		omitDownloadOntologiesCheckBox = new JCheckBox("Omit Download Ontologies", omitDownloadOntologiesCheckBoxIsActive);
 		
-		defaultOntologyField = createTextField(defaultOntologyConfigValue);
-		
 		ontologyDownloadFolderField = createTextField(defaultBuildDir);
-		owlOntologyVersion = createTextField(defaultOwlOntologyVersion);
 		
 		setLayout(new GridBagLayout());
 		GBHelper pos = new GBHelper();
@@ -104,39 +90,18 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		add(new JLabel("ADVANCED"), pos);
 		addRowGap(this, pos, 10);
 		
-		// owl version
-		createOntologyVersionPanel(pos);
-		addRowGap(this, pos, 5);
-		
-		createStrictPanel(pos);
-		addRowGap(this, pos, 5);
-
 		// download ontologies
 		createOntologiesPanel(pos, downloadOntologies, downloadOntologiesCheckBox);
 		addRowGap(this, pos, 5);
 		
 		// work dir for downloading ontologies
-		createDownloadDirPanel(pos);
+		createDownloadDirPanel(pos, defaultBuildDir);
 		addRowGap(this, pos, 5);
 		
 		// omit download ontologies
 		createOntologiesPanel(pos, omitDownloadOntologies, omitDownloadOntologiesCheckBox);
 		addRowGap(this, pos, 5);
 		
-		// default ontology
-		createDefaultOntologyPanel(pos);
-		addRowGap(this, pos, 10);
-		
-	}
-
-	/**
-	 * Layout for the ontology version field
-	 * 
-	 * @param pos
-	 */
-	private void createOntologyVersionPanel(GBHelper pos) {
-		add(new JLabel("OWL version"),pos.nextRow());
-		add(owlOntologyVersion, pos.nextCol().expandW().fill());
 	}
 
 	/**
@@ -144,8 +109,8 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * 
 	 * @param pos
 	 */
-	private void createDownloadDirPanel(GBHelper pos) {
-		final SelectDialog dialog = SelectDialog.getFolderSelector(frame, "Work directory choose dialog"); 
+	private void createDownloadDirPanel(GBHelper pos, String defaultFolder) {
+		final SelectDialog dialog = SelectDialog.getFolderSelector(frame, defaultFolder, "Work directory choose dialog"); 
 		
 		JButton selectButton = new JButton("Select");
 		selectButton.addActionListener(new ActionListener() {
@@ -190,19 +155,5 @@ public class GuiAdvancedPanel extends SizedJPanel {
 		add(scrollPane, pos.nextCol().expandW().expandH().anchorCenter().fill().height(3));
 		pos.nextRow();
 		pos.nextRow();
-	}
-	
-	/**
-	 * Layout for the default ontology field.
-	 * 
-	 * @param pos
-	 */
-	private void createDefaultOntologyPanel(GBHelper pos) {
-		add(new JLabel("DefaultOntology"),pos.nextRow());
-		add(defaultOntologyField, pos.nextCol().expandW().fill());
-	}
-
-	private void createStrictPanel(GBHelper pos) {
-		add(strictCheckBox, pos.nextRow());
 	}
 }
