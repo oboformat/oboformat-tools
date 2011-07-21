@@ -1,5 +1,6 @@
 package org.obolibrary.obo2owl.test;
 
+import org.obolibrary.macro.test.ExpandExpressionTest;
 import org.obolibrary.oboformat.test.*;
 
 import junit.framework.Test;
@@ -47,6 +48,9 @@ public class AllProductionTests extends TestCase {
 		out.addTestSuite(SingleIntersectionOfTagTest.class);
 		out.addTestSuite(TagTest.class);
 		out.addTestSuite(XrefExpanderTest.class);
+		
+		// macro expansion
+		out.addTestSuite(ExpandExpressionTest.class);
 		
 		return out;
 

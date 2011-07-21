@@ -334,6 +334,8 @@ public class OBORunner {
 
 	}
 	
+	
+	// TODO - document this
 	private static void addVersion(OWLOntology ontology, String version, OWLOntologyManager manager){
 		OWLDataFactory fac = manager.getOWLDataFactory();
 		
