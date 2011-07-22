@@ -91,6 +91,15 @@ public class IDsTest extends TestCase {
 		oboId = owl2Obo.getIdentifier(iri);
 		assertTrue("http://purl.obolibrary.org/testont".equals(oboId));
 		
+
+		iri= bridge.oboIdToIRI("http://purl.obolibrary.org/obo/BFO_0000050");
+		assertTrue("http://purl.obolibrary.org/obo/BFO_0000050".equals(iri.toString()));
+		
+		//OWL 2 obo 
+		oboId = owl2Obo.getIdentifier(iri);
+		assertTrue("BFO:0000050".equals(oboId));
+		
+		
 		
 	}
 	
