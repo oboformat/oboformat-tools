@@ -54,15 +54,6 @@ public class XrefExpander {
 			String [] parts;
 			parts = c.getValue().toString().split("\\s");
 			String idSpace = parts[0];
-			if (targetBase != null) {
-				// create a new bridge ontology for every expansion macro
-				OBODoc tgt = new OBODoc();
-				Frame thf = new Frame(FrameType.HEADER);
-				thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), targetBase + "-" + idSpace.toLowerCase()));
-				tgt.setHeaderFrame(thf);
-				targetDocMap.put(idSpace, tgt);
-				sourceOBODoc.addImportedOBODoc(tgt);
-			}
 			if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag())) {
 				addRule(parts[0], new EquivalenceExpansion());
 				//				addMacro(idSpace,"is_specific_equivalent_of","Class: ?X EquivalentTo: ?Y and "+oboIdToIRI(parts[1])+" some "+oboIdToIRI(parts[2]));
@@ -84,6 +75,20 @@ public class XrefExpander {
 			else if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_RELATIONSHIP.getTag())) {
 				addRule(idSpace, new RelationshipExpansion(parts[1]));
 			}
+			else {
+				continue;
+			}
+			
+			if (targetBase != null) {
+				// create a new bridge ontology for every expansion macro
+				OBODoc tgt = new OBODoc();
+				Frame thf = new Frame(FrameType.HEADER);
+				thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), targetBase + "-" + idSpace.toLowerCase()));
+				tgt.setHeaderFrame(thf);
+				targetDocMap.put(idSpace, tgt);
+				sourceOBODoc.addImportedOBODoc(tgt);
+			}
+
 		}
 	}
 	
