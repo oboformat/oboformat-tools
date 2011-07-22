@@ -912,6 +912,23 @@ public class Owl2Obo {
 		List<OWLClassExpression> list = ax.getClassExpressionsAsList();
 		String cls2 = this.getIdentifier(list.get(1));
 
+		if(cls2 == null){
+			
+			String logErr = "the axiom is not translated : " + ax;
+			String err = "The conversion is halted as the axiom is not translated: " + ax;
+			if(strictConversion){
+				logErr = err;
+			}
+
+			LOG.warn(logErr);
+
+			if(strictConversion)
+				throw new RuntimeException(err);
+
+			return;
+		}	
+		
+		
 		Frame f = getTermFrame((OWLEntity) list.get(0));
 		Clause c = new Clause();
 		c.setTag(OboFormatTag.TAG_DISJOINT_FROM.getTag());
@@ -1413,6 +1430,8 @@ public class Owl2Obo {
 
 					if(strictConversion)
 						throw new RuntimeException(err);
+					
+					return;
 				}
 
 				Clause c = new Clause();
@@ -1433,6 +1452,8 @@ public class Owl2Obo {
 
 				if(strictConversion)
 					throw new RuntimeException(err);
+				
+				return;
 
 			}
 		} else {
@@ -1446,6 +1467,8 @@ public class Owl2Obo {
 
 			if(strictConversion)
 				throw new RuntimeException(err);
+			
+			return;
 
 		}
 	}
