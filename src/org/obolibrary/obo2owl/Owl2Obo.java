@@ -234,9 +234,9 @@ public class Owl2Obo {
 	}
 
 
-	private void trObjectProperty(OWLObjectProperty prop, String tag, String value){
+	private boolean trObjectProperty(OWLObjectProperty prop, String tag, String value){
 		if(prop == null || value == null)
-			return;
+			return false;
 
 		Frame f = getTypedefFrame(prop);
 		Clause clause = new Clause();
@@ -244,12 +244,14 @@ public class Owl2Obo {
 
 		clause.addValue(value);
 		f.addClause(clause);
+		
+		return true;
 
 	}
 
-	private void trObjectProperty(OWLObjectProperty prop, String tag, Boolean value){
+	private boolean trObjectProperty(OWLObjectProperty prop, String tag, Boolean value){
 		if(prop == null || value == null)
-			return;
+			return false;
 
 		Frame f = getTypedefFrame(prop);
 		Clause clause = new Clause();
@@ -258,6 +260,7 @@ public class Owl2Obo {
 		clause.addValue(value);
 		f.addClause(clause);
 
+		return true;
 	}
 
 	private void trNaryPropertyAxiom(OWLNaryPropertyAxiom<OWLObjectPropertyExpression> ax, String tag){
@@ -277,21 +280,23 @@ public class Owl2Obo {
 				}
 			}
 
-			trObjectProperty(prop, tag, disjointFrom);
-
-		}else{
-			String logErr = "the axiom is not translated : " + ax;
-			String err = "The conversion is halted as the axiom is not translated: " + ax;
-			if(strictConversion){
-				logErr = err;
+			if( trObjectProperty(prop, tag, disjointFrom) ){
+				return;
 			}
 
-			LOG.warn(logErr);
-
-			if(strictConversion)
-				throw new RuntimeException(err);
-
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+
 
 	}
 
@@ -355,8 +360,22 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE) )
+				return;
 		}
+		
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 	}
 
 	private void tr(OWLDisjointObjectPropertiesAxiom ax){
@@ -388,8 +407,21 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE) )
+				return;
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 
 	}
 
@@ -397,16 +429,43 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE) )
+				return;
 		}
+		
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 	}
 	private void tr(OWLInverseObjectPropertiesAxiom ax){
 		OWLObjectPropertyExpression prop1 = ax.getFirstProperty();
 		OWLObjectPropertyExpression prop2 = ax.getSecondProperty();
 
 		if(prop1 instanceof OWLObjectProperty && prop2 instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2));
+			if( trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2)) )
+				return;
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 	}
 
 
@@ -415,17 +474,46 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(range != null && prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_DOMAIN.getTag(), range);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_DOMAIN.getTag(), range) ){
+				return;
+			}
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
+		
 	}
 
 	private void tr(OWLAsymmetricObjectPropertyAxiom ax){
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_ASYMMETRIC.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_ASYMMETRIC.getTag(), Boolean.TRUE) ){
+				return;
+			}
 		}
 
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
+		
 	}
 
 
@@ -433,8 +521,21 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE) )
+				return;
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 
 	}
 
@@ -443,8 +544,21 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE) )
+				return;
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 	}
 
 	private void tr(OWLObjectPropertyRangeAxiom ax){
@@ -453,8 +567,21 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(range != null && prop instanceof OWLObjectProperty){
-			trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_RANGE.getTag(), range);
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_RANGE.getTag(), range) )
+				return;
 		}
+		
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		
 
 	}
 
@@ -598,9 +725,23 @@ public class Owl2Obo {
 
 	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 		tr(aanAx.getProperty(), aanAx.getValue(), aanAx.getAnnotations(), frame);
+		
+		/*if( !tr(aanAx.getProperty(), aanAx.getValue(), aanAx.getAnnotations(), frame)){
+			String logErr = "the axiom is not translated : " + aanAx;
+			String err = "The conversion is halted as the axiom is not translated: " + aanAx;
+			if(strictConversion){
+				logErr = err;
+			}
+
+			LOG.warn(logErr);
+
+			if(strictConversion)
+				throw new RuntimeException(err);
+				
+		}*/
 	}	
 
-	private void tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,  Frame frame) {
+	private boolean tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,  Frame frame) {
 
 		//		OWLAnnotationProperty prop = aanAx.getProperty();
 		String tag = owlObjectToTag(prop);
@@ -697,18 +838,23 @@ public class Owl2Obo {
 						}
 					}
 					else {
-						// TODO: Exception
+
+						return false;
 					}
 
-				}
+				}else
+					return false;
 			}else{
-				LOG.warn("The annotation '" +prop + "' is not translated");
-
+				return false;
 			}
 
 
 
-		}
+		}else
+			return false;
+		
+		
+		return true;
 
 	}
 
@@ -868,6 +1014,7 @@ public class Owl2Obo {
 					equivalenceAxiomClauses.add(c);
 				}
 				else if (f.getClauses(OboFormatTag.TAG_INTERSECTION_OF).size() > 0) {
+
 					String logErr = "the axiom is not translated (maximimum one IntersectionOf EquivalenceAxiom : " + ax;
 					String err = "The conversion is halted as the axiom is not translated: " + ax;
 					if(strictConversion){
@@ -971,7 +1118,24 @@ public class Owl2Obo {
 
 			add(f);
 
+			return;
 		}
+		
+		/*
+		if(entity.getIRI().toString().startsWith("http://www.geneontology.org/formats/oboInOwl#"))
+			return;
+		
+		String logErr = "the axiom is not translated : " + axiom;
+		String err = "The conversion is halted as the axiom is not translated: " + axiom;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+		*/
 
 	}
 
