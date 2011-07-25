@@ -40,6 +40,15 @@ public class OBORunnerConfiguration {
 			return true;
 		}
 	};
+	public final Variable<Boolean> isDisableDocumentChecking = new ParamterVariable<Boolean>("Disable document checking",
+			false, "--disable-checks","--disable-document-checks") {
+
+		@Override
+		public boolean setValue(String value) {
+			this.value = true;
+			return true;
+		}
+	};
 	public final Variable<Boolean> allowDangling = new ParamterVariable<Boolean>("Allow Dangling", false,
 			"--allowdangling", "--allow-dangling") {
 

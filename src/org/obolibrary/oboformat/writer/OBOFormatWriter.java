@@ -48,6 +48,20 @@ public class OBOFormatWriter {
 	public OBOFormatWriter(){
 		oboDoc = null;
 	}
+	
+	
+
+	public boolean isCheckStructure() {
+		return isCheckStructure;
+	}
+
+
+
+	public void setCheckStructure(boolean isCheckStructure) {
+		this.isCheckStructure = isCheckStructure;
+	}
+
+
 
 	private static HashSet<String> buildTagsInformative(){
 		HashSet<String> set = new HashSet<String>();
@@ -158,6 +172,8 @@ public class OBOFormatWriter {
 		List<String> tags = duplicateTags(frame.getTags());
 		Collections.sort(tags, new HeaderTagsComparator());
 
+		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer);
+		
 		for(String tag: tags){
 
 			if(tag.equals(OboFormatTag.TAG_FORMAT_VERSION.getTag()))

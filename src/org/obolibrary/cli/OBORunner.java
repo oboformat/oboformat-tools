@@ -167,6 +167,10 @@ public class OBORunner {
 				
 				OBOFormatWriter oboWriter = new OBOFormatWriter();
 				
+				if (config.isDisableDocumentChecking.getValue()) {
+					oboWriter.setCheckStructure(false);
+				}
+				
 				oboWriter.write(doc, writer);
 				
 				writer.close();
