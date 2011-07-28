@@ -69,7 +69,7 @@ public class OBORunnerConfiguration {
 		}
 	};
 	
-	public final Variable<Boolean> strictConversion = new ParamterVariable<Boolean>("Strict Conversion", false,
+	public final Variable<Boolean> strictConversion = new ParamterVariable<Boolean>("Strict Conversion", true,
 			"--strictconversion", "--strict-conversion") {
 
 		@Override
