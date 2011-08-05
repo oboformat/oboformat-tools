@@ -948,44 +948,34 @@ public class Owl2Obo {
 			List<OWLClassExpression> list2 = ((OWLObjectUnionOf) ce2)
 			.getOperandsAsList();
 
-			String id = this.getIdentifier(list2.get(0));
-
-			if(id == null){
-				isUntranslateable = true;
-				String logErr = "the axiom is not translated : " + ax;
-				String err = "The conversion is halted as the axiom is not translated: " + ax;
-				if(strictConversion){
-					logErr = err;
-				}
-
-				LOG.warn(logErr);
-
-				if(strictConversion)
-					throw new RuntimeException(err);
-
-				return;
-			}
-			else if (f.getClauses(OboFormatTag.TAG_UNION_OF).size() > 0) {
-				String logErr = "the axiom is not translated (maximimum one UnionOf EquivalenceAxiom : " + ax;
-				String err = "The conversion is halted as the axiom is not translated: " + ax;
-				if(strictConversion){
-					logErr = err;
-				}
-
-				LOG.warn(logErr);
-
-				if(strictConversion)
-					throw new RuntimeException(err);
-				
-			}
-			else{
-
+			for(OWLClassExpression oce: list2){
+				String id = this.getIdentifier(oce);
 				Clause c = new Clause();
 				c.setTag(OboFormatTag.TAG_UNION_OF.getTag());
-				//c.setValue(getIdentifier(list2.get(0)));
-				c.setValue(id);
-				equivalenceAxiomClauses.add(c);
+
+				if(id == null){
+					isUntranslateable = true;
+					String logErr = "the axiom is not translated : " + ax;
+					String err = "The conversion is halted as the axiom is not translated: " + ax;
+					if(strictConversion){
+						logErr = err;
+					}
+	
+					LOG.warn(logErr);
+	
+					if(strictConversion)
+						throw new RuntimeException(err);
+	
+					return;
+				}
+				else{
+					c.setValue(id);
+					equivalenceAxiomClauses.add(c);
+				}
 			}
+			
+			
+			
 		} else if (ce2 instanceof OWLObjectIntersectionOf) {
 
 			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();

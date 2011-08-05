@@ -388,7 +388,7 @@ public class OBOFormatWriter {
 			line +="]";
 		}
 
-		if(idsLabel != null){
+		if(idsLabel != null && idsLabel.trim().length()>0){
 			line += " ! " +idsLabel;
 		}
 
