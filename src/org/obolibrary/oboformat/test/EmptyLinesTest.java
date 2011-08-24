@@ -1,13 +1,14 @@
 package org.obolibrary.oboformat.test;
 
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
 import java.util.Collection;
 
+import org.junit.Test;
+import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
-
-import junit.framework.TestCase;
 
 
 /**
@@ -15,12 +16,11 @@ import junit.framework.TestCase;
  *  but an empty line as first entry. 
  *  Original url: http://www.geneontology.org/scratch/xps/biological_process_xp_plant_anatomy.obo
  */
-public class EmptyLinesTest extends TestCase {
+public class EmptyLinesTest extends OboFormatTestBasics {
 
+	@Test
 	public void testEmptyFirstLine() throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse("test_resources/empty_lines.obo");
-		assertNotNull("The obodoc has to be created.", obodoc);
+		OBODoc obodoc = parseOBOFile("empty_lines.obo");
 		
 		Collection<Frame> frames = obodoc.getTermFrames();
 		assertEquals(1, frames.size());

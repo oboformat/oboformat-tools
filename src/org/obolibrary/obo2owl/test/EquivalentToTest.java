@@ -1,51 +1,32 @@
 package org.obolibrary.obo2owl.test;
 
-import java.io.BufferedReader;
+import static junit.framework.Assert.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationSubject;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
-import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
-
-import junit.framework.TestCase;
 
 /**
  * @author cjm
@@ -55,24 +36,18 @@ import junit.framework.TestCase;
  * See http://code.google.com/p/oboformat/issues/detail?id=13
  *
  */
-public class EquivalentToTest extends TestCase {
+public class EquivalentToTest extends OboFormatTestBasics {
 
-	public EquivalentToTest() {
-		super();
+	@BeforeClass
+	public static void beforeClass() {
+		Logger.getRootLogger().setLevel(Level.ERROR);		
 	}
-
-	public EquivalentToTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public static void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, URISyntaxException {
-		Logger.getRootLogger().setLevel(Level.ERROR);
-		Obo2Owl obo2owl = new Obo2Owl();
+	
+	@Test
+	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, URISyntaxException {
 
 		// PARSE TEST FILE
-		OWLOntology ontology = obo2owl.convert("test_resources/equivtest.obo");
-
+		OWLOntology ontology = convert(parseOBOFile("equivtest.obo"));
 
 		// TEST CONTENTS OF OWL ONTOLOGY
 		if (true) {
@@ -101,13 +76,9 @@ public class EquivalentToTest extends TestCase {
 		obodoc = p.parse(fn);
 		checkOBODoc(obodoc);
 		
-
-
-
-
 	}
 	
-	public static void checkOBODoc(OBODoc obodoc) {
+	public void checkOBODoc(OBODoc obodoc) {
 		// OBODoc tests
 		
 		// test ECA between named classes is persisted using correct tag
@@ -168,12 +139,5 @@ public class EquivalentToTest extends TestCase {
 			assertTrue(ok);
 		}	
 	}
-
-	public static OBODoc parseOBOFile(String fn) throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse("test_resources/"+fn);
-		return obodoc;
-	}
-
 
 }

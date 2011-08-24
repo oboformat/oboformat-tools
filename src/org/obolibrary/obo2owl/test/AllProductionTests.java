@@ -1,59 +1,48 @@
 package org.obolibrary.obo2owl.test;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.obolibrary.macro.test.ExpandExpressionTest;
 import org.obolibrary.oboformat.test.*;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-public class AllProductionTests extends TestCase {
-
-	protected AllProductionTests(String name) {
-		super(name);
-	}
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+	//obo2owl tests
+	BFOROXrefTest.class,
+	DanglingOwl2OboTest.class,
+	DanglingRoundTripTest.class,
+	//TODO
+	//DanglingRestrictionOwl2OboTest.class,
+	EquivalentToTest.class,
+	//FlyXPTest.class,
+	HeaderLostBug.class,
+	IDsTest.class,
+	Obo2OwlTest.class,
+	ObsoleteTermTest.class,
+	Owl2OboTest.class,
+	PropertyChainTest.class,
+	RelationShorthandTest.class,
+	RoundTripTestSimpleGo.class,
+	//RoundTripImportTest.class,
+	RoundTripMultipleDefXrefTest.class,
+	RoundTripSynonymTest.class,
+	//SBOTest.class,
+	SubsetTest.class,
+	SynonymTest.class,
+	UnionOfTest.class,
+	UnmappableExpressionsTest.class,
+	XPBridgeFileTest.class,
 	
-	public static Test suite() {
-		TestSuite out = new TestSuite();
-		
-		//obo2owl tests
-		out.addTestSuite(BFOROXrefTest.class);
-		out.addTestSuite(DanglingOwl2OboTest.class);
-		out.addTestSuite(DanglingRoundTripTest.class);
-		//TODO
-		//out.addTestSuite(DanglingRestrictionOwl2OboTest.class);
-		out.addTestSuite(EquivalentToTest.class);
-		//out.addTestSuite(FlyXPTest.class);
-		out.addTestSuite(HeaderLostBug.class);
-		out.addTestSuite(IDsTest.class);
-		out.addTestSuite(Obo2OwlTest.class);
-		out.addTestSuite(ObsoleteTermTest.class);
-		out.addTestSuite(Owl2OboTest.class);
-		out.addTestSuite(PropertyChainTest.class);
-		out.addTestSuite(RelationShorthandTest.class);
-		out.addTestSuite(RoundTripTestSimpleGo.class);
-		//out.addTestSuite(RoundTripImportTest.class);
-		out.addTestSuite(RoundTripMultipleDefXrefTest.class);
-		out.addTestSuite(RoundTripSynonymTest.class);
-		//out.addTestSuite(SBOTest.class);
-		out.addTestSuite(SubsetTest.class);
-		out.addTestSuite(SynonymTest.class);
-		out.addTestSuite(UnionOfTest.class);
-		out.addTestSuite(UnmappableExpressionsTest.class);
-		out.addTestSuite(XPBridgeFileTest.class);
-		
-		// oboformat tests
-		out.addTestSuite(CAROTest.class);
-		out.addTestSuite(SimpleGOTest.class);
-		out.addTestSuite(SingleIntersectionOfTagTest.class);
-		out.addTestSuite(TagTest.class);
-		out.addTestSuite(XrefExpanderTest.class);
-		
-		// macro expansion
-		out.addTestSuite(ExpandExpressionTest.class);
-		
-		return out;
-
-	}
-
+	// oboformat tests
+	CAROTest.class,
+	SimpleGOTest.class,
+	SingleIntersectionOfTagTest.class,
+	TagTest.class,
+	XrefExpanderTest.class,
+	
+	// macro expansion
+	ExpandExpressionTest.class
+})
+public class AllProductionTests {
+	// intentionally empty, uses annotations to define test suite
 }

@@ -1,46 +1,27 @@
 package org.obolibrary.obo2owl.test;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.obolibrary.obo2owl.Obo2Owl;
-import org.obolibrary.obo2owl.Owl2Obo;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.model.Xref;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
-import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationSubject;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
-
-import junit.framework.TestCase;
 
 /**
  * @author cjm
@@ -48,24 +29,18 @@ import junit.framework.TestCase;
  * see 5.9.3 and 8.2.2 of spec
  *
  */
-public class RelationShorthandTest extends TestCase {
+public class RelationShorthandTest extends OboFormatTestBasics  {
 
-	public RelationShorthandTest() {
-		super();
-	}
-
-	public RelationShorthandTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public static void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	@BeforeClass
+	public static void beforeClass() {
 		Logger.getRootLogger().setLevel(Level.ERROR);
-		Obo2Owl obo2owl = new Obo2Owl();
+	}
+	
+	@Test
+	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 
-		// PARSE TEST FILE
-		OWLOntology ontology = obo2owl.convert("test_resources/relation_shorthand_test.obo");
-
+		// PARSE TEST FILE, CONVERT TO OWL, AND WRITE TO OWL FILE 
+		OWLOntology ontology = convert(parseOBOFile("relation_shorthand_test.obo"), "x.owl");
 
 		// TEST CONTENTS OF OWL ONTOLOGY
 
@@ -104,16 +79,8 @@ public class RelationShorthandTest extends TestCase {
 			assertTrue(ok);
 		}
 
-		// CONVERT TO OWL FILE
-		IRI outputStream = IRI.create("file:///tmp/x.owl");
-		System.out.println("saving to "+outputStream);
-		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		OWLOntologyManager manager = obo2owl.getManager();
-		manager.saveOntology(ontology, format, outputStream);
-
 		// CONVERT BACK TO OBO
-		Owl2Obo owl2obo = new Owl2Obo();
-		OBODoc obodoc = owl2obo.convert(ontology);
+		OBODoc obodoc = convert(ontology);
 		
 		// test that relation IDs are converted back to symbolic form
 		if (true) {
@@ -141,12 +108,5 @@ public class RelationShorthandTest extends TestCase {
 
 
 	}
-
-	public static OBODoc parseOBOFile(String fn) throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse("test_resources/"+fn);
-		return obodoc;
-	}
-
 
 }

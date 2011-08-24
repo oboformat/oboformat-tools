@@ -1,32 +1,22 @@
 package org.obolibrary.oboformat.test;
 
-import java.io.BufferedReader;
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collection;
 
+import org.junit.Test;
+import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 
-import junit.framework.TestCase;
-
-public class CAROTest extends TestCase {
+public class CAROTest extends OboFormatTestBasics {
 	
-	public CAROTest() {
-		super();
-	}
-
-
-
-	public CAROTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public static void testParseCARO() throws IOException {
+	@Test
+	public void testParseCARO() throws IOException {
 		OBODoc obodoc = parseOBOFile("caro.obo");
 		System.out.println("F:"+obodoc);
 		assertTrue(obodoc.getTermFrames().size() > 2);
@@ -47,11 +37,4 @@ public class CAROTest extends TestCase {
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
 	
-	public static OBODoc parseOBOFile(String fn) throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse("test_resources/"+fn);
-		return obodoc;
-	}
-
-
 }

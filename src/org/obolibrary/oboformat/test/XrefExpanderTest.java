@@ -1,35 +1,23 @@
 package org.obolibrary.oboformat.test;
 
-import java.io.BufferedReader;
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 
+import org.junit.Test;
+import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
-import org.obolibrary.oboformat.model.FrameStructureException;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.InvalidXrefMapException;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.XrefExpander;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
-import org.obolibrary.oboformat.writer.OBOFormatWriter;
 
-import junit.framework.TestCase;
-
-public class XrefExpanderTest extends TestCase {
+public class XrefExpanderTest extends OboFormatTestBasics {
 	
-	public XrefExpanderTest() {
-		super();
-	}
-
-
-	public XrefExpanderTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public static void testExpand() throws IOException, URISyntaxException, InvalidXrefMapException {
+	@Test
+	public void testExpand() throws IOException, URISyntaxException, InvalidXrefMapException {
 		OBODoc obodoc = parseOBOFile("treat_xrefs_test.obo");
 		XrefExpander x = new XrefExpander(obodoc);
 		x.expandXrefs();
@@ -44,7 +32,8 @@ public class XrefExpanderTest extends TestCase {
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
 
-	public static void testExpandIntoSeparateBridges() throws IOException, URISyntaxException, InvalidXrefMapException {
+	@Test
+	public void testExpandIntoSeparateBridges() throws IOException, URISyntaxException, InvalidXrefMapException {
 		OBODoc obodoc = parseOBOFile("treat_xrefs_test.obo");
 		XrefExpander x = new XrefExpander(obodoc, "bridge");
 		x.expandXrefs();
@@ -77,13 +66,5 @@ public class XrefExpanderTest extends TestCase {
 		assertTrue(n == 3);
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
-
-	
-	public static OBODoc parseOBOFile(String fn) throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parse("test_resources/"+fn);
-		return obodoc;
-	}
-
 
 }

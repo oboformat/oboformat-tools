@@ -1,28 +1,17 @@
 package org.obolibrary.oboformat.test;
 
-import java.io.BufferedReader;
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
-import java.io.StringReader;
 
-import org.obolibrary.oboformat.model.Clause;
-import org.obolibrary.oboformat.model.Frame;
+import org.junit.Test;
+import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
 
-import junit.framework.TestCase;
+public class GOTest extends OboFormatTestBasics {
 
-public class GOTest extends TestCase {
-
-	public GOTest() {
-		super();
-	}
-
-	public GOTest(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public static void testParseGO() throws IOException {
+	@Test
+	public void testParseGO() throws IOException {
 		OBODoc obodoc = parseOBOURL("http://geneontology.org/ontology/obo_format_1_2/gene_ontology_ext.obo");
 		//System.out.println("F:"+obodoc);
 		System.out.println("term frames:"+obodoc.getTermFrames().size());
@@ -31,11 +20,4 @@ public class GOTest extends TestCase {
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
 	
-	public static OBODoc parseOBOURL(String url) throws IOException {
-		OBOFormatParser p = new OBOFormatParser();
-		OBODoc obodoc = p.parseURL(url);
-		return obodoc;
-	}
-
-
 }

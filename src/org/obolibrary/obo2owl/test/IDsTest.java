@@ -1,5 +1,8 @@
 package org.obolibrary.obo2owl.test;
 
+import static junit.framework.Assert.*;
+
+import org.junit.Test;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Clause;
@@ -11,11 +14,10 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import junit.framework.TestCase;
+public class IDsTest {
 
-public class IDsTest extends TestCase {
-
-	public static void testIDs() throws OWLOntologyCreationException{
+	@Test
+	public void testIDs() throws OWLOntologyCreationException{
 		OBODoc doc = new OBODoc();
 		Frame header = new Frame(FrameType.HEADER);
 		Clause c = new Clause();
