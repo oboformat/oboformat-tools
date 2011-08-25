@@ -14,16 +14,41 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Wrapper for the native {@link FileDialog}. Allow convenient use of
+ * the native Dialog. The wrapper sets also the system specific flags, for file
+ * and folder dialogs.
+ * 
+ * Limitations:
+ * <ul>
+ *  <li>No API for multiple file selection (Fixed in Java7).</li>
+ *  <li>Linux: Due to a bug, the non-native {@link JFileChooser} is used (Fixed in Java7).</li>
+ *  <li>Windows: FileFilters are ignored in the reference implementation</li>
+ * </ul>
+ */
 public abstract class SelectDialog {
 	
 	private final static Logger LOGGER = Logger.getLogger(SelectDialog.class);
 	public final static boolean LOAD = false;
 	public final static boolean SAVE = true;
 	
+	/**
+	 * Show the dialog to the user for selection. 
+	 */
 	public abstract void show();
 	
+	/**
+	 * Retrieve the selected file/folder.
+	 * 
+	 * @return selected file/folder or null (if not available).
+	 */
 	public abstract File getSelected();
 	
+	/**
+	 * Retrieve the canonical path of the selected folder.
+	 * 
+	 * @return canonical path of the selected file/folder or null (if not available)
+	 */
 	public String getSelectedCanonicalPath() {
 		File selected = getSelected();
 		return getCanonical(selected);
@@ -40,20 +65,39 @@ public abstract class SelectDialog {
 		return null;
 	}
 	
+	/**
+	 * Create a new dialog, which selects a file from the file system.
+	 * 
+	 * @param frame the owner frame used to configure the dialog
+	 * @param write write mode, see {@link #LOAD} and {@link #SAVE}.
+	 * @param defaultFolder default folder the dialog 
+	 * @param title title string for the dialog
+	 * @param description filter description
+	 * @param extensions suffixes for the filter, set to null to show all files
+	 * @return dialog
+	 */
 	public static SelectDialog getFileSelector(final Frame frame, boolean write, String defaultFolder, String title, String description, String[] extensions) {
 		if (isUnix()) {
 			// due to a bug, which is fixed in JDK 7, the native AWT dialog 
 			// does not use the correct renderer: meaning it looks very ugly.
 			// http://bugs.sun.com/view_bug.do?bug_id=6913179
 			// work around: use the built-in java swing version
-			final JFileChooser fc = new JFileChooser();
+			final JFileChooser fc;
+			if (defaultFolder != null) {
+				fc = new JFileChooser(defaultFolder);
+			}
+			else {
+				fc = new JFileChooser();
+			}
 			int dialogType = JFileChooser.OPEN_DIALOG;
 			if (write) {
 				dialogType = JFileChooser.SAVE_DIALOG;
 			}
 			fc.setDialogType(dialogType);
 			fc.setDialogTitle(title);
-			fc.setFileFilter(new SuffixFileFilter(description, extensions));
+			if (extensions != null && extensions.length > 0) {
+				fc.setFileFilter(new SuffixFileFilter(description, extensions));
+			}
 			return new SelectDialog() {
 				File selected = null;
 				
@@ -81,13 +125,16 @@ public abstract class SelectDialog {
 				mode = FileDialog.SAVE;
 			}
 			final FileDialog dialog = new FileDialog(frame, title, mode);
-			/*
-			 * Extracted from the javadoc:
-			 * 
-			 * Filename filters do not function in Sun's reference
-			 * implementation for Microsoft Windows.
-			 */
-			dialog.setFilenameFilter(new SuffixFilenameFilter(extensions));
+			dialog.setDirectory(defaultFolder);
+			if (extensions != null && extensions.length > 0) {
+				/*
+				 * Extracted from the javadoc:
+				 * 
+				 * Filename filters do not function in Sun's reference
+				 * implementation for Microsoft Windows.
+				 */
+				dialog.setFilenameFilter(new SuffixFilenameFilter(extensions));
+			}
 			
 			return new SelectDialog() {
 				File selected = null;
@@ -111,7 +158,14 @@ public abstract class SelectDialog {
 		}
 	}
 	
-	
+	/**
+	 * Create a new dialog, which selects a folder from the file system.
+	 * 
+	 * @param frame the frame used to center the dialog
+	 * @param defaultFolder default folder for the dialog 
+	 * @param title title string for the dialog
+	 * @return dialog
+	 */
 	public static SelectDialog getFolderSelector(final Frame frame, String defaultFolder, String title) {
 		if (isUnix()) {
 			final JFileChooser folderFC;
@@ -195,15 +249,24 @@ public abstract class SelectDialog {
 	}
 	
 	
+	/**
+	 * {@link FileFilter} for a given list of suffixes. 
+	 * If the list is empty, accept all files.
+	 */
 	private static class SuffixFileFilter extends FileFilter {
 		
 		private final String description; 
 		private final Set<String> extensions;
 		
-		public SuffixFileFilter(String description, String...sufixes) {
+		public SuffixFileFilter(String description, String...suffixes) {
 			super();
 			this.description = description;
-			this.extensions = new HashSet<String>(Arrays.asList(sufixes));
+			if (suffixes != null) {
+				this.extensions = new HashSet<String>(Arrays.asList(suffixes));
+			}
+			else {
+				extensions = null;
+			}
 		}
 
 		public String getDescription() {
@@ -211,6 +274,9 @@ public abstract class SelectDialog {
 		}
 		
 		public boolean accept(File f) {
+			if (extensions == null) {
+				return true;
+			}
 			if (f != null) {
 	            if (f.isDirectory()) {
 	                return true;
@@ -226,15 +292,27 @@ public abstract class SelectDialog {
 		}
 	};
 	
+	/**
+	 * {@link FilenameFilter} for a given list of suffixes. 
+	 * If the list is empty, accept all files.
+	 */
 	private static class SuffixFilenameFilter implements FilenameFilter {
 		
 		private final Set<String> extensions;
 		
 		public SuffixFilenameFilter(String...suffixes) {
-			extensions = new HashSet<String>(Arrays.asList(suffixes));
+			if (suffixes != null) {
+				extensions = new HashSet<String>(Arrays.asList(suffixes));
+			}
+			else {
+				extensions = null;
+			}
 		}
 		
 		public boolean accept(File dir, String fileName) {
+			if (extensions == null) {
+				return true;
+			}
 			if (fileName != null && fileName.length() > 0) {
 				int i = fileName.lastIndexOf('.');
 	            if (i > 0 && i < fileName.length() - 1) {
