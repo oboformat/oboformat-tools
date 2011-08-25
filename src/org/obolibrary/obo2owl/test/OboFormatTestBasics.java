@@ -91,11 +91,11 @@ public class OboFormatTestBasics {
 		return file;
 	}
 
-	protected void writeOWL(OWLOntology ontology, String filename) throws OWLOntologyStorageException {
-		writeOWL(ontology, filename, new OWLXMLOntologyFormat());
+	protected File writeOWL(OWLOntology ontology, String filename) throws OWLOntologyStorageException {
+		return writeOWL(ontology, filename, new OWLXMLOntologyFormat());
 	}
 	
-	protected void writeOWL(OWLOntology ontology, String filename, OWLOntologyFormat format) throws OWLOntologyStorageException {
+	protected File writeOWL(OWLOntology ontology, String filename, OWLOntologyFormat format) throws OWLOntologyStorageException {
 		if (!filename.toLowerCase().endsWith(".owl")) {
 			filename += ".owl";
 		}
@@ -105,5 +105,7 @@ public class OboFormatTestBasics {
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
 		System.out.println("saving to "+iri);
 		manager.saveOntology(ontology, format, iri);
+		
+		return tempFile;
 	}
 }

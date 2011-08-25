@@ -2,6 +2,7 @@ package org.obolibrary.obo2owl.test;
 
 import static junit.framework.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
@@ -17,6 +18,8 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class HeaderLostBug extends OboFormatTestBasics {
 
+	private File owlFile = null;
+	
 	/**
 	 * During the conversion of the rdfxml formatfile the ontology header tags are lost.
 	 * The possible reason is that the RDFXMLOntologyFormat format writes the annotation assertion axioms
@@ -28,7 +31,9 @@ public class HeaderLostBug extends OboFormatTestBasics {
 
 		convertOBOFile("header_lost_bug.obo");
 
-		IRI ontologyIRI = IRI.create("file:///tmp/header_lost_bug.obo.owl");
+		assertNotNull(owlFile);
+		
+		IRI ontologyIRI = IRI.create(owlFile);
 	
 	 	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		
@@ -46,7 +51,9 @@ public class HeaderLostBug extends OboFormatTestBasics {
 	}
 	
 	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		return convert(parseOBOFile(fn), fn);
+		OWLOntology ontology = convert(parseOBOFile(fn));
+		owlFile = writeOWL(ontology, fn);
+		return ontology;
 	}
 
 }
