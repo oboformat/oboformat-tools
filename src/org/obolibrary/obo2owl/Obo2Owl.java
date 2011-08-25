@@ -1130,7 +1130,7 @@ public class Obo2Owl {
 
 	public IRI oboIdToIRI(String id) {
 		if (id.contains(" ")) {
-			LOG.error("id contains space: "+id);
+			LOG.error("id contains space: \""+id+"\"");
 			//throw new UnsupportedEncodingException();
 			return null;
 		}
