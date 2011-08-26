@@ -27,7 +27,7 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
 	
 	@Test
 	public void testExpand() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		OWLOntology owlOnt = convertOBOFile("gcitest.obo");
+		OWLOntology owlOnt = convertOBOFile("homrel.obo");
 		assertNotNull(owlOnt);
 	}
 	
