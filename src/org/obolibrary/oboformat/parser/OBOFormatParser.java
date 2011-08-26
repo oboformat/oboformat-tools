@@ -1266,7 +1266,7 @@ public class OBOFormatParser {
 		String v = getParseUntil("!{");
 
 		// strip whitespace from the end - TODO
-		v = v.replaceAll("\\s$", "");
+		v = v.replaceAll("\\s*$", "");
 		
 		cl.setValue(v);
 		//s.advanceLine();
