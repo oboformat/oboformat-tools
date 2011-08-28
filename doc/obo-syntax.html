@@ -111,7 +111,7 @@ body {
 						 alt="The Open Biological and Biomedical Ontology Foundry" /></a>
 <h1 class="mainTitle">
 OBO Flat File Format 1.4 Syntax and Semantics [DRAFT]</h1>
-<h2><a id="editordraft" name="editordraft"></a>Editor's Draft of 2011/06/15</h2>
+<h2><a id="editordraft" name="editordraft"></a>Editor's Draft of $Date$</h2>
 <dl>
   <dt>This version: </dt>
   <dd><a href="http://berkeleybop.org/~cjm/obo2owl/obo-syntax.html">http://berkeleybop.org/~cjm/obo2owl/obo-syntax.html</a></dd>
@@ -208,7 +208,7 @@ a translation to the OWL DL abstract syntax.</p>
 </p>
 
 <p>
-  The NCBO OboInOwl vocabulary attempted to fill in the gaps in the
+  The OboInOwl vocabulary attempted to fill in the gaps in the
   Horrocks translation by providing a full translation of all of
   obof1.2, including synonyms and definitions using the n-ary
   relations pattern. [<cite><a href="#obo-owl-ncbo" title="">OBO-OWL
@@ -918,7 +918,7 @@ but it will eventually "ground out" in (a fragment of) OWL DL.</p>
 <tr>
 <td valign="top" style="white-space: pre;">subsetdef(ID String)
 </td>
-<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(ID))
+<td valign="top" style="white-space: pre; color: red">AnnotationProperty(<span class="name">T</span>(ID))
 SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</span>(subsetdef) )
 AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) ID)
 AnnotationAssertion(<span class="name">T</span>(comment) <span class="name">T</span>(ID) String)
@@ -929,7 +929,7 @@ AnnotationAssertion(<span class="name">T</span>(comment) <span class="name">T</s
 <tr>
 <td valign="top" style="white-space: pre;">synonymtypedef(ID String [Scope])
 </td>
-<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(ID))
+<td valign="top" style="white-space: pre; color:red">AnnotationProperty(<span class="name">T</span>(ID))
 SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</span>(subsetdef) )
 AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) <span class="name">T</span>(String))
 [AnnotationAssertion(<span class="name">T</span>(hasScope) <span class="name">T</span>(ID) <span class="name">T</span>(Scope))]
@@ -1002,6 +1002,7 @@ AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span
 </table>
 
 <h3><a name="5.2"></a>5.2 Mapping Term Frames - Class Axioms</h3>
+<h4><a name="5.2.1"></a>5.2.1 Class Axioms, Basic Table</h4>
 
 <p>
   Term frames are mapped to Class declarations and Class-level
@@ -1085,6 +1086,40 @@ union_of(UnionClassN QualifiersN)
 </tbody>
 </table>
 
+<h4><a name="5.2.2"></a>5.2.2 Treatment of gci_relation qualifier</h4>
+
+              <span style="color: red;">
+                <p>
+                  If <span style="white-space: pre;">Qualifiers</span> contains the tags <span style="white-space: pre;">gci_relation</span> and  <span style="white-space: pre;">gci_filler</span> then
+                  <span style="white-space:pre;"><span class="name">T</span>(Class-ID)</span> in 5.2.1 is translated as a class expression:
+                </p>
+                <span style="white-space: pre;">ObjectIntersectionOf(<span class="name">T</span>(Class-ID) ObjectSomeValuesFrom(<span class="name">T</span>(GCI-Relation) <span class="name">T</span>(GCI-Filler)))</span>
+                <p>
+                </p>
+
+                <p>
+                  This effectively allows a limited form of General Class Inclusion (GCI) axioms in OBO Documents. For example, in:
+                  <span style="white-space: pre;"> 
+
+id: CL:0000232
+name: erythrocyte
+relationship: has_part GO:0005634 {gci_relation="part_of", gci_filler="NCBITaxon:7955"} ! nucleus
+
+                  </span>
+
+                  the relationship is translated to:
+
+                  <span style="white-space: pre;"> 
+
+SubClassOf(
+   ObjectIntersectionOf( ObjectSomeValuesFrom(T('part_of') T('NCBITaxon:7955')) T('CL:0000232'))
+   ObjectSomeValuesFrom(T('has_part') T('GO:0005634'))
+)
+
+                  </span>
+
+                </p>
+              </span>
 
 <h3><a name="5.3"></a>5.3 Class Expressions</h3>
 
@@ -1434,22 +1469,22 @@ is_transitive(Rel1-ID)</td>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym(String 'EXACT' [Type] Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(exactSynonyn) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre; color:red">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(exactSynonyn) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym(String 'NARROW' [Type] Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(narrowSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre; color:red">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(narrowSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym(String 'RELATED' [Type] Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(relatedSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre; color:red">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(relatedSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym(String 'BROAD' [Type] Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(broadSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
+<td valign="top" style="white-space: pre; color:red">AnnotationAssertion(<span class="name">T</span>(ann( [Type] Xrefs Qualifiers)) <span class="name">T</span>(broadSynonym) <span class="name">T</span>(ID) <span class="name">T</span>(String))</td>
 </tr>
 
 <tr>
@@ -1474,7 +1509,7 @@ is_transitive(Rel1-ID)</td>
 
 <tr>
 <td valign="top" style="white-space: pre;">subset(Subsetdef-ID)</td>
-<td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(subset) <span class="name">T</span>(ID) <span class="name">T</span>(Subsetdef-ID))</td>
+<td valign="top" style="white-space: pre; color:red">AnnotationAssertion(<span class="name">T</span>(subset) <span class="name">T</span>(ID) <span class="name">T</span>(Subsetdef-ID))</td>
 </tr>
 
 <tr>
@@ -1513,14 +1548,16 @@ is_transitive(Rel1-ID)</td>
 <td valign="top" style="white-space: pre;">Annotation( <span class="name">T</span>(xref) <span class="name">T</span>(Xref1)) .. Annotation( <span class="name">T</span>(xref) <span class="name">T</span>(Xref1)) <span class="name">T</span>(Qualifiers)</td>
 </tr>
 
+<!--
 <tr>
 <td valign="top" style="white-space: pre;">ann( Xrefs Qualifiers)</td>
 <td valign="top" style="white-space: pre;">Annotation( <span class="name">T</span>(synonym-scope) <span class="name">T</span>(Scope)) <span class="name">T</span>(Xrefs Qualifiers)</td>
 </tr>
+-->
 
 <tr>
 <td valign="top" style="white-space: pre;">ann( Type Xrefs Qualifiers)</td>
-<td valign="top" style="white-space: pre;">Annotation( <span class="name">T</span>(synonym-type) <span class="name">T</span>(Type)) <span class="name">T</span>(Scope Xrefs Qualifiers)</td>
+<td valign="top" style="white-space: pre; color:red">Annotation( <span class="name">T</span>(synonym-type) <span class="name">T</span>(Type)) <span class="name">T</span>(Scope Xrefs Qualifiers)</td>
 </tr>
 
 </tbody>
@@ -1529,6 +1566,17 @@ is_transitive(Rel1-ID)</td>
 
 </tbody>
 </table>
+
+<p>
+The following qualifiers are not translated to annotations:
+<ul>
+ <li>cardinality</li>
+ <li>maxCardinality</li>
+ <li>maxCardinality</li>
+ <li>gci_relation</li>
+ <li>gci_filler</li>
+</ul>
+</p>
 
 <h3><a name="5.8"></a>5.8 Translation of Annotation Vocabulary</h3>
 
@@ -1608,68 +1656,68 @@ is_transitive(Rel1-ID)</td>
 
 <tr>
 <td valign="top" style="white-space: pre;">consider</td>
-<td valign="top" style="white-space: pre;">oboInOwl:consider</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:consider</td>
 </tr>
 
 
 <tr>
 <td valign="top" style="white-space: pre;">hasScope</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasScope</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasScope</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonym-type</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasSynonymType</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasSynonymType</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">exactSynonym</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasExactSynonym</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasExactSynonym</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">narrowSynonym</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasNarrowSynonym</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasNarrowSynonym</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">broadSynonym</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasBroadSynonym</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasBroadSynonym</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">relatedSynonym</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasRelatedSynonym</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasRelatedSynonym</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">synonymtypedef</td>
-<td valign="top" style="white-space: pre;">oboInOwl:SynonymTypeProperty</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:SynonymTypeProperty</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">xref</td>
-<td valign="top" style="white-space: pre;">oboInOwl:xref</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:xref</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">subsetdef</td>
-<td valign="top" style="white-space: pre;">oboInOwl:SubsetProperty</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:SubsetProperty</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">subset</td>
-<td valign="top" style="white-space: pre;">oboInOwl:subset</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:subset</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">alt_id</td>
-<td valign="top" style="white-space: pre;">oboInOwl:hasAlternativeId</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:hasAlternativeId</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">shorthand</td>
-<td valign="top" style="white-space: pre;">oboInOwl:shorthand</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:shorthand</td>
 </tr>
 
 </tbody>
