@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.test.OboFormatTestBasics;
-import org.obolibrary.oboformat.model.OBODoc;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -35,17 +34,8 @@ public class ExpandExpressionTest extends OboFormatTestBasics {
 	
 	@Test
 	public void testExpand() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		OWLOntology owlOnt = convertOBOFile("no_overlap.obo");
-		assertNotNull(owlOnt);
-	}
-
-	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		return convert(parseOBOFile(fn), fn);
-	}
-
-	protected OWLOntology convert(OBODoc obodoc, String fn) throws OWLOntologyCreationException, OWLOntologyStorageException {
 		
-		OWLOntology ontology = convert(obodoc);
+		OWLOntology ontology = convert(parseOBOFile("no_overlap.obo"));
 
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
 		OWLDataFactory df = manager.getOWLDataFactory();
@@ -82,9 +72,7 @@ public class ExpandExpressionTest extends OboFormatTestBasics {
 		}
 		assertTrue(ok);
 
-		writeOWL(ontology, fn);
-		
-		return outputOntology;
+		writeOWL(ontology, "no_overlap.owl");
 	}
 
 }
