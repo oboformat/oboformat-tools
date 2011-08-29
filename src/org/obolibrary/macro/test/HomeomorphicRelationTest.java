@@ -12,10 +12,8 @@ import org.junit.Test;
 import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class HomeomorphicRelationTest extends OboFormatTestBasics {
@@ -38,11 +36,8 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
 	protected OWLOntology convert(OBODoc obodoc, String fn) throws OWLOntologyCreationException, OWLOntologyStorageException {
 		OWLOntology ontology = convert(obodoc);
 
-		OWLOntologyManager manager = ontology.getOWLOntologyManager();
-		OWLDataFactory df = manager.getOWLDataFactory();
-		
 		MacroExpansionVisitor mev = 
-			new MacroExpansionVisitor(df,ontology, manager);
+			new MacroExpansionVisitor(ontology);
 		OWLOntology outputOntology = mev.expandAll();
 		
 		writeOWL(ontology, fn, new ManchesterOWLSyntaxOntologyFormat());

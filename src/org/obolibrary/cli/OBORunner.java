@@ -126,7 +126,7 @@ public class OBORunner {
 				if (config.isExpandMacros.getValue()) {
 					//System.out.println("EXPANDING MACROS");
 					MacroExpansionVisitor mev = 
-						new MacroExpansionVisitor(manager.getOWLDataFactory(),ontology, manager);
+						new MacroExpansionVisitor(ontology);
 					ontology = mev.expandAll();					
 				}
 				

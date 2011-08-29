@@ -25,11 +25,11 @@ abstract class AbstractMacroExpansionVisitor implements OWLClassExpressionVisito
 	final Map<IRI,String> expandAssertionToMap;
 	final Map<IRI,String> expandExpressionMap;
 	
-	AbstractMacroExpansionVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology, Logger log) {
+	AbstractMacroExpansionVisitor(OWLOntology inputOntology, Logger log) {
 		super();
 		this.log = log;
 		this.DEBUG = log.isDebugEnabled();
-		this.dataFactory = dataFactory;
+		this.dataFactory = inputOntology.getOWLOntologyManager().getOWLDataFactory();
 		expandExpressionMap = new HashMap<IRI,String>();
 		expandAssertionToMap = new HashMap<IRI,String>();
 		

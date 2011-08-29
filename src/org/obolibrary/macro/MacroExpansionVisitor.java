@@ -26,11 +26,11 @@ public class MacroExpansionVisitor {
 	private Visitor vistor;
 	private ManchesterSyntaxTool manchesterSyntaxTool;
 	
-	public MacroExpansionVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology, OWLOntologyManager manager) {
+	public MacroExpansionVisitor(OWLOntology inputOntology) {
 		super();
 		this.inputOntology = inputOntology;
-		this.vistor = new Visitor(dataFactory, inputOntology);
-		this.manchesterSyntaxTool = new ManchesterSyntaxTool(dataFactory, manager, inputOntology);
+		this.vistor = new Visitor(inputOntology);
+		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 		
 		outputManager = OWLManager.createOWLOntologyManager();
 		
@@ -113,8 +113,8 @@ public class MacroExpansionVisitor {
 	
 	private class Visitor extends AbstractMacroExpansionVisitor {
 		
-		Visitor(OWLDataFactory dataFactory, OWLOntology inputOntology) {
-			super(dataFactory, inputOntology, MacroExpansionVisitor.log);
+		Visitor(OWLOntology inputOntology) {
+			super(inputOntology, MacroExpansionVisitor.log);
 		}
 
 		@Override

@@ -32,9 +32,10 @@ class ManchesterSyntaxTool {
 	private final OWLDataFactory dataFactory;
 	private OWLEntityChecker entityChecker;
 
-	ManchesterSyntaxTool(OWLDataFactory dataFactory, OWLOntologyManager manager, OWLOntology inputOntology) {
+	ManchesterSyntaxTool(OWLOntology inputOntology) {
 		super();
-		this.dataFactory = dataFactory;
+		OWLOntologyManager manager = inputOntology.getOWLOntologyManager();
+		this.dataFactory = manager.getOWLDataFactory();
 		entityChecker = new ShortFormEntityChecker(
                 new BidirectionalShortFormProviderAdapter(
                         manager,

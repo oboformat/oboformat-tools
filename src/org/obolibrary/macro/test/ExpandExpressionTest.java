@@ -21,7 +21,6 @@ import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
@@ -37,10 +36,9 @@ public class ExpandExpressionTest extends OboFormatTestBasics {
 		
 		OWLOntology ontology = convert(parseOBOFile("no_overlap.obo"));
 
-		OWLOntologyManager manager = ontology.getOWLOntologyManager();
-		OWLDataFactory df = manager.getOWLDataFactory();
+		OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
 		
-		MacroExpansionVisitor mev = new MacroExpansionVisitor(df,ontology, manager);
+		MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
 		OWLOntology outputOntology = mev.expandAll();
 
 		OWLClass cls = df.getOWLClass(IRI.create("http://purl.obolibrary.org/obo/TEST_2"));

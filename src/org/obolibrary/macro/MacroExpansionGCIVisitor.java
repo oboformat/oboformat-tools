@@ -6,8 +6,6 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.expression.ParserException;
 import org.semanticweb.owlapi.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class MacroExpansionGCIVisitor {
@@ -16,22 +14,19 @@ public class MacroExpansionGCIVisitor {
 	private static final boolean DEBUG = log.isDebugEnabled();
 	
 	private OWLOntology inputOntology;
-	private List<String> gciList;
 	private OWLOntologyManager outputManager;
 	private OWLOntology outputOntology;
 
 	private ManchesterSyntaxTool manchesterSyntaxTool;
 	private GCIVisitor visitor;
 	
-	public MacroExpansionGCIVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology, OWLOntologyManager manager) {
+	public MacroExpansionGCIVisitor(OWLOntology inputOntology) {
 		super();
 		this.inputOntology = inputOntology;
-		this.visitor = new GCIVisitor(dataFactory, inputOntology);
-		this.manchesterSyntaxTool = new ManchesterSyntaxTool(dataFactory, manager, inputOntology);
-		gciList = new ArrayList<String>();
+		this.visitor = new GCIVisitor(inputOntology);
+		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 		
 		outputManager = OWLManager.createOWLOntologyManager();
-		
 		
 		try{
 			outputOntology = outputManager.createOntology(inputOntology.getOntologyID());
@@ -69,14 +64,7 @@ public class MacroExpansionGCIVisitor {
 				expand((OWLAnnotationAssertionAxiom)ax);
 			}
 		}
-		if (gciList != null && !gciList.isEmpty()) {
-			return outputOntology;
-		}
-		return null;
-	}
-	
-	public List<String> getGCIList() {
-		return gciList;
+		return outputOntology;
 	}
 	
 	private void expand(OWLAnnotationAssertionAxiom ax){
@@ -94,7 +82,6 @@ public class MacroExpansionGCIVisitor {
 			if(DEBUG)
 				log.debug("Expanding " + expandTo);
 		
-			gciList.add(expandTo);
 			try{
 				Set<OntologyAxiomPair> setAxp =  manchesterSyntaxTool.parseManchesterExpressionFrames(expandTo);
 				for(OntologyAxiomPair axp: setAxp){
@@ -109,8 +96,8 @@ public class MacroExpansionGCIVisitor {
 	
 	private class GCIVisitor extends AbstractMacroExpansionVisitor {
 		
-		GCIVisitor(OWLDataFactory dataFactory, OWLOntology inputOntology) {
-			super(dataFactory, inputOntology, MacroExpansionGCIVisitor.log);
+		GCIVisitor(OWLOntology inputOntology) {
+			super(inputOntology, MacroExpansionGCIVisitor.log);
 		}
 
 		@Override
@@ -167,13 +154,8 @@ public class MacroExpansionGCIVisitor {
 					String exStr = tStr.replaceAll("\\?Y", ManchesterSyntaxTool.getId( templateVal));
 					System.out.println("R: "+exStr);
 	
-					gciList.add(exStr);
 					try {
 						result = manchesterSyntaxTool.parseManchesterExpression(exStr);
-						
-	//					OWLAxiom axiom  = dataFactory.get
-	//					output(axiom);
-						
 					} catch (ParserException e) {
 						log.error(e.getMessage(), e);
 					}
