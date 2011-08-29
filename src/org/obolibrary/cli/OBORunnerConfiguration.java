@@ -36,10 +36,49 @@ public class OBORunnerConfiguration {
 
 		@Override
 		public boolean setValue(String value) {
-			this.value = true;
+			this.value = Boolean.TRUE;
 			return true;
 		}
 	};
+	
+	public enum ExpandMacrosModeOptions {
+		GCI,
+		INPLACE
+	}
+	
+	public final Variable<ExpandMacrosModeOptions> expandMacrosMode = new ParamterVariable<ExpandMacrosModeOptions>("Expand OWL Macros",
+			ExpandMacrosModeOptions.GCI, "-xm","--expand-macros-mode") {
+
+		private String failureMessage = null;
+
+		@Override
+		public boolean setValue(String value) {
+			
+			if (value == null || 
+					ExpandMacrosModeOptions.GCI.name().equals(value.toUpperCase())) {
+				this.value = ExpandMacrosModeOptions.GCI;
+			}
+			else if (ExpandMacrosModeOptions.INPLACE.name().equals(value.toUpperCase())) {
+				this.value = ExpandMacrosModeOptions.INPLACE;
+			}
+			else {
+				failureMessage = "Unknown option for Expand Macros: '" + value + "' -- reverting to default: " + value;
+				return false;
+			}
+			return true;
+		}
+		
+		@Override
+		public String getSetValueFailure() {
+			return failureMessage;
+		}
+
+		@Override
+		public boolean doesReadValue() {
+			return true;
+		}
+	};
+	
 	public final Variable<Boolean> isDisableDocumentChecking = new ParamterVariable<Boolean>("Disable document checking",
 			false, "--disable-checks","--disable-document-checks") {
 

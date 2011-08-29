@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
+import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
@@ -29,12 +31,15 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -123,20 +128,17 @@ public class OBORunner {
 					addVersion(ontology, version, manager);
 				}
 				
-				if (config.isExpandMacros.getValue()) {
-					//System.out.println("EXPANDING MACROS");
-					MacroExpansionVisitor mev = 
-						new MacroExpansionVisitor(ontology);
-					ontology = mev.expandAll();					
-				}
-				
-				String outputURI = outFile;
+				String gciFile = outFile;
+				String outputFile = outFile;
 				String ontologyId = Owl2Obo.getOntologyId(ontology);
-				if(outputURI == null){
-					outputURI = new File(config.outputdir.getValue(), ontologyId+ ".owl").toURI().toString();
+				if(outputFile == null){
+					gciFile = new File(config.outputdir.getValue(), ontologyId+ "-aux.owl").getAbsolutePath();
+					outputFile = new File(config.outputdir.getValue(), ontologyId+ ".owl").getAbsolutePath();
 				}
 				
-				IRI outputStream = IRI.create(outputURI);
+				ontology = handleMacroExpansion(config, ontology, gciFile, outputFile, ontologyId);
+				
+				IRI outputStream = IRI.create(new File(outputFile));
 				OWLOntologyFormat format = config.format.getValue();
 				logger.info("saving to "+ ontologyId + "," +outputStream+" via "+format);
 				manager.saveOntology(ontology, format, outputStream);
@@ -176,6 +178,62 @@ public class OBORunner {
 				writer.close();
 			}
 		}
+	}
+
+	private static OWLOntology handleMacroExpansion(OBORunnerConfiguration config, OWLOntology ontology, 
+			String gciFile, String outputFile, String ontologyId) throws OWLOntologyStorageException {
+		
+		if (!config.isExpandMacros.getValue()) {
+			return ontology;
+		}
+		
+		ExpandMacrosModeOptions option = config.expandMacrosMode.getValue();
+		if (option == ExpandMacrosModeOptions.GCI) {
+			// create GCI ontology
+			MacroExpansionGCIVisitor mevGCI = 
+				new MacroExpansionGCIVisitor(ontology);
+			OWLOntology gciOntology = mevGCI.createGCIOntology();
+
+			if (gciOntology.isEmpty()) {
+				// no macros expanded, do nothing
+				return ontology;
+			}
+			
+			// add import
+			OWLOntologyManager manager = gciOntology.getOWLOntologyManager();
+			OWLImportsDeclaration importDeclaration = manager.getOWLDataFactory()
+				.getOWLImportsDeclaration(IRI.create(new File(outputFile).getName()));
+			OWLOntologyChange change = new AddImport(gciOntology, importDeclaration);
+			manager.applyChange(change);
+			
+			// create output file name
+			File file = new File(gciFile);
+			if (gciFile.equals(outputFile)) {
+				String name = file.getName();
+				String lowerCaseName = name.toLowerCase();
+				int pos = lowerCaseName.lastIndexOf(".owl");
+				if (pos > 0) {
+					name = name.substring(0, pos) + "-aux" + name.substring(pos);
+				} else {
+					name += "-aux.owl";
+				}
+				gciFile = new File(file.getParent(), name).getAbsolutePath();
+			}
+			
+			// write to file
+			IRI gciIRI = IRI.create(file);
+			OWLOntologyFormat format = config.format.getValue();
+			logger.info("saving gci for " + ontologyId + " to " + gciIRI + " via " + format);
+			manager.saveOntology(gciOntology, format, gciIRI);
+			
+			
+		}
+		else {
+			MacroExpansionVisitor mev = 
+				new MacroExpansionVisitor(ontology);
+			ontology = mev.expandAll();	
+		}
+		return ontology;
 	}
 
 	private static void usage() {
