@@ -15,6 +15,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
@@ -1561,6 +1562,43 @@ public class Owl2Obo {
 		OWLSubClassOfAxiom a = (OWLSubClassOfAxiom) ax;
 		OWLClassExpression sub = a.getSubClass();
 		OWLClassExpression sup = a.getSuperClass();
+		Set<QualifierValue> qvs = new HashSet<QualifierValue>();
+		
+		// 5.2.2
+		boolean isRewrittenToGCI = false;
+		if (sub instanceof OWLObjectIntersectionOf) {
+			Set<OWLClassExpression> xs = ((OWLObjectIntersectionOf)sub).getOperands();
+			
+			// obo-format is limited to very restricted GCIs - the LHS of the axiom
+			// must correspond to ObjectIntersectionOf(cls ObjectSomeValuesFrom(p filler))
+			if (xs.size() == 2) {
+				OWLClass c = null;
+				OWLObjectSomeValuesFrom r = null;
+				OWLObjectProperty p = null;
+				OWLClass filler = null;
+				for (OWLClassExpression x : xs) {
+					if (x instanceof OWLClass)
+						c = (OWLClass) x;
+					if (x instanceof OWLObjectSomeValuesFrom) {
+						r = (OWLObjectSomeValuesFrom)x;
+						if (r.getProperty() instanceof OWLObjectProperty) {
+							if (r.getFiller() instanceof OWLClass) {
+								p = (OWLObjectProperty) r.getProperty();
+								filler = (OWLClass) r.getFiller();
+							}
+						}
+					}
+				}
+				if (c != null && p != null && filler != null) {
+					
+					isRewrittenToGCI = true;
+					sub = c;
+					qvs.add(new QualifierValue("gci_relation",getIdentifier(p)));
+					qvs.add(new QualifierValue("gci_filler",getIdentifier(filler)));
+				}
+			}
+		}
+		
 		if (sub instanceof OWLClass) {
 			Frame f = getTermFrame((OWLEntity) sub);
 
@@ -1568,6 +1606,7 @@ public class Owl2Obo {
 				Clause c = new Clause();
 				c.setTag(OboFormatTag.TAG_IS_A.getTag());
 				c.setValue(this.getIdentifier(sup));
+				c.setQualifierValues(qvs);
 				f.addClause(c);
 			} else if (sup instanceof OWLObjectSomeValuesFrom ||sup instanceof OWLObjectAllValuesFrom ) {
 				OWLQuantifiedRestriction r = (OWLQuantifiedRestriction) sup;
@@ -1591,9 +1630,9 @@ public class Owl2Obo {
 				Clause c = new Clause();
 				c.setTag(OboFormatTag.TAG_RELATIONSHIP.getTag());
 				c.addValue(this.getIdentifier(r.getProperty()));
-
-
 				c.addValue(fillerId);
+				c.setQualifierValues(qvs);
+
 				f.addClause(c);
 			} else {
 				String logErr = "the axiom is not translated : " + ax;

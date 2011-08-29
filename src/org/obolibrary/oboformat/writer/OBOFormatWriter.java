@@ -26,6 +26,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
@@ -387,7 +388,22 @@ public class OBOFormatWriter {
 			//	if(!xrefs.isEmpty())
 			line +="]";
 		}
-
+		
+		Collection<QualifierValue> qvs = clause.getQualifierValues();
+		if (qvs != null && qvs.size() > 0) {
+			line += " {";
+			Iterator<QualifierValue> qvsIterator = qvs.iterator();
+			while (qvsIterator.hasNext()) {
+				QualifierValue qv = qvsIterator.next();
+				line += qv.getQualifier()+"=\""+escapeOboString(qv.getValue().toString())+"\"";
+				if (qvsIterator.hasNext()) {
+					line += ", ";
+				}
+			}
+		
+			line += "}";
+		}
+		
 		if(idsLabel != null && idsLabel.trim().length()>0){
 			line += " ! " +idsLabel;
 		}
@@ -397,6 +413,13 @@ public class OBOFormatWriter {
 
 	}
 
+	private String escapeOboString(String in) {
+		String s;
+		s = in.replaceAll("\n", "\\n");
+		s = in.replaceAll("\"", "\\\"");
+		return s;
+	}
+	
 	private static class HeaderTagsComparator implements Comparator<String>{
 
 		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
