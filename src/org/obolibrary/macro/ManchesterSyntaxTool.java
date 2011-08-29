@@ -18,6 +18,12 @@ import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 
+/**
+ * wrapper for parsing Manchester Syntax
+ * 
+ * @author heiko
+ *
+ */
 class ManchesterSyntaxTool {
 
 	private static final Logger log = Logger.getLogger(ManchesterSyntaxTool.class);
@@ -62,6 +68,12 @@ class ManchesterSyntaxTool {
 		return parser;
 	}
 
+	/**
+	 * TODO: document behavior
+	 * 
+	 * @param iri
+	 * @return
+	 */
 	static String getId(IRI iri){
 		String iriString = iri.toString();
 		String id = null;

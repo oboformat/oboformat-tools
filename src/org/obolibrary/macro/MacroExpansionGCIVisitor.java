@@ -115,17 +115,27 @@ public class MacroExpansionGCIVisitor {
 
 		@Override
 		OWLClassExpression expandOWLObjSomeVal(OWLClassExpression filler, OWLObjectPropertyExpression p) {
-			return expandObject(filler, p);
+			OWLClassExpression gciRHS = expandObject(filler, p);
+			OWLClassExpression gciLHS = dataFactory.getOWLObjectSomeValuesFrom(p, filler);
+			OWLEquivalentClassesAxiom ax = 
+				this.dataFactory.getOWLEquivalentClassesAxiom(
+					gciLHS, gciRHS
+					);
+			output(ax);
+			return gciRHS;
 		}
 	
 		@Override
 		OWLClassExpression expandOWLObjHasVal(OWLObjectHasValue desc, OWLIndividual filler,
 				OWLObjectPropertyExpression p) {
-			OWLClassExpression result = expandObject(filler, p);
-			if (result != null) {
-				result = dataFactory.getOWLObjectSomeValuesFrom(desc.getProperty(), result);
-			}
-			return result;
+			OWLClassExpression gciRHS = expandObject(filler, p);
+			OWLClassExpression gciLHS = dataFactory.getOWLObjectHasValue(p, filler);
+			OWLEquivalentClassesAxiom ax = 
+				this.dataFactory.getOWLEquivalentClassesAxiom(
+					gciLHS, gciRHS
+					);
+			output(ax);
+			return gciRHS;
 		}
 
 		private OWLClassExpression expandObject(Object filler, OWLObjectPropertyExpression p) {

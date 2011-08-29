@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.obo2owl.test.OboFormatTestBasics;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
@@ -34,6 +35,9 @@ public class ExpandExpressionGCITest extends OboFormatTestBasics {
 		
 		MacroExpansionGCIVisitor mev = new MacroExpansionGCIVisitor(df,ontology, manager);
 		OWLOntology gciOntology = mev.createGCIOntology();
+		for (OWLAxiom ax : gciOntology.getAxioms()) {
+			System.out.println(ax);
+		}
 		List<String> gciList = mev.getGCIList();
 		assertEquals(3, gciList.size());
 		
