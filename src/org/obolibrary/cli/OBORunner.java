@@ -162,7 +162,7 @@ public class OBORunner {
 
 				logger.info("saving to "+ outputFilePath);
 				
-				FileOutputStream os = new FileOutputStream(new File(new URI( outputFilePath ))); 
+				FileOutputStream os = new FileOutputStream(new File(outputFilePath)); 
 				OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 				BufferedWriter writer = new BufferedWriter(osw);
 				
