@@ -42,8 +42,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.SetOntologyID;
 
 /**
  * command line access to obo2owl
@@ -206,6 +208,9 @@ public class OBORunner {
 			OWLOntologyChange change = new AddImport(gciOntology, importDeclaration);
 			manager.applyChange(change);
 			
+			
+			
+			
 			// create output file name
 			File file = new File(gciFile);
 			if (gciFile.equals(outputFile)) {
@@ -219,6 +224,11 @@ public class OBORunner {
 				}
 				gciFile = new File(file.getParent(), name).getAbsolutePath();
 			}
+			
+			// set ontology ID
+			OWLOntologyID id = new OWLOntologyID(IRI.create(ontologyId+"-aux"));
+			change = new SetOntologyID(gciOntology, id);
+			manager.applyChange(change);
 			
 			// write to file
 			IRI gciIRI = IRI.create(file);
