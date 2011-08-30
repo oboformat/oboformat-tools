@@ -89,10 +89,7 @@ public class OBORunner {
 			OBOFormatDanglingReferenceException, OWLOntologyCreationException, OWLOntologyStorageException,
 			URISyntaxException {
 		
-		String outFileConfigValue = config.outFile.getValue();
-		// getURI throws NPE if the input is null
-		// BUT the outFile may be optional, if an outputfolder is specified in the config
-		String outFile = outFileConfigValue != null ? getURI(outFileConfigValue) : null;
+		String outFile = config.outFile.getValue();
 		
 		for (String iri : config.paths.getValue()) {
 			iri = getURI(iri);
@@ -222,7 +219,7 @@ public class OBORunner {
 				} else {
 					name += "-aux.owl";
 				}
-				gciFile = new File(file.getParent(), name).getAbsolutePath();
+				gciFile = new File(file.getParentFile(), name).getAbsolutePath();
 			}
 			
 			// set ontology ID
@@ -231,7 +228,7 @@ public class OBORunner {
 			manager.applyChange(change);
 			
 			// write to file
-			IRI gciIRI = IRI.create(file);
+			IRI gciIRI = IRI.create(new File(gciFile));
 			OWLOntologyFormat format = config.format.getValue();
 			logger.info("saving gci for " + ontologyId + " to " + gciIRI + " via " + format);
 			manager.saveOntology(gciOntology, format, gciIRI);
