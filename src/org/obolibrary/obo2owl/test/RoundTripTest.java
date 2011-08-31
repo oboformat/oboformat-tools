@@ -42,13 +42,14 @@ public class RoundTripTest extends OboFormatTestBasics {
 			obodoc2.check();
 		} catch (FrameStructureException exception) {
 			exception.printStackTrace();
-			assertTrue(false);
+			fail("No syntax errors allowed");
 		}
 		
 		try {
 			writeOBO(obodoc2, "roundtrip.obo");
 		} catch (IOException e) {
 			e.printStackTrace();
+			fail("No IOExceptions allowed");
 		} 
 		
 		OBODocDiffer dd = new OBODocDiffer();
@@ -57,7 +58,7 @@ public class RoundTripTest extends OboFormatTestBasics {
 			for (Diff diff : diffs) {
 				System.out.println(diff);
 			}
-			assertTrue(diffs.size() == 0); 
+			assertEquals("Expected no diffs", 0, diffs.size()); 
 		}
 		return diffs;
 	}

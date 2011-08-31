@@ -99,29 +99,34 @@ public class Clause {
 	public String toString() {
 		if (values == null)
 			return tag+"=null";
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder(tag);
+		sb.append('(');
 		for (Object ob : values) {
-			sb.append(" "+ob);
+			sb.append(' ');
+			sb.append(ob);
 		}
 		if (qualifierValues != null) {
-			sb.append("{");
+			sb.append('{');
 			for (QualifierValue qv : qualifierValues) {
-				sb.append(qv+" ");
+				sb.append(qv);
+				sb.append(' ');
 			}
-			sb.append("}");
+			sb.append('}');
 		}
 		if (xrefs != null) {
-			sb.append("[");
+			sb.append('[');
 			for (Xref x : xrefs) {
-				sb.append(x+" ");
+				sb.append(x);
+				sb.append(' ');
 			}
-			sb.append("]");
+			sb.append(']');
 
 		}
-		return tag+"("+sb.toString()+")";
+		sb.append(')');
+		return sb.toString();
 	}
 
-	private boolean collectionsEquals(Collection c1, Collection c2) {
+	private boolean collectionsEquals(Collection<?> c1, Collection<?> c2) {
 		if (c1 == null || c1.size() == 0) {
 			return (c2 == null || c2.size() == 0);
 		}
@@ -188,7 +193,7 @@ public class Clause {
 		if (qualifierValues != null) {
 			if (other.getQualifierValues() == null)
 				return false;
-			if (!qualifierValues.equals(other.getQualifierValues()))
+			if (!collectionsEquals(qualifierValues, other.getQualifierValues()))
 				return false;
 		}
 		else {

@@ -41,7 +41,6 @@ public class GuiMainPanel extends SizedJPanel {
 	 * 
 	 * @param frame
 	 * @param defaultInputFiles
-	 * @param defaultOutputFolder
 	 * @param defaultOutputFile
 	 * @param obo2owl
 	 */

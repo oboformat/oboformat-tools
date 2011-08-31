@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.obolibrary.oboformat.model.Frame.FrameType;
 
@@ -233,7 +232,7 @@ public class OBODoc {
 
 
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		//StringBuffer sb = new StringBuffer();
 		//for (Frame f : getTermFrames()) {
 		//	sb.append(f.toString());
 		//}

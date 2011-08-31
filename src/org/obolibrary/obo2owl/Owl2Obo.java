@@ -757,7 +757,7 @@ public class Owl2Obo {
 			if(annVal instanceof OWLLiteral){
 				value = getLiteral((OWLLiteral) annVal);
 			}else if(annVal instanceof IRI){
-				value = this.getIdentifier((IRI)annVal); //getIdentifier((IRI)aanAx.getValue());
+				value = getIdentifier((IRI)annVal); //getIdentifier((IRI)aanAx.getValue());
 			}
 
 			if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){

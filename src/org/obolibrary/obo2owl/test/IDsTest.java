@@ -38,14 +38,14 @@ public class IDsTest {
 		assertTrue("http://purl.obolibrary.org/obo/GO_001".equals(iri.toString()));
 
 		//OWL 2 obo 
-		String oboId = owl2Obo.getIdentifier(iri);
+		String oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("GO:001".equals(oboId));
 		
 		
 		iri= bridge.oboIdToIRI("My_Ont:FOO_002");
 		assertTrue("http://purl.obolibrary.org/obo/My_Ont#_FOO_002".equals(iri.toString()));
 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 				assertTrue("My_Ont:FOO_002".equals(oboId));
 	
 		
@@ -56,7 +56,7 @@ public class IDsTest {
 
 		
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		System.out.println("roundtrip:"+oboId);
 		assertTrue("My_Ont:002".equals(oboId));
 		
@@ -66,7 +66,7 @@ public class IDsTest {
 
 
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("003".equals(oboId));
 		
 		
@@ -74,7 +74,7 @@ public class IDsTest {
 		assertTrue("http://purl.obolibrary.org/obo/test#part_of".equals(iri.toString()));
 
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("part_of".equals(oboId));
 		
 		
@@ -82,7 +82,7 @@ public class IDsTest {
 		assertTrue("http://purl.obolibrary.org/obo/OBO_REL#_part_of".equals(iri.toString()));
 
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("OBO_REL:part_of".equals(oboId));
 		
 		
@@ -90,7 +90,7 @@ public class IDsTest {
 		assertTrue("http://purl.obolibrary.org/testont".equals(iri.toString()));
 		
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("http://purl.obolibrary.org/testont".equals(oboId));
 		
 
@@ -98,7 +98,7 @@ public class IDsTest {
 		assertTrue("http://purl.obolibrary.org/obo/BFO_0000050".equals(iri.toString()));
 		
 		//OWL 2 obo 
-		oboId = owl2Obo.getIdentifier(iri);
+		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("BFO:0000050".equals(oboId));
 		
 		

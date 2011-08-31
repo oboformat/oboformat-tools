@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -154,8 +153,17 @@ public class OBOFormatWriter {
 		}
 	}
 
+	private void writeLine(StringBuilder ln, BufferedWriter writer) throws IOException{
+		ln.append('\n');
+		writer.write(ln.toString());
+	}
+	
 	private void writeLine(String ln, BufferedWriter writer) throws IOException{
 		writer.write(ln+"\n");
+	}
+	
+	private void writeEmptyLine(BufferedWriter writer) throws IOException{
+		writer.write("\n");
 	}
 
 	private List<String> duplicateTags(Set<String> src){
@@ -190,7 +198,7 @@ public class OBOFormatWriter {
 			}
 		}
 
-		writeLine("", writer);
+		writeEmptyLine(writer);
 
 
 	}
@@ -232,48 +240,41 @@ public class OBOFormatWriter {
 				else
 					write(clause, writer);
 			}
-
-
-
 		}
-
-		writeLine("", writer);
-
+		writeEmptyLine(writer);
 	}
 
 
 	private void writeSynonymtypedef(Clause clause, BufferedWriter writer) throws IOException{
-		String line = clause.getTag() + ": ";
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
 
-		boolean  first = true;
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
-		Collection values = clause.getValues();
+		Collection<?> values = clause.getValues();
 		for(int i=0;i<values.size();i++) {
-			String value = valuesIterator.next() + "";
-			if (i==1) { line += "\""; }
-			value.replaceAll("\n", "\\n");
-			line += value;
-			if (i==1) { line += "\""; }
-			if (valuesIterator.hasNext()) { line += " "; }
+			String value = valuesIterator.next().toString();
+			if (i==1) { sb.append('"'); }
+			sb.append(escapeOboString(value));
+			if (i==1) { sb.append('"'); }
+			if (valuesIterator.hasNext()) { sb.append(' '); }
 		}
-
-		writeLine(line, writer);
-
+		writeLine(sb, writer);
 	}
 
-
 	private void writeClauseWithQuotedString(Clause clause, BufferedWriter writer) throws IOException{
-		String line = clause.getTag() + ": ";
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
 
 		boolean  first = true;
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
 		while (valuesIterator.hasNext()) {
-			if (first) { line += "\""; }
-			String value = valuesIterator.next() + "";
-			value.replaceAll("\n", "\\n");
-			line += value;
-			if (first) { line += "\""; }
-			if (valuesIterator.hasNext()) { line += " "; }
+			if (first) { sb.append('"'); }
+			String value = valuesIterator.next().toString();
+			sb.append(escapeOboString(value));
+			if (first) { sb.append('"'); }
+			if (valuesIterator.hasNext()) { sb.append(' ');}
 			first = false;
 		}
 
@@ -283,24 +284,23 @@ public class OBOFormatWriter {
 		// not that the value may be a non-null empty list - here we still want to write []
 		if(xrefs != null){
 
-			line += " [";
+			sb.append(" [");
 
 			Iterator<Xref> xrefsIterator = xrefs.iterator();
 			while (xrefsIterator.hasNext()) {
-				line += xrefsIterator.next().getIdref();
+				sb.append(xrefsIterator.next().getIdref());
 				if (xrefsIterator.hasNext()) {
-					line += ", ";
+					sb.append(", ");
 				}
 			}
 
-			line +="]";
+			sb.append("]");
 		}else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) ||
 				OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag())){
-			line  += " []";
+			sb.append(" []");
 		}
 
-		writeLine(line, writer);
-
+		writeLine(sb, writer);
 	}
 
 
@@ -311,26 +311,32 @@ public class OBOFormatWriter {
 
 	public void writePropertyValue(Clause clause, BufferedWriter writer) throws IOException{
 
-		String line = clause.getTag() + ": ";
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
 
-		Collection cols = clause.getValues();
+		Collection<?> cols = clause.getValues();
 
 		if(cols.size()<2){
 			LOG.warn("The " + OboFormatTag.TAG_PROPERTY_VALUE.getTag() + " has incorrect number of values: " + clause);
 			return;
 		}
 
-		Iterator itr = cols.iterator();
-		line +=  itr.next() + " ";
+		Iterator<?> itr = cols.iterator();
+		sb.append(itr.next());
+		sb.append(" ");
 
 		String val = itr.next().toString();
 
-		if(val.contains(" ") || !val.contains(":"))
-			val = " \"" + val + "\"";
-
-		line += val;
-
-		writeLine(line, writer);
+		if(val.contains(" ") || !val.contains(":")) {
+			sb.append(" \"");
+			sb.append(val);
+			sb.append("\"");
+		}
+		else {
+			sb.append(val);
+		}
+		writeLine(sb, writer);
 	}
 
 
@@ -339,13 +345,18 @@ public class OBOFormatWriter {
 	}
 
 	public void write(Clause clause, BufferedWriter writer) throws IOException{
-		String line = clause.getTag() + ": ";
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
 
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
-		String idsLabel = this.oboDoc != null && tagsInformative.contains(clause.getTag()) ? "" : null;
+		StringBuilder idsLabel = null;
+		if (this.oboDoc != null && tagsInformative.contains(clause.getTag())) {
+			idsLabel = new StringBuilder();
+		}
 
 		while (valuesIterator.hasNext()) {
-			String value = valuesIterator.next() + "";
+			String value = valuesIterator.next().toString();
 			if(idsLabel != null){
 				Frame f= oboDoc.getTermFrame(value);
 				if(f == null){
@@ -355,16 +366,16 @@ public class OBOFormatWriter {
 				if(f != null){
 					Clause cl = f.getClause(OboFormatTag.TAG_NAME.getTag());
 					if(cl != null){
-						if(idsLabel.length()>0)
-							idsLabel += " ";
-						idsLabel += cl.getValue();
+						if(idsLabel.length() > 0)
+							idsLabel.append(" ");
+						idsLabel.append(cl.getValue());
 					}
 
 				}
 			}
-			line += value;
+			sb.append(value);
 			if (valuesIterator.hasNext()) {
-				line += " ";
+				sb.append(' ');
 			}
 		}
 
@@ -375,49 +386,69 @@ public class OBOFormatWriter {
 		if(xrefs != null){
 
 			//	if(!xrefs.isEmpty())
-			line += " [";
+			sb.append(" [");
 
 			Iterator<Xref> xrefsIterator = xrefs.iterator();
 			while (xrefsIterator.hasNext()) {
-				line += xrefsIterator.next().getIdref();
+				sb.append(xrefsIterator.next().getIdref());
 				if (xrefsIterator.hasNext()) {
-					line += ", ";
+					sb.append(", ");
 				}
 			}
 
 			//	if(!xrefs.isEmpty())
-			line +="]";
+			sb.append("]");
 		}
 		
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		if (qvs != null && qvs.size() > 0) {
-			line += " {";
+			sb.append(" {");
 			Iterator<QualifierValue> qvsIterator = qvs.iterator();
 			while (qvsIterator.hasNext()) {
 				QualifierValue qv = qvsIterator.next();
-				line += qv.getQualifier()+"=\""+escapeOboString(qv.getValue().toString())+"\"";
+				sb.append(qv.getQualifier());
+				sb.append("=\"");
+				sb.append(escapeOboString(qv.getValue().toString()));
+				sb.append("\"");
 				if (qvsIterator.hasNext()) {
-					line += ", ";
+					sb.append(", ");
 				}
 			}
-		
-			line += "}";
+			sb.append("}");
 		}
 		
-		if(idsLabel != null && idsLabel.trim().length()>0){
-			line += " ! " +idsLabel;
+		if(idsLabel != null && idsLabel.length() > 0) {
+			String trimmed = idsLabel.toString().trim();
+			if (trimmed.length() > 0) {
+				sb.append(" ! ");
+				sb.append(trimmed);
+			}
 		}
-
-
-		writeLine(line, writer);
-
+		writeLine(sb, writer);
 	}
 
-	private String escapeOboString(String in) {
-		String s;
-		s = in.replaceAll("\n", "\\n");
-		s = in.replaceAll("\"", "\\\"");
-		return s;
+	private CharSequence escapeOboString(String in) {
+		boolean modfied = false;
+		StringBuilder sb = new StringBuilder();
+		int length = in.length();
+		for (int i = 0; i < length; i++) {
+			char c = in.charAt(i);
+			if (c == '\n') {
+				modfied = true;
+				sb.append("\\n");
+			}
+			else if (c == '"') {
+				modfied = true;
+				sb.append("\\\"");
+			}
+			else {
+				sb.append(c);
+			}
+		}
+		if (modfied) {
+			return sb;
+		}
+		return in;
 	}
 	
 	private static class HeaderTagsComparator implements Comparator<String>{

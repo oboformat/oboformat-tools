@@ -98,10 +98,14 @@ public class Frame {
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
+		sb.append("Frame(");
+		sb.append(id);
+		sb.append(' ');
 		for (Clause cl: clauses) {
 			sb.append(cl.toString());
 		}
-		return "Frame("+id+" "+sb.toString()+")";
+		sb.append(')');
+		return sb.toString();
 	}
 
 	public Object getTagValue(String tag) {
