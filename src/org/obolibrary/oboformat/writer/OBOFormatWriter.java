@@ -373,7 +373,7 @@ public class OBOFormatWriter {
 
 				}
 			}
-			sb.append(value);
+			sb.append(escapeOboString(value));
 			if (valuesIterator.hasNext()) {
 				sb.append(' ');
 			}
@@ -440,6 +440,14 @@ public class OBOFormatWriter {
 			else if (c == '"') {
 				modfied = true;
 				sb.append("\\\"");
+			}
+			else if (c == '{') {
+				modfied = true;
+				sb.append("\\{");
+			}
+			else if (c == '}') {
+				modfied = true;
+				sb.append("\\}");
 			}
 			else {
 				sb.append(c);

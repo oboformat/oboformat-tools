@@ -1,13 +1,17 @@
 package org.obolibrary.oboformat.test;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 import org.obolibrary.obo2owl.test.OboFormatTestBasics;
+import org.obolibrary.oboformat.diff.Diff;
+import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
@@ -34,5 +38,21 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 		
 		Clause commentClause = f2.getClause(OboFormatTag.TAG_COMMENT);
 		assertEquals("bla bla bla.\nbla bla (bla).", commentClause.getValue());
+	}
+	
+	@Test
+	public void testRoundTripEscapeChars() throws IOException {
+		OBODoc oboDoc = parseOBOFile("escape_chars_test.obo");
+		
+		File file = this.writeOBO(oboDoc, "escape_chars_test2.obo");
+		System.out.println("Writen test ontology to file: "+file.getAbsolutePath());
+		OBODoc oboDoc2 = parseOBOFile(file);
+		assertNotNull("There was an error during parsing of the obodoc", oboDoc2);
+		OBODocDiffer differ = new OBODocDiffer();
+		List<Diff> diffs = differ.getDiffs(oboDoc, oboDoc2);
+		for (Diff diff : diffs) {
+			System.out.println(diff);
+		}
+		assertEquals("Expected no diffs.", 0, diffs.size());
 	}
 }
