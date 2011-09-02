@@ -2,6 +2,7 @@ package org.obolibrary.obo2owl.test;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.obolibrary.macro.test.ExpandExpressionGCITest;
 import org.obolibrary.macro.test.ExpandExpressionTest;
 import org.obolibrary.oboformat.test.*;
 
@@ -39,9 +40,11 @@ import org.obolibrary.oboformat.test.*;
 	SingleIntersectionOfTagTest.class,
 	TagTest.class,
 	XrefExpanderTest.class,
+	OboEscapeCharsTest.class,
 	
 	// macro expansion
-	ExpandExpressionTest.class
+	ExpandExpressionTest.class,
+	ExpandExpressionGCITest.class
 })
 public class AllProductionTests {
 	// intentionally empty, uses annotations to define test suite
