@@ -23,3 +23,10 @@ xref: EC:3.2.1.141
 xref: MetaCyc:3.2.1.141-RXN
 is_a: GO:0004553  ! hydrolase activity, hydrolyzing O-glycosyl compounds
 
+
+[Term]
+id: CL:0000096
+name: mature neutrophil
+namespace: cell
+def: "bla bla .\"" [GOC:add, GOC:tfm, MESH:A.11.118.637.415.583, http://www.cap.org]
+comment: bla bla bla.\nbla bla (bla).
