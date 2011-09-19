@@ -245,7 +245,7 @@ public class Owl2Obo {
 
 		clause.addValue(value);
 		f.addClause(clause);
-		
+
 		return true;
 
 	}
@@ -286,7 +286,7 @@ public class Owl2Obo {
 			}
 
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -364,8 +364,8 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE) )
 				return;
 		}
-		
-		
+
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -376,7 +376,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 	}
 
 	private void tr(OWLDisjointObjectPropertiesAxiom ax){
@@ -411,7 +411,7 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE) )
 				return;
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -422,7 +422,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 
 	}
 
@@ -433,8 +433,8 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE) )
 				return;
 		}
-		
-		
+
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -445,7 +445,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 	}
 	private void tr(OWLInverseObjectPropertiesAxiom ax){
 		OWLObjectPropertyExpression prop1 = ax.getFirstProperty();
@@ -455,7 +455,7 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2)) )
 				return;
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -466,7 +466,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 	}
 
 
@@ -479,7 +479,7 @@ public class Owl2Obo {
 				return;
 			}
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -490,8 +490,8 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
-		
+
+
 	}
 
 	private void tr(OWLAsymmetricObjectPropertyAxiom ax){
@@ -513,8 +513,8 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
-		
+
+
 	}
 
 
@@ -525,7 +525,7 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE) )
 				return;
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -536,7 +536,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 
 	}
 
@@ -548,7 +548,7 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE) )
 				return;
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -559,7 +559,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 	}
 
 	private void tr(OWLObjectPropertyRangeAxiom ax){
@@ -571,7 +571,7 @@ public class Owl2Obo {
 			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_RANGE.getTag(), range) )
 				return;
 		}
-		
+
 		String logErr = "the axiom is not translated : " + ax;
 		String err = "The conversion is halted as the axiom is not translated: " + ax;
 		if(strictConversion){
@@ -582,7 +582,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		
+
 
 	}
 
@@ -726,7 +726,7 @@ public class Owl2Obo {
 
 	private void tr(OWLAnnotationAssertionAxiom aanAx, Frame frame) {
 		tr(aanAx.getProperty(), aanAx.getValue(), aanAx.getAnnotations(), frame);
-		
+
 		/*if( !tr(aanAx.getProperty(), aanAx.getValue(), aanAx.getAnnotations(), frame)){
 			String logErr = "the axiom is not translated : " + aanAx;
 			String err = "The conversion is halted as the axiom is not translated: " + aanAx;
@@ -738,7 +738,7 @@ public class Owl2Obo {
 
 			if(strictConversion)
 				throw new RuntimeException(err);
-				
+
 		}*/
 	}	
 
@@ -782,9 +782,14 @@ public class Owl2Obo {
 				Clause clause = new Clause();
 				clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
 				String propId = this.getIdentifier(prop); //getIdentifier(prop);
-				clause.addValue(propId);
-				clause.addValue(value);
-				frame.addClause(clause);
+				if (propId.equals("shorthand")) {
+
+				}
+				else {
+					clause.addValue(propId);
+					clause.addValue(value);
+					frame.addClause(clause);
+				}
 
 				//				if(propId.endsWith("0000426"))
 				//				System.out.println(propId+"----- " + value);
@@ -853,8 +858,8 @@ public class Owl2Obo {
 
 		}else
 			return false;
-		
-		
+
+
 		return true;
 
 	}
@@ -961,12 +966,12 @@ public class Owl2Obo {
 					if(strictConversion){
 						logErr = err;
 					}
-	
+
 					LOG.warn(logErr);
-	
+
 					if(strictConversion)
 						throw new RuntimeException(err);
-	
+
 					return;
 				}
 				else{
@@ -974,9 +979,9 @@ public class Owl2Obo {
 					equivalenceAxiomClauses.add(c);
 				}
 			}
-			
-			
-			
+
+
+
 		} else if (ce2 instanceof OWLObjectIntersectionOf) {
 
 			List<OWLClassExpression> list2 = ((OWLObjectIntersectionOf) ce2).getOperandsAsList();
@@ -1016,7 +1021,7 @@ public class Owl2Obo {
 
 					if(strictConversion)
 						throw new RuntimeException(err);
-					
+
 				}
 				else{
 					isUntranslateable = true;
@@ -1051,7 +1056,7 @@ public class Owl2Obo {
 		String cls2 = this.getIdentifier(list.get(1));
 
 		if(cls2 == null){
-			
+
 			String logErr = "the axiom is not translated : " + ax;
 			String err = "The conversion is halted as the axiom is not translated: " + ax;
 			if(strictConversion){
@@ -1065,8 +1070,8 @@ public class Owl2Obo {
 
 			return;
 		}	
-		
-		
+
+
 		Frame f = getTermFrame((OWLEntity) list.get(0));
 		Clause c = new Clause();
 		c.setTag(OboFormatTag.TAG_DISJOINT_FROM.getTag());
@@ -1111,11 +1116,11 @@ public class Owl2Obo {
 
 			return;
 		}
-		
+
 		/*
 		if(entity.getIRI().toString().startsWith("http://www.geneontology.org/formats/oboInOwl#"))
 			return;
-		
+
 		String logErr = "the axiom is not translated : " + axiom;
 		String err = "The conversion is halted as the axiom is not translated: " + axiom;
 		if(strictConversion){
@@ -1126,7 +1131,7 @@ public class Owl2Obo {
 
 		if(strictConversion)
 			throw new RuntimeException(err);
-		*/
+		 */
 
 	}
 
@@ -1407,7 +1412,7 @@ public class Owl2Obo {
 		String tag = annotationPropertyMap.get(iri);
 
 		if (tag == null) {
-			
+
 			// hardcoded values for legacy annotation properties: (TEMPORARY)
 			if (iri.startsWith(Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_")) {
 				String legacyId = iri.replace(Obo2OWLConstants.DEFAULT_IRI_PREFIX, "");
@@ -1420,9 +1425,9 @@ public class Owl2Obo {
 				if (legacyId.equals("IAO_namespace")) {
 					return OboFormatTag.TAG_NAMESPACE.getTag();
 				}
-				
+
 			}
-			
+
 			//String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
 			String prefix = Obo2OWLConstants.OIOVOCAB_IRI_PREFIX;
 
@@ -1563,12 +1568,12 @@ public class Owl2Obo {
 		OWLClassExpression sub = a.getSubClass();
 		OWLClassExpression sup = a.getSuperClass();
 		Set<QualifierValue> qvs = new HashSet<QualifierValue>();
-		
+
 		// 5.2.2
 		boolean isRewrittenToGCI = false;
 		if (sub instanceof OWLObjectIntersectionOf) {
 			Set<OWLClassExpression> xs = ((OWLObjectIntersectionOf)sub).getOperands();
-			
+
 			// obo-format is limited to very restricted GCIs - the LHS of the axiom
 			// must correspond to ObjectIntersectionOf(cls ObjectSomeValuesFrom(p filler))
 			if (xs.size() == 2) {
@@ -1590,7 +1595,7 @@ public class Owl2Obo {
 					}
 				}
 				if (c != null && p != null && filler != null) {
-					
+
 					isRewrittenToGCI = true;
 					sub = c;
 					qvs.add(new QualifierValue("gci_relation",getIdentifier(p)));
@@ -1598,7 +1603,7 @@ public class Owl2Obo {
 				}
 			}
 		}
-		
+
 		if (sub instanceof OWLClass) {
 			Frame f = getTermFrame((OWLEntity) sub);
 
@@ -1623,7 +1628,7 @@ public class Owl2Obo {
 
 					if(strictConversion)
 						throw new RuntimeException(err);
-					
+
 					return;
 				}
 
@@ -1645,7 +1650,7 @@ public class Owl2Obo {
 
 				if(strictConversion)
 					throw new RuntimeException(err);
-				
+
 				return;
 
 			}
@@ -1660,7 +1665,7 @@ public class Owl2Obo {
 
 			if(strictConversion)
 				throw new RuntimeException(err);
-			
+
 			return;
 
 		}
