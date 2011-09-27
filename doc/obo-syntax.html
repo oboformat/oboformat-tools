@@ -427,7 +427,7 @@ tag-value qualifiers.
 <p class="grammar" style="white-space: pre;">
 
 <span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' {ws} <span class="nonterminal">Xref</span> } ] ']'
-<span class="nonterminal">Xref</span> ::=  <span class="nonterminal">ID</span> [ {ws} <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">Xref</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ {ws} <span class="nonterminal">QuotedString</span> ]
 
 </p>
 
