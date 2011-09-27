@@ -421,13 +421,20 @@ tag-value qualifiers.
 <h3><a name="2.6"></a>2.6 Xref Lists</h3>
 
             <p>
-              An XrefList is a comma-separated list of zero or more Xrefs inside square brackets (these are manditory). Each Xref is an identifier, optionally followed by q auoted description
+              An XrefList is a comma-separated list of zero or more
+              Xrefs inside square brackets (these are manditory). Each
+              Xref is a string of characters, optionally followed by a
+              auoted description. Note that commans in the xref need
+              to be escaped. We include an extra production rule for
+              when solitary Xrefs are provided (i.e. with the 'xref'
+              tag) - in this case commas do not need to be escaped.
             </p>
 
 <p class="grammar" style="white-space: pre;">
 
-<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' {ws} <span class="nonterminal">Xref</span> } ] ']'
-<span class="nonterminal">Xref</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ {ws} <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' {ws} <span class="nonterminal">XrefNoComma</span> } ] ']'
+<span class="nonterminal">XrefNoComma</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ {ws} <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ {ws} <span class="nonterminal">QuotedString</span> ]
 
 </p>
 
@@ -2373,6 +2380,10 @@ relationship: R:9999999 ABC:1234567 ! part_of hand
                 <p>
                   TODO
                 </p>
+<h3><a name="8.1.1"></a>8.1.4 Escaping characters</h3>
+<p>
+  When writing solitary 'xref' tags, the comma character should be escaped.
+</p>
 <h3><a name="8.2"></a>8.2 Identifiers</h3>
 <h3><a name="8.2.1"></a>8.2.1 Class (Term) Identifiers</h3>
                 <p>
