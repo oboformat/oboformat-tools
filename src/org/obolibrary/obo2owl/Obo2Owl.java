@@ -469,28 +469,30 @@ public class Obo2Owl {
 			add(fac.getOWLDeclarationAxiom(p));
 
 			String id = typedefFrame.getId();
-			Object xref = typedefFrame.getTagValue(OboFormatTag.TAG_XREF.getTag());
-			if (xref != null) {
-				String xid = ((Xref)xref).getIdref();
-
-				// RO and BFO have special status.
-				// avoid cycles (in case of self-xref)
-				if ((xid.startsWith("RO") ||
-						xid.startsWith("BFO")) &&
-						!xid.equals(id)) {
-
-
-					//	fac.getOWLAnnotationAssertionAxiom(prop, p.getIRI(), trLiteral(id), new HashSet<OWLAnnotation>());
-					OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
-							trTagToAnnotationProp("shorthand"),
-							p.getIRI(), 
-							trLiteral(id), 
-							new HashSet<OWLAnnotation>());
-
-					add(ax);
+			Collection<Object> xrefs = typedefFrame.getTagValues(OboFormatTag.TAG_XREF.getTag());
+			for (Object xref: xrefs) {
+				if (xref != null) {
+					String xid = ((Xref)xref).getIdref();
+					
+					// RO and BFO have special status.
+					// avoid cycles (in case of self-xref)
+					if ((xid.startsWith("RO") ||
+							xid.startsWith("BFO")) &&
+							!xid.equals(id)) {
 
 
-					//	return oboIdToIRI(xid);
+						//	fac.getOWLAnnotationAssertionAxiom(prop, p.getIRI(), trLiteral(id), new HashSet<OWLAnnotation>());
+						OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
+								trTagToAnnotationProp("shorthand"),
+								p.getIRI(), 
+								trLiteral(id), 
+								new HashSet<OWLAnnotation>());
+
+						add(ax);
+
+
+						//	return oboIdToIRI(xid);
+					}
 				}
 			}
 
@@ -1190,16 +1192,18 @@ public class Obo2Owl {
 		// special case rule for relation xrefs:
 		Frame tdf = obodoc.getTypedefFrame(id);
 		if (tdf != null) {
-			Object xref = tdf.getTagValue(OboFormatTag.TAG_XREF.getTag());
-			if (xref != null) {
-				String xid = ((Xref)xref).getIdref();
+			Collection<Object> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF.getTag());
+			for (Object xref : xrefs) {
+				if (xref != null) {
+					String xid = ((Xref)xref).getIdref();
 
-				// RO and BFO have special status.
-				// avoid cycles (in case of self-xref)
-				if ((xid.startsWith("RO") ||
-						xid.startsWith("BFO")) &&
-						!xid.equals(id)) {
-					return oboIdToIRI(xid);
+					// RO and BFO have special status.
+					// avoid cycles (in case of self-xref)
+					if ((xid.startsWith("RO") ||
+							xid.startsWith("BFO")) &&
+							!xid.equals(id)) {
+						return oboIdToIRI(xid);
+					}
 				}
 			}
 		}
