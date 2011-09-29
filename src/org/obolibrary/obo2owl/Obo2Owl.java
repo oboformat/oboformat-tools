@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,26 +68,36 @@ public class Obo2Owl {
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
 	OBODoc obodoc;
-	Map<String,String> idSpaceMap;
+	final Map<String,String> idSpaceMap;
 	public static Map<String,IRI> annotationPropertyMap = initAnnotationPropertyMap();
-	Set<OWLAnnotationProperty> apToDeclare;
-	private Map<String, OWLClass> clsToDeclar;
+	final Set<OWLAnnotationProperty> apToDeclare;
+	private final Map<String, OWLClass> clsToDeclar;
 
-	private Map<String, OWLAnnotationProperty> typedefToAnnotationProperty;
+	final private Map<String, OWLAnnotationProperty> typedefToAnnotationProperty;
 
 	public Obo2Owl() {
-		init();
+		// as default create an empty manager
+		this(OWLManager.createOWLOntologyManager());
 	}
 
-
-	private void init() {
+	public Obo2Owl(OWLOntologyManager manager) {
 		idSpaceMap = new HashMap<String,String>();
-		this.manager = OWLManager.createOWLOntologyManager();
-
-		fac = this.manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 		clsToDeclar = new Hashtable<String, OWLClass>();
 		typedefToAnnotationProperty = new Hashtable<String, OWLAnnotationProperty>();
+		init(manager);
+	}
+
+	private void init(OWLOntologyManager manager) {
+		// use the given manager and its factory
+		this.manager = manager;
+		fac = this.manager.getOWLDataFactory();
+		
+		// clear all internal maps.
+		idSpaceMap.clear();
+		apToDeclare.clear();
+		clsToDeclar.clear();
+		typedefToAnnotationProperty.clear();
 	}
 
 
@@ -182,6 +190,19 @@ public class Obo2Owl {
 		this.obodoc = obodoc;
 	}
 
+	/**
+	 * @return the owlOntology
+	 */
+	protected OWLOntology getOwlOntology() {
+		return owlOntology;
+	}
+	
+	/**
+	 * @param owlOntology the owlOntology to set
+	 */
+	protected void setOwlOntology(OWLOntology owlOntology) {
+		this.owlOntology = owlOntology;
+	}
 
 	public OWLOntology convert(String oboFile) throws OWLOntologyCreationException {
 
@@ -200,7 +221,8 @@ public class Obo2Owl {
 
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
-		init();
+		// always create a new manager, when loading a new obo document
+		init(OWLManager.createOWLOntologyManager());
 		return tr();
 	}
 
