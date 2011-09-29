@@ -25,5 +25,5 @@ xref: BFO:0000051
 id: part_of
 name: part_of
 is_transitive: true
-xref: BFO:0000050       ! this should take priority
 xref: OBO_REL:part_of   ! this should be ignored
+xref: BFO:0000050       ! this should take priority
