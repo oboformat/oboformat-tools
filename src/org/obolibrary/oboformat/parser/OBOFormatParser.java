@@ -1099,7 +1099,7 @@ public class OBOFormatParser {
 	// an xref that supports a value of values in a clause
 	private boolean parseXref(Clause cl) {
 		parseZeroOrMoreWs();
-		String id = getParseUntil("\",]!{");
+		String id = getParseUntil("\",]!{", true);
 		if (id != null && !(id.equals(""))) {
 			id = id.replaceAll(" *$", "");
 			if (id.contains(" ")) {
@@ -1121,7 +1121,7 @@ public class OBOFormatParser {
 	// an xref that is a direct value of a clause
 	private boolean parseDirectXref(Clause cl) {
 		parseZeroOrMoreWs();
-		String id = getParseUntil("\",]!{");
+		String id = getParseUntil("\",]!{", true);
 		if (id != null) {
 			id = id.trim();
 			if (id.contains(" ")) {
@@ -1351,8 +1351,12 @@ public class OBOFormatParser {
 		s.advance(1);
 		return ret;
 	}
-
+	
 	private String getParseUntil(String compl) {
+		return getParseUntil(compl, false);
+	}
+
+	private String getParseUntil(String compl, boolean commaWhitespace) {
 		String r = s.rest();
 		int i = 0;
 		boolean hasEscapedChars = false;
@@ -1363,7 +1367,16 @@ public class OBOFormatParser {
 				continue;
 			}
 			if (compl.contains(r.subSequence(i, i+1))) {
-				break;
+				if (commaWhitespace && r.charAt(i) == ',') {
+					// a comma is only a valid separator with a following whitespace
+					// see bug and specification update http://code.google.com/p/oboformat/issues/detail?id=54
+					if (i + 1 < r.length() && r.charAt(i + 1) == ' ') {
+						break;
+					}
+				}
+				else {
+					break;
+				}
 			}
 			i++;
 		}
