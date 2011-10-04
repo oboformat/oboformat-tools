@@ -73,12 +73,10 @@ public class Owl2Obo {
 	OWLDataFactory fac;
 	OBODoc obodoc;
 	Map<String, String> idSpaceMap;
-	// Map<String,IRI> annotationPropertyMap;
 	public static Map<String, String> annotationPropertyMap = initAnnotationPropertyMap();
 	Set<OWLAnnotationProperty> apToDeclare;
 
 	private String ontologyId;
-	//private String ontologyId;
 
 	private boolean strictConversion;
 
@@ -756,6 +754,7 @@ public class Owl2Obo {
 
 	private boolean tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,  Frame frame) {
 
+		boolean result = true;
 		//		OWLAnnotationProperty prop = aanAx.getProperty();
 		String tag = owlObjectToTag(prop);
 
@@ -814,7 +813,7 @@ public class Owl2Obo {
 				clause.setTag(tag);
 				clause.addValue(value);
 				frame.addClause(clause);
-				addQualifiers(clause, qualifiers);
+				Set<OWLAnnotation> unprocessedQualifiers = new HashSet<OWLAnnotation>(qualifiers);
 
 				if(_tag == OboFormatTag.TAG_DEF){
 
@@ -825,7 +824,7 @@ public class Owl2Obo {
 							String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
 							Xref xref = new Xref(xrefValue);
 							clause.addXref(xref);
-
+							unprocessedQualifiers.remove(aan);
 						}
 					}
 				}
@@ -847,9 +846,10 @@ public class Owl2Obo {
 							String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
 							Xref xref = new Xref(xrefValue);
 							clause.addXref(xref);
-
+							unprocessedQualifiers.remove(aan);
 						}else if(OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag().equals(propId)){
 							type = getIdentifier(aan.getValue());
+							unprocessedQualifiers.remove(aan);
 						}
 					}
 
@@ -862,23 +862,21 @@ public class Owl2Obo {
 						}
 					}
 					else {
-
-						return false;
+						result = false;
 					}
 
-				}else
-					return false;
+				}else {
+					result = false;
+				}
+				addQualifiers(clause, unprocessedQualifiers);
 			}else{
-				return false;
+				result = false;
 			}
-
-
-
 		}else
-			return false;
+			result = false;
 
 
-		return true;
+		return result;
 
 	}
 
