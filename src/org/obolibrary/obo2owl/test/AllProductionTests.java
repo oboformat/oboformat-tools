@@ -27,6 +27,7 @@ import org.obolibrary.oboformat.test.*;
 	//RoundTripImportTest.class,
 	RoundTripMultipleDefXrefTest.class,
 	RoundTripSynonymTest.class,
+	RoundTripXrefTest.class,
 	//SBOTest.class,
 	SubsetTest.class,
 	SynonymTest.class,
