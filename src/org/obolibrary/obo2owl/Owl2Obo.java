@@ -829,7 +829,23 @@ public class Owl2Obo {
 					}
 				}
 				else if (_tag == OboFormatTag.TAG_XREF) {
-					clause.setValue(new Xref(value));
+					Xref xref = new Xref(value);
+					for(OWLAnnotation annotation : qualifiers) {
+						if (fac.getRDFSLabel().equals(annotation.getProperty())) {
+							OWLAnnotationValue owlAnnotationValue = annotation.getValue();
+							if (owlAnnotationValue instanceof OWLLiteral) {
+								unprocessedQualifiers.remove(annotation);
+								String xrefAnnotation = getLiteral((OWLLiteral) owlAnnotationValue);
+								if (xrefAnnotation != null) {
+									xrefAnnotation = xrefAnnotation.trim();
+									if (xrefAnnotation.length() > 0) {
+										xref.setAnnotation(xrefAnnotation);
+									}
+								}
+							}
+						}
+					}
+					clause.setValue(xref);
 				}
 				else if(_tag == OboFormatTag.TAG_EXACT ||
 						_tag == OboFormatTag.TAG_NARROW ||

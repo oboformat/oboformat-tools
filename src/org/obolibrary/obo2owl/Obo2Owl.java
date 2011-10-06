@@ -935,6 +935,20 @@ public class Obo2Owl {
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
+		else if (_tag == OboFormatTag.TAG_XREF) {
+			Xref xref = (Xref) clause.getValue();
+			String xrefAnnotation = xref.getAnnotation();
+			if (xrefAnnotation != null) {
+				OWLAnnotation owlAnnotation = fac.getOWLAnnotation(fac.getRDFSLabel(), fac.getOWLLiteral(xrefAnnotation));
+				annotations.add(owlAnnotation);
+				LOG.warn("Accepting xref ('"+xref.getIdref()+"') with annotation: "+xrefAnnotation);
+			}
+			ax = fac.getOWLAnnotationAssertionAxiom(
+					trTagToAnnotationProp(tag),
+					sub, 
+					trLiteral(clause.getValue()), 
+					annotations);
+		}
 		else {
 			// generic
 			//System.out.println("generic clause:"+clause);
@@ -944,7 +958,6 @@ public class Obo2Owl {
 					trLiteral(clause.getValue()), 
 					annotations);
 		}
-		// TODO synonyms
 		return ax;
 	}
 
