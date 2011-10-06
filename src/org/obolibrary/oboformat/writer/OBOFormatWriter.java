@@ -137,11 +137,11 @@ public class OBOFormatWriter {
 
 		List<Frame> termFrames = new ArrayList<Frame>();
 		termFrames.addAll(doc.getTermFrames());
-		Collections.sort(termFrames, new FramesComparator());
+		Collections.sort(termFrames, FramesComparator.instance);
 
 		List<Frame> typeDefFrames = new ArrayList<Frame>();
 		typeDefFrames.addAll(doc.getTypedefFrames());
-		Collections.sort(typeDefFrames, new FramesComparator());
+		Collections.sort(typeDefFrames, FramesComparator.instance);
 
 
 		for(Frame f: termFrames){
@@ -179,7 +179,7 @@ public class OBOFormatWriter {
 	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
 
 		List<String> tags = duplicateTags(frame.getTags());
-		Collections.sort(tags, new HeaderTagsComparator());
+		Collections.sort(tags, HeaderTagsComparator.instance);
 
 		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer);
 		
@@ -188,7 +188,10 @@ public class OBOFormatWriter {
 			if(tag.equals(OboFormatTag.TAG_FORMAT_VERSION.getTag()))
 				continue;
 
-			for(Clause clause: frame.getClauses(tag)){
+			List<Clause> clauses = new ArrayList<Clause>(frame.getClauses(tag));
+			Collections.sort(clauses, ClauseComparator.instance);
+			
+			for(Clause clause: clauses){
 				if(tag.equals(OboFormatTag.TAG_SUBSETDEF.getTag())){
 					writeSynonymtypedef(clause, writer);
 				}else if(tag.equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())){
@@ -210,10 +213,10 @@ public class OBOFormatWriter {
 		if(frame.getType() == FrameType.TERM){
 			writeLine("[Term]", writer);
 
-			comparator = new TermsTagsComparator();
+			comparator = TermsTagsComparator.instance;
 		}else if (frame.getType() == FrameType.TYPEDEF){
 			writeLine("[Typedef]", writer);
-			comparator = new TypeDefTagsComparator();
+			comparator = TypeDefTagsComparator.instance;
 		}
 
 		if(frame.getId() != null){
@@ -224,25 +227,51 @@ public class OBOFormatWriter {
 		Collections.sort(tags, comparator);
 
 		for(String tag: tags){
+			List<Clause> clauses = new ArrayList<Clause>(frame.getClauses(tag));
+			Collections.sort(clauses, ClauseComparator.instance);
+			for( Clause clause : clauses){
 
-			for( Clause clause : frame.getClauses(tag)){
-
-				if(clause.getTag().equals("id"))
+				if(OboFormatTag.TAG_ID.getTag().equals(clause.getTag()))
 					continue;
-				else if(clause.getTag().equals("def"))
+				else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag()))
 					writeDef(clause, writer);
-				else if(clause.getTag().equals("synonym"))
+				else if(OboFormatTag.TAG_SYNONYM.getTag().equals(clause.getTag()))
 					writeSynonym(clause, writer);
 				else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
 					writePropertyValue(clause, writer);
 				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag()))
 					writeClauseWithQuotedString(clause, writer);
+				else if (OboFormatTag.TAG_XREF.getTag().equals(clause.getTag()))
+					writeXRefClause(clause, writer);
 				else
 					write(clause, writer);
 			}
 		}
 		writeEmptyLine(writer);
 	}
+
+
+	private void writeXRefClause(Clause clause, BufferedWriter writer) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
+		Object value = clause.getValue();
+		if (value != null && value instanceof Xref) {
+			Xref xref = (Xref) value;
+			if (xref.getIdref() != null) {
+				sb.append(xref.getIdref());
+				String annotation = xref.getAnnotation();
+				if (annotation != null) {
+					sb.append(" \"");
+					sb.append(escapeOboString(annotation));
+					sb.append('"');
+				}
+			}
+		}
+		appendQualifiers(sb, clause);
+		writeLine(sb, writer);
+	}
+
 
 
 	private void writeSynonymtypedef(Clause clause, BufferedWriter writer) throws IOException{
@@ -283,24 +312,29 @@ public class OBOFormatWriter {
 		// if the xrefs value is null, then there should *never* be xrefs at this location
 		// not that the value may be a non-null empty list - here we still want to write []
 		if(xrefs != null){
-
-			sb.append(" [");
-
-			Iterator<Xref> xrefsIterator = xrefs.iterator();
-			while (xrefsIterator.hasNext()) {
-				sb.append(xrefsIterator.next().getIdref());
-				if (xrefsIterator.hasNext()) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
+			appendXrefs(sb, xrefs);
 		}else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) ||
 				OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag())){
 			sb.append(" []");
 		}
 
 		writeLine(sb, writer);
+	}
+
+	private void appendXrefs(StringBuilder sb, Collection<Xref> xrefs) {
+		List<Xref> sortedXrefs = new ArrayList<Xref>(xrefs);
+		Collections.sort(sortedXrefs, XrefComparator.instance);
+		sb.append(" [");
+
+		Iterator<Xref> xrefsIterator = sortedXrefs.iterator();
+		while (xrefsIterator.hasNext()) {
+			sb.append(xrefsIterator.next().getIdref());
+			if (xrefsIterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("]");
 	}
 
 
@@ -357,7 +391,8 @@ public class OBOFormatWriter {
 
 		while (valuesIterator.hasNext()) {
 			String value = valuesIterator.next().toString();
-			if(idsLabel != null){
+			if(idsLabel != null && !valuesIterator.hasNext()){
+				// only try to resolve the last value as id
 				Frame f= oboDoc.getTermFrame(value);
 				if(f == null){
 					f = oboDoc.getTypedefFrame(value);
@@ -384,22 +419,22 @@ public class OBOFormatWriter {
 
 
 		if(xrefs != null){
-
-			//	if(!xrefs.isEmpty())
-			sb.append(" [");
-
-			Iterator<Xref> xrefsIterator = xrefs.iterator();
-			while (xrefsIterator.hasNext()) {
-				sb.append(xrefsIterator.next().getIdref());
-				if (xrefsIterator.hasNext()) {
-					sb.append(", ");
-				}
-			}
-
-			//	if(!xrefs.isEmpty())
-			sb.append("]");
+			appendXrefs(sb, xrefs);
 		}
 		
+		appendQualifiers(sb, clause);
+		
+		if(idsLabel != null && idsLabel.length() > 0) {
+			String trimmed = idsLabel.toString().trim();
+			if (trimmed.length() > 0) {
+				sb.append(" ! ");
+				sb.append(trimmed);
+			}
+		}
+		writeLine(sb, writer);
+	}
+
+	private void appendQualifiers(StringBuilder sb, Clause clause) {
 		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		if (qvs != null && qvs.size() > 0) {
 			sb.append(" {");
@@ -416,15 +451,6 @@ public class OBOFormatWriter {
 			}
 			sb.append("}");
 		}
-		
-		if(idsLabel != null && idsLabel.length() > 0) {
-			String trimmed = idsLabel.toString().trim();
-			if (trimmed.length() > 0) {
-				sb.append(" ! ");
-				sb.append(trimmed);
-			}
-		}
-		writeLine(sb, writer);
 	}
 
 	private CharSequence escapeOboString(String in) {
@@ -461,13 +487,14 @@ public class OBOFormatWriter {
 	
 	private static class HeaderTagsComparator implements Comparator<String>{
 
+		static final HeaderTagsComparator instance = new HeaderTagsComparator();
+		
 		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
 
 		private static Hashtable<String, Integer> buildTagsPriorities(){
 			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
 			table.put(OboFormatTag.TAG_FORMAT_VERSION.getTag(),0);
-			table.put("ontology",5);
 			table.put("data-version",10);
 			table.put("date",15);
 			table.put("saved-by",20);
@@ -482,7 +509,7 @@ public class OBOFormatWriter {
 			table.put("treat-xrefs-as-relationship",65);
 			table.put("treat-xrefs-as-is_a",70);
 			table.put("remark",75);
-
+			table.put("ontology",85); // moved from pos 5 to emulate OBO-Edit behavior
 
 			return table;
 		}
@@ -507,6 +534,8 @@ public class OBOFormatWriter {
 
 	private static class TermsTagsComparator implements Comparator<String>{
 
+		static final TermsTagsComparator instance = new TermsTagsComparator();
+		
 		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
 
 		private static Hashtable<String, Integer> buildTagsPriorities(){
@@ -559,6 +588,8 @@ public class OBOFormatWriter {
 
 	private static class TypeDefTagsComparator implements Comparator<String>{
 
+		static final TypeDefTagsComparator instance = new TypeDefTagsComparator();
+		
 		private static Hashtable<String, Integer> tagsPriorities = buildTagsPriorities();
 
 		private static Hashtable<String, Integer> buildTagsPriorities(){
@@ -624,15 +655,79 @@ public class OBOFormatWriter {
 
 	}
 
-
 	private static class FramesComparator implements Comparator<Frame>{
 
+		static final FramesComparator instance = new FramesComparator();
+		
 		public int compare(Frame f1, Frame f2) {
 			return f1.getId().compareTo(f2.getId());
 		}
 
 	}
 
+	private static class ClauseComparator implements Comparator<Clause> {
+		
+		static final ClauseComparator instance = new ClauseComparator();
+		
+		public int compare(Clause o1, Clause o2) {
+			int comp = compareValues(o1.getValue(), o2.getValue());
+			if (comp != 0) {
+				return comp;
+			}
+			return compareValues(o1.getValue2(), o2.getValue2());
+		}
+	
+		private int compareValues(Object o1, Object o2) {
+			String s1 = toStringRepresentation(o1);
+			String s2 = toStringRepresentation(o2);
+			if (o1 == null && o2 == null) {
+				return 0;
+			}
+			if (o1 == null) {
+				return -1;
+			}
+			if (o2 == null) {
+				return 1;
+			}
+			return s1.compareToIgnoreCase(s2);
+		}
+		
+		private String toStringRepresentation(Object obj) {
+			String s = null;
+			if (obj != null) {
+				if (obj instanceof Xref) {
+					Xref xref = (Xref) obj;
+					s = xref.getIdref()+" "+xref.getAnnotation();
+				}
+				else if (obj instanceof String) {
+					s = (String) obj;
+				}
+				else {
+					s = obj.toString();
+				}
+			}
+			return s;
+		}
+	}
 
+	private static class XrefComparator implements Comparator<Xref> {
+	
+		static final XrefComparator instance = new XrefComparator();
+		
+		public int compare(Xref x1, Xref x2) {
+			String idref1 = x1.getIdref();
+			String idref2 = x2.getIdref();
+			if (idref1 == null && idref2 == null) {
+				return 0;
+			}
+			if (idref1 == null) {
+				return -1;
+			}
+			if (idref2 == null) {
+				return 1;
+			}
+			return idref1.compareToIgnoreCase(idref2);
+		}
+	}
 
 }
