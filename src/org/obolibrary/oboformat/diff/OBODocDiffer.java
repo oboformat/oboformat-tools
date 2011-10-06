@@ -10,6 +10,8 @@ import java.util.Map;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.Xref;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 
 /**
@@ -77,9 +79,21 @@ public class OBODocDiffer {
 		for (Clause c : f1.getClauses()) {
 			boolean isMatched = false;
 			for (Clause c2 : f2.getClauses()) {
-				if (c.equals(c2)) {
-					isMatched = true;
-					break;
+				if (c.getTag().equals(c2.getTag())) {
+					if (c.equals(c2)) {
+						isMatched = true;
+						if (OboFormatTag.TAG_XREF.getTag().equals(c.getTag())) {
+							String a1 = ((Xref) c.getValue()).getAnnotation();
+							String a2 = ((Xref) c2.getValue()).getAnnotation();
+							if (a1 != a2) {
+								isMatched = false;
+								if (a1 != null && a2 != null) {
+									isMatched = a1.equals(a2);
+								}
+							}
+						}
+						break;
+					}
 				}
 			}
 			if (!isMatched) {
