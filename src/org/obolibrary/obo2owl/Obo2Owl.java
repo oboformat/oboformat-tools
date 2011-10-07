@@ -941,7 +941,6 @@ public class Obo2Owl {
 			if (xrefAnnotation != null) {
 				OWLAnnotation owlAnnotation = fac.getOWLAnnotation(fac.getRDFSLabel(), fac.getOWLLiteral(xrefAnnotation));
 				annotations.add(owlAnnotation);
-				LOG.warn("Accepting xref ('"+xref.getIdref()+"') with annotation: "+xrefAnnotation);
 			}
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
