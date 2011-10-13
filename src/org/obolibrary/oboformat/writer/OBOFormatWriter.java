@@ -41,15 +41,7 @@ public class OBOFormatWriter {
 
 	private static HashSet<String> tagsInformative = buildTagsInformative();
 
-	private OBODoc oboDoc;
-
 	private boolean isCheckStructure = true;
-
-	public OBOFormatWriter(){
-		oboDoc = null;
-	}
-	
-	
 
 	public boolean isCheckStructure() {
 		return isCheckStructure;
@@ -131,9 +123,7 @@ public class OBOFormatWriter {
 		}
 		Frame headerFrame = doc.getHeaderFrame();
 
-		this.oboDoc = doc;
-
-		writeHeader(headerFrame, writer);
+		writeHeader(headerFrame, writer, doc);
 
 		List<Frame> termFrames = new ArrayList<Frame>();
 		termFrames.addAll(doc.getTermFrames());
@@ -145,11 +135,11 @@ public class OBOFormatWriter {
 
 
 		for(Frame f: termFrames){
-			write(f, writer);
+			write(f, writer, doc);
 		}
 
 		for(Frame f: typeDefFrames){
-			write(f, writer);
+			write(f, writer, doc);
 		}
 	}
 
@@ -176,12 +166,12 @@ public class OBOFormatWriter {
 		return tags;
 	}
 
-	public void writeHeader(Frame frame, BufferedWriter writer) throws IOException{
+	public void writeHeader(Frame frame, BufferedWriter writer, OBODoc oboDoc) throws IOException{
 
 		List<String> tags = duplicateTags(frame.getTags());
 		Collections.sort(tags, HeaderTagsComparator.instance);
 
-		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer);
+		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer, oboDoc);
 		
 		for(String tag: tags){
 
@@ -197,7 +187,7 @@ public class OBOFormatWriter {
 				}else if(tag.equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())){
 					writeSynonymtypedef(clause, writer);
 				}else
-					write(clause, writer);
+					write(clause, writer, oboDoc);
 			}
 		}
 
@@ -206,7 +196,7 @@ public class OBOFormatWriter {
 
 	}
 
-	public void write(Frame frame, BufferedWriter writer) throws IOException{
+	public void write(Frame frame, BufferedWriter writer, OBODoc oboDoc) throws IOException{
 
 		Comparator<String> comparator = null;
 
@@ -244,7 +234,7 @@ public class OBOFormatWriter {
 				else if (OboFormatTag.TAG_XREF.getTag().equals(clause.getTag()))
 					writeXRefClause(clause, writer);
 				else
-					write(clause, writer);
+					write(clause, writer, oboDoc);
 			}
 		}
 		writeEmptyLine(writer);
@@ -378,14 +368,14 @@ public class OBOFormatWriter {
 		writeClauseWithQuotedString(clause, writer);
 	}
 
-	public void write(Clause clause, BufferedWriter writer) throws IOException{
+	public void write(Clause clause, BufferedWriter writer, OBODoc oboDoc) throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(clause.getTag());
 		sb.append(": ");
 
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
 		StringBuilder idsLabel = null;
-		if (this.oboDoc != null && tagsInformative.contains(clause.getTag())) {
+		if (oboDoc != null && tagsInformative.contains(clause.getTag())) {
 			idsLabel = new StringBuilder();
 		}
 
