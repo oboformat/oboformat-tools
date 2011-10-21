@@ -720,7 +720,6 @@ public class Obo2Owl {
 	private OWLAxiom trTypedefClause(OWLObjectProperty p, String tag, Clause clause) {
 		OWLAxiom ax = null;
 		Object v = clause.getValue();
-		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<OWLAnnotation> annotations = trAnnotations(clause);
 		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 		if (_tag == OboFormatTag.TAG_IS_A) {
@@ -869,13 +868,10 @@ public class Obo2Owl {
 
 
 	protected OWLAxiom trGenericClause(OWLAnnotationSubject sub, String tag, Clause clause) {
-		Collection<QualifierValue> qvs = clause.getQualifierValues();
 		Set<OWLAnnotation> annotations = trAnnotations(clause);
 
-		//		OWLAnnotationSubject sub = (OWLAnnotationSubject) e.getIRI();
-
 		if (clause.getValue() == null) {
-			LOG.error("Problem:"+clause);
+			LOG.error("Problem: "+clause);
 		}
 
 		OWLAxiom ax = null;
@@ -898,7 +894,7 @@ public class Obo2Owl {
 			Object v = clause.getValue();
 			if (v == null) {
 				// TODO: Throw Exceptions
-				System.out.println("Cannot translate: "+clause);
+				LOG.warn("Cannot translate: "+clause);
 			}
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
@@ -910,11 +906,9 @@ public class Obo2Owl {
 
 			Object[] values= clause.getValues().toArray();
 
+			String synScope;
 			if(values.length>1){
-				//OWLAnnotation ann= fac.getOWLAnnotation(trTagToAnnotationProp("scope"), trLiteral(values[1]));
-				//annotations.add(ann);
-
-
+				synScope = values[1].toString();
 				if(values.length>2){
 					OWLAnnotation ann= 
 						fac.getOWLAnnotation(trTagToAnnotationProp(OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag()), 
@@ -924,11 +918,10 @@ public class Obo2Owl {
 				}
 			}
 			else {
-				System.err.println("Warning: not enough values in"+clause);
+				LOG.warn("Assume 'RELATED'for missing scope in synonym clause: "+clause);
+				// we make allowances for obof1.0, where the synonym scope is optional
+				synScope = OboFormatTag.TAG_RELATED.getTag();
 			}
-
-			// we make allowances for obof1.0, where the synonym scope is optional
-			String synScope = values.length <= 1 ? "RELATED" : values[1].toString();
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(synScope),
 					sub, 
@@ -1036,7 +1029,7 @@ public class Obo2Owl {
 			ex = fac.getOWLObjectMinCardinality(min, pe, ce);
 		}
 		else if (max != null) {
-			ex = fac.getOWLObjectMaxCardinality(min, pe, ce);
+			ex = fac.getOWLObjectMaxCardinality(max, pe, ce);
 		}
 		else if (allSome != null && allSome &&
 				allOnly != null && allOnly) {
