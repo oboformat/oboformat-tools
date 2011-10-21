@@ -2,6 +2,7 @@ package org.obolibrary.oboformat.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class Clause {
@@ -57,15 +58,39 @@ public class Clause {
 
 
 	public Object getValue() {
-		// TODO Auto-generated method stub
-		return values.toArray()[0];
+		Object value = null; 
+		if (!values.isEmpty()) {
+			value = values.iterator().next();
+		}
+		return value;
+	}
+	
+	public <T> T getValue(Class<T> cls) {
+		Object value = getValue();
+		if (value != null && value.getClass().isAssignableFrom(cls)) {
+			return cls.cast(value);
+		}
+		return null;
 	}
 
 	public Object getValue2() {
-		// TODO Auto-generated method stub
-		return values.toArray()[1];
+		Object value = null;
+		if (values.size() > 1) {
+			Iterator<Object> iterator = values.iterator();
+			iterator.next();
+			value = iterator.next();
+		}
+		return value;
 	}
 
+	public <T> T getValue2(Class<T> cls) {
+		Object value = getValue2();
+		if (value != null && value.getClass().isAssignableFrom(cls)) {
+			return cls.cast(value);
+		}
+		return null;
+	}
+	
 	public Collection<Xref> getXrefs() {
 		return xrefs;
 	}
@@ -96,6 +121,7 @@ public class Clause {
 	}
 
 
+	@Override
 	public String toString() {
 		if (values == null)
 			return tag+"=null";
@@ -142,6 +168,7 @@ public class Clause {
 		return true;
 	}
 
+	@Override
 	public boolean equals(Object e) {
 
 		if(e == null || !(e instanceof Clause))

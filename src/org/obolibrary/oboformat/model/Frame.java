@@ -113,6 +113,16 @@ public class Frame {
 			return null;
 		return getClause(tag).getValue();
 	}
+
+	public <T> T getTagValue(String tag, Class<T> cls) {
+		if (getClause(tag) == null)
+			return null;
+		Object value = getClause(tag).getValue();
+		if (value != null && value.getClass().isAssignableFrom(cls)) {
+			return cls.cast(value);
+		}
+		return null;
+	}
 	
 	public Collection<Object> getTagValues(String tag) {
 		Collection<Object> vals = new Vector<Object>();

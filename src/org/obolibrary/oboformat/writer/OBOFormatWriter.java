@@ -679,7 +679,14 @@ public class OBOFormatWriter {
 			if (o2 == null) {
 				return 1;
 			}
-			return s1.compareToIgnoreCase(s2);
+			int comp = s1.compareToIgnoreCase(s2);
+			if (comp == 0) {
+				// normally ignore case, for sorting
+				// but if the strings are equal, 
+				// try again with case check
+				comp = s1.compareTo(s2);
+			}
+			return comp;
 		}
 		
 		private String toStringRepresentation(Object obj) {
