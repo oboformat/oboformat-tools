@@ -210,7 +210,7 @@ public class OBOFormatWriter {
 		}
 
 		if(frame.getId() != null){
-			writeLine("id: " + frame.getId(), writer);
+			writeLine(OboFormatTag.TAG_ID.getTag()+": " + frame.getId(), writer);
 		}
 
 		List<String> tags = duplicateTags(frame.getTags());
@@ -242,12 +242,11 @@ public class OBOFormatWriter {
 
 
 	private void writeXRefClause(Clause clause, BufferedWriter writer) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		sb.append(clause.getTag());
-		sb.append(": ");
-		Object value = clause.getValue();
-		if (value != null && value instanceof Xref) {
-			Xref xref = (Xref) value;
+		Xref xref = clause.getValue(Xref.class);
+		if (xref != null) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(clause.getTag());
+			sb.append(": ");
 			if (xref.getIdref() != null) {
 				sb.append(xref.getIdref());
 				String annotation = xref.getAnnotation();
@@ -257,9 +256,9 @@ public class OBOFormatWriter {
 					sb.append('"');
 				}
 			}
+			appendQualifiers(sb, clause);
+			writeLine(sb, writer);
 		}
-		appendQualifiers(sb, clause);
-		writeLine(sb, writer);
 	}
 
 
@@ -389,11 +388,11 @@ public class OBOFormatWriter {
 				}
 
 				if(f != null){
-					Clause cl = f.getClause(OboFormatTag.TAG_NAME.getTag());
+					Clause cl = f.getClause(OboFormatTag.TAG_NAME);
 					if(cl != null){
 						if(idsLabel.length() > 0)
 							idsLabel.append(" ");
-						idsLabel.append(cl.getValue());
+						idsLabel.append(cl.getValue(String.class));
 					}
 
 				}
@@ -485,21 +484,21 @@ public class OBOFormatWriter {
 			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
 			table.put(OboFormatTag.TAG_FORMAT_VERSION.getTag(),0);
-			table.put("data-version",10);
-			table.put("date",15);
-			table.put("saved-by",20);
-			table.put("auto-generated-by",25);
-			table.put("import",30);
-			table.put("subsetdef",35);
-			table.put("synonymtypedef",40);
-			table.put("default-namespace",45);
-			table.put("idspace",50);
-			table.put("treat-xrefs-as-equivalent",55);
-			table.put("treat-xrefs-as-genus-differentia",60);
-			table.put("treat-xrefs-as-relationship",65);
-			table.put("treat-xrefs-as-is_a",70);
-			table.put("remark",75);
-			table.put("ontology",85); // moved from pos 5 to emulate OBO-Edit behavior
+			table.put(OboFormatTag.TAG_DATA_VERSION.getTag(),10);
+			table.put(OboFormatTag.TAG_DATE.getTag(),15);
+			table.put(OboFormatTag.TAG_SAVED_BY.getTag(),20);
+			table.put(OboFormatTag.TAG_AUTO_GENERATED_BY.getTag(),25);
+			table.put(OboFormatTag.TAG_IMPORT.getTag(),30);
+			table.put(OboFormatTag.TAG_SUBSETDEF.getTag(),35);
+			table.put(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag(),40);
+			table.put(OboFormatTag.TAG_DEFAULT_NAMESPACE.getTag(),45);
+			table.put(OboFormatTag.TAG_IDSPACE.getTag(),50);
+			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag(),55);
+			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_GENUS_DIFFERENTIA.getTag(),60);
+			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_RELATIONSHIP.getTag(),65);
+			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_IS_A.getTag(),70);
+			table.put(OboFormatTag.TAG_REMARK.getTag(),75);
+			table.put(OboFormatTag.TAG_ONTOLOGY.getTag(),85); // moved from pos 5 to emulate OBO-Edit behavior
 
 			return table;
 		}
@@ -531,30 +530,29 @@ public class OBOFormatWriter {
 		private static Hashtable<String, Integer> buildTagsPriorities(){
 			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
-			table.put("id",5);
-			table.put("is_anonymous",10);
-			table.put("name",15);
-			table.put("namespace",20); 
-			table.put("alt_id",25);
-			table.put("def",30);
-			table.put("comment",35);
-			table.put("subset",40);
-			table.put("synonym",45);
-			table.put("xref",50);
-			table.put("builtin",55);
-			table.put("property_value",60); 
-			table.put("is_a",65);
-			table.put("intersection_of",70); 
-			table.put("intersection_of",75);
-			table.put("union_of",80);
-			table.put("equivalent_to",85);
-			table.put("disjoint_from",90);
-			table.put("relationship",95);
-			table.put("created_by",100);
-			table.put("creation_date",105);
-			table.put("is_obsolete",110);
-			table.put("replaced_by",115);
-			table.put("consider",120);
+			table.put(OboFormatTag.TAG_ID.getTag(),5);
+			table.put(OboFormatTag.TAG_IS_ANONYMOUS.getTag(),10);
+			table.put(OboFormatTag.TAG_NAME.getTag(),15);
+			table.put(OboFormatTag.TAG_NAMESPACE.getTag(),20); 
+			table.put(OboFormatTag.TAG_ALT_ID.getTag(),25);
+			table.put(OboFormatTag.TAG_DEF.getTag(),30);
+			table.put(OboFormatTag.TAG_COMMENT.getTag(),35);
+			table.put(OboFormatTag.TAG_SUBSET.getTag(),40);
+			table.put(OboFormatTag.TAG_SYNONYM.getTag(),45);
+			table.put(OboFormatTag.TAG_XREF.getTag(),50);
+			table.put(OboFormatTag.TAG_BUILTIN.getTag(),55);
+			table.put(OboFormatTag.TAG_PROPERTY_VALUE.getTag(),60); 
+			table.put(OboFormatTag.TAG_IS_A.getTag(),65);
+			table.put(OboFormatTag.TAG_INTERSECTION_OF.getTag(),70); 
+			table.put(OboFormatTag.TAG_UNION_OF.getTag(),80);
+			table.put(OboFormatTag.TAG_EQUIVALENT_TO.getTag(),85);
+			table.put(OboFormatTag.TAG_DISJOINT_FROM.getTag(),90);
+			table.put(OboFormatTag.TAG_RELATIONSHIP.getTag(),95);
+			table.put(OboFormatTag.TAG_CREATED_BY.getTag(),100);
+			table.put(OboFormatTag.TAG_CREATION_DATE.getTag(),105);
+			table.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),110);
+			table.put(OboFormatTag.TAG_REPLACED_BY.getTag(),115);
+			table.put(OboFormatTag.TAG_CONSIDER.getTag(),120);
 
 			return table;
 		}
@@ -585,47 +583,47 @@ public class OBOFormatWriter {
 		private static Hashtable<String, Integer> buildTagsPriorities(){
 			Hashtable<String, Integer> table = new Hashtable<String, Integer>();
 
-			table.put("id",5);
-			table.put("is_anonymous",10);
-			table.put("name",15);
-			table.put("namespace",20); 
-			table.put("alt_id",25);
-			table.put("def",30);
-			table.put("comment",35);
-			table.put("subset",40); 
-			table.put("synonym",45); 
-			table.put("xref",50); 
-			table.put("property_value",55); 
-			table.put("domain",60); 
-			table.put("range",65); 
-			table.put("builtin",70);
-			table.put("is_anti_symmetric",75);
-			table.put("is_cyclic",80);
-			table.put("is_reflexive",85);
-			table.put("is_symmetric",90);
-			table.put("is_transitive",100);
-			table.put("is_functional",105);
-			table.put("is_inverse_functional",110);
-			table.put("is_a",115);
-			table.put("intersection_of",120); 
-			table.put("union_of",125);
-			table.put("equivalent_to",130); 
-			table.put("disjoint_from",135); 
-			table.put("inverse_of",140); 
-			table.put("transitive_over",145);
-			table.put("holds_over_chain",150);
-			table.put("equivalent_to_chain",155);
-			table.put("disjoint_over",160); 
-			table.put("relationship",165); 
-			table.put("created_by",170); 
-			table.put("creation_date",175); 
-			table.put("is-obsolete",180);
-			table.put("replaced_by",185); 
-			table.put("consider",190);
-			table.put("expand_assertion_to",195); 
-			table.put("expand_expression_to",200); 
-			table.put("is_metadata_tag",205);
-			table.put("is_class_level_tag",210);      
+			table.put(OboFormatTag.TAG_ID.getTag(),5);
+			table.put(OboFormatTag.TAG_IS_ANONYMOUS.getTag(),10);
+			table.put(OboFormatTag.TAG_NAME.getTag(),15);
+			table.put(OboFormatTag.TAG_NAMESPACE.getTag(),20); 
+			table.put(OboFormatTag.TAG_ALT_ID.getTag(),25);
+			table.put(OboFormatTag.TAG_DEF.getTag(),30);
+			table.put(OboFormatTag.TAG_COMMENT.getTag(),35);
+			table.put(OboFormatTag.TAG_SUBSET.getTag(),40); 
+			table.put(OboFormatTag.TAG_SYNONYM.getTag(),45); 
+			table.put(OboFormatTag.TAG_XREF.getTag(),50); 
+			table.put(OboFormatTag.TAG_PROPERTY_VALUE.getTag(),55); 
+			table.put(OboFormatTag.TAG_DOMAIN.getTag(),60); 
+			table.put(OboFormatTag.TAG_RANGE.getTag(),65); 
+			table.put(OboFormatTag.TAG_BUILTIN.getTag(),70);
+			table.put(OboFormatTag.TAG_IS_ANTI_SYMMETRIC.getTag(),75);
+			table.put(OboFormatTag.TAG_IS_CYCLIC.getTag(),80);
+			table.put(OboFormatTag.TAG_IS_REFLEXIVE.getTag(),85);
+			table.put(OboFormatTag.TAG_IS_SYMMETRIC.getTag(),90);
+			table.put(OboFormatTag.TAG_IS_TRANSITIVE.getTag(),100);
+			table.put(OboFormatTag.TAG_IS_FUNCTIONAL.getTag(),105);
+			table.put(OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(),110);
+			table.put(OboFormatTag.TAG_IS_A.getTag(),115);
+			table.put(OboFormatTag.TAG_INTERSECTION_OF.getTag(),120); 
+			table.put(OboFormatTag.TAG_UNION_OF.getTag(),125);
+			table.put(OboFormatTag.TAG_EQUIVALENT_TO.getTag(),130); 
+			table.put(OboFormatTag.TAG_DISJOINT_FROM.getTag(),135); 
+			table.put(OboFormatTag.TAG_INVERSE_OF.getTag(),140); 
+			table.put(OboFormatTag.TAG_TRANSITIVE_OVER.getTag(),145);
+			table.put(OboFormatTag.TAG_HOLDS_OVER_CHAIN.getTag(),150);
+			table.put(OboFormatTag.TAG_EQUIVALENT_TO_CHAIN.getTag(),155);
+			table.put(OboFormatTag.TAG_DISJOINT_OVER.getTag(),160); 
+			table.put(OboFormatTag.TAG_RELATIONSHIP.getTag(),165); 
+			table.put(OboFormatTag.TAG_CREATED_BY.getTag(),170); 
+			table.put(OboFormatTag.TAG_CREATION_DATE.getTag(),175); 
+			table.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),180);
+			table.put(OboFormatTag.TAG_REPLACED_BY.getTag(),185); 
+			table.put(OboFormatTag.TAG_CONSIDER.getTag(),190);
+			table.put(OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag(),195); 
+			table.put(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag(),200); 
+			table.put(OboFormatTag.TAG_IS_METADATA_TAG.getTag(),205);
+			table.put(OboFormatTag.TAG_IS_CLASS_LEVEL_TAG.getTag(),210);      
 
 			return  table;
 		}

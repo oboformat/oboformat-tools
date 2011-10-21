@@ -113,6 +113,10 @@ public class Frame {
 			return null;
 		return getClause(tag).getValue();
 	}
+	
+	public Object getTagValue(OboFormatTag tag) {
+		return getTagValue(tag.getTag());
+	}
 
 	public <T> T getTagValue(String tag, Class<T> cls) {
 		if (getClause(tag) == null)
@@ -124,10 +128,30 @@ public class Frame {
 		return null;
 	}
 	
+	public <T> T getTagValue(OboFormatTag tag, Class<T> cls) {
+		return getTagValue(tag.getTag(), cls);
+	}
+	
+	public Collection<Object> getTagValues(OboFormatTag tag) {
+		return getTagValues(tag.getTag());
+	}
+	
 	public Collection<Object> getTagValues(String tag) {
 		Collection<Object> vals = new Vector<Object>();
 		for (Clause c : getClauses(tag)) {
 			vals.add(c.getValue());
+		}
+		return vals;
+	}
+	
+	public <T> Collection<T> getTagValues(OboFormatTag tag, Class<T> cls) {
+		return getTagValues(tag.getTag(), cls);
+	}
+	
+	public <T> Collection<T> getTagValues(String tag, Class<T> cls) {
+		Collection<T> vals = new Vector<T>();
+		for (Clause c : getClauses(tag)) {
+			vals.add(c.getValue(cls));
 		}
 		return vals;
 	}
@@ -168,11 +192,11 @@ public class Frame {
 	}
 	
 	public void check() throws FrameStructureException {
-		Collection<Clause> iClauses = getClauses(OboFormatTag.TAG_INTERSECTION_OF.getTag());
+		Collection<Clause> iClauses = getClauses(OboFormatTag.TAG_INTERSECTION_OF);
 		if (iClauses.size() == 1) {
 			throw new FrameStructureException(this, "single intersection_of tags are not allowed");
 		}
-		if (getClauses(OboFormatTag.TAG_DEF.getTag()).size() > 1) {
+		if (getClauses(OboFormatTag.TAG_DEF).size() > 1) {
 			throw new FrameStructureException(this, "multiple def tags not allowed");	
 		}
 		

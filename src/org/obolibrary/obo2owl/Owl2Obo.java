@@ -94,35 +94,13 @@ public class Owl2Obo {
 	}
 
 	private static HashMap<String, String>  initAnnotationPropertyMap() {
-		/*annotationPropertyMap = new HashMap<String, String>();
-		annotationPropertyMap.put(OWLRDFVocabulary.RDFS_LABEL.getIRI()
-				.toString(), "name");
-		annotationPropertyMap.put(OWLRDFVocabulary.RDFS_COMMENT.getIRI()
-				.toString(), "comment");
-		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000424",
-				"expand_expression_to");
-		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000425",
-				"expand_assertion_to");
-		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000115", "def");
-		annotationPropertyMap
-				.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000118", "synonym");
-		annotationPropertyMap.put(Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_0000427",
-				"is_anti_symmetric");
-		annotationPropertyMap.put(OBO2 DEFAULT_IRI_PREFIX + "IAO_0100001",
-				"replaced_by");
-		annotationPropertyMap
-				.put(DEFAULT_IRI_PREFIX + "remark", "data-version");*/
-
 		HashMap<String, String> map = new HashMap<String, String>();
 		for(String key: Obo2Owl.annotationPropertyMap.keySet()){
 			IRI propIRI =Obo2Owl.annotationPropertyMap.get(key);
 			map.put(propIRI.toString(), key);
 		}
 
-
-
 		return map;
-
 	}
 
 	public void setStrictConversion(boolean b){

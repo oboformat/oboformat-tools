@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
@@ -53,7 +54,7 @@ public class UnmappableExpressionsTest extends OboFormatTestBasics {
 		 		
 		if (true) {
 			Frame tf = obodoc.getTermFrame("x1"); // TODO - may change
-			Collection<Clause> cs = tf.getClauses("intersection_of");
+			Collection<Clause> cs = tf.getClauses(OboFormatTag.TAG_INTERSECTION_OF);
 			assertTrue(cs.size() != 1); // there should NEVER be a situation with single intersection tags
 			// TODO - add validation step prior to saving
 		}

@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+
 public class Clause {
 	protected String tag;
 
@@ -15,14 +17,23 @@ public class Clause {
 
 
 
+	public Clause(OboFormatTag tag) {
+		this(tag.getTag());
+	}
+	
 	public Clause(String tag) {
 		super();
 		this.tag = tag;
 	}
+	
 	public Clause(String tag, String value) {
 		super();
 		this.tag = tag;
 		this.setValue(value);
+	}
+	
+	public Clause(OboFormatTag tag, String value) {
+		this(tag.getTag(), value);
 	}
 
 	public Clause() {

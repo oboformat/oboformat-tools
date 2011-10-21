@@ -1,6 +1,5 @@
 package org.obolibrary.oboformat.parser;
 
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 

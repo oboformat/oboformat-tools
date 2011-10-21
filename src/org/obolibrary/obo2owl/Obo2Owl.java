@@ -260,7 +260,7 @@ public class Obo2Owl {
 		}*/		
 
 		Frame hf = obodoc.getHeaderFrame();
-		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY.getTag());
+		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY);
 		if (ontClause != null) {
 			String ontOboId = (String) ontClause.getValue();
 			defaultIDSpace = ontOboId;
@@ -298,7 +298,7 @@ public class Obo2Owl {
 		}
 		// TODO - individuals
 
-		for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
+		for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT)){
 			String path = getURI(cl.getValue() + "");
 
 			IRI importIRI = IRI.create(path);
@@ -354,7 +354,7 @@ public class Obo2Owl {
 
 				for(Clause clause: headerFrame.getClauses(t)){
 
-					OWLAnnotationProperty childAnnotProp = trAnnotationProp( clause.getValue().toString() );
+					OWLAnnotationProperty childAnnotProp = trAnnotationProp( clause.getValue(String.class) );
 					add(fac.getOWLSubAnnotationPropertyOfAxiom(childAnnotProp, parentAnnotProp));
 					//OWLIndividual indv= trIndividual(  clause.getValue().toString() );
 					//add (fac.getOWLClassAssertionAxiom(cls, indv) );
@@ -450,8 +450,8 @@ public class Obo2Owl {
 
 	private OWLNamedObject trTypedefToAnnotationProperty(Frame typedefFrame){
 
-		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag()) != null &&
-				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
+		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG) != null &&
+				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG)) {
 
 			OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
 			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
@@ -471,8 +471,8 @@ public class Obo2Owl {
 
 	public OWLNamedObject trTypedefFrame(Frame typedefFrame) {
 		// TODO - annotation props
-		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag()) != null &&
-				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG.getTag())) {
+		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG) != null &&
+				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG)) {
 
 			return null;
 			/*OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
@@ -491,10 +491,10 @@ public class Obo2Owl {
 			add(fac.getOWLDeclarationAxiom(p));
 
 			String id = typedefFrame.getId();
-			Collection<Object> xrefs = typedefFrame.getTagValues(OboFormatTag.TAG_XREF.getTag());
-			for (Object xref: xrefs) {
+			Collection<Xref> xrefs = typedefFrame.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
+			for (Xref xref: xrefs) {
 				if (xref != null) {
-					String xid = ((Xref)xref).getIdref();
+					String xid = xref.getIdref();
 					
 					// RO and BFO have special status.
 					// avoid cycles (in case of self-xref)
@@ -1041,8 +1041,8 @@ public class Obo2Owl {
 			ex = fac.getOWLObjectAllValuesFrom(pe, ce);
 
 		}
-		else if (relFrame != null && relFrame.getTagValue("is_class_level") != null &&
-				(Boolean)relFrame.getTagValue("is_class_level")) {
+		else if (relFrame != null && relFrame.getTagValue(OboFormatTag.TAG_IS_CLASS_LEVEL_TAG) != null &&
+				(Boolean)relFrame.getTagValue(OboFormatTag.TAG_IS_CLASS_LEVEL_TAG)) {
 			// pun
 			ex = fac.getOWLObjectHasValue(pe,trIndividual(classId));
 		}
@@ -1100,9 +1100,9 @@ public class Obo2Owl {
 	private String mapPropId(String id) {
 		Frame f = obodoc.getTypedefFrame(id);
 		if (f != null) {
-			Collection<Object> xrefs = f.getTagValues(OboFormatTag.TAG_XREF.getTag());
-			for (Object x : xrefs) {
-				String xid = ((Xref)x).getIdref();
+			Collection<Xref> xrefs = f.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
+			for (Xref x : xrefs) {
+				String xid = x.getIdref();
 				if (obodoc.isTreatXrefsAsEquivalent(getIdPrefix(xid))) {
 					return xid;
 				}
@@ -1179,7 +1179,7 @@ public class Obo2Owl {
 			value = ((Xref)value).getIdref();
 		}
 		else if (value instanceof Date) {
-			// TODO
+			// TODO replace toString() with defined date mapping
 			value = ((Date)value).toString();
 		}
 		else if (value instanceof Boolean) {
@@ -1219,10 +1219,10 @@ public class Obo2Owl {
 		// special case rule for relation xrefs:
 		Frame tdf = obodoc.getTypedefFrame(id);
 		if (tdf != null) {
-			Collection<Object> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF.getTag());
-			for (Object xref : xrefs) {
+			Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
+			for (Xref xref : xrefs) {
 				if (xref != null) {
-					String xid = ((Xref)xref).getIdref();
+					String xid = xref.getIdref();
 
 					// RO and BFO have special status.
 					// avoid cycles (in case of self-xref)

@@ -83,8 +83,8 @@ public class OBODocDiffer {
 					if (c.equals(c2)) {
 						isMatched = true;
 						if (OboFormatTag.TAG_XREF.getTag().equals(c.getTag())) {
-							String a1 = ((Xref) c.getValue()).getAnnotation();
-							String a2 = ((Xref) c2.getValue()).getAnnotation();
+							String a1 = c.getValue(Xref.class).getAnnotation();
+							String a2 = c2.getValue(Xref.class).getAnnotation();
 							if (a1 != a2) {
 								isMatched = false;
 								if (a1 != null && a2 != null) {

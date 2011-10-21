@@ -48,7 +48,7 @@ public class XrefExpanderTest extends OboFormatTestBasics {
 			if (impClause == null) {
 				continue;
 			}
-			String tid = impClause.getValue().toString().replace("bridge-", "");
+			String tid = impClause.getValue(String.class).replace("bridge-", "");
 			System.out.println("BRIDGE: "+tid);
 			if (tid.equals("zfa")) {
 				assertTrue(tdoc.getTermFrame("ZFA:0001689").getClauses(OboFormatTag.TAG_INTERSECTION_OF).size() == 2);

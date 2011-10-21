@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.Xref;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -85,25 +87,25 @@ public class RelationShorthandTest extends OboFormatTestBasics  {
 		// test that relation IDs are converted back to symbolic form
 		if (true) {
 			Frame tf = obodoc.getTermFrame("GO:0000050");
-			Clause c = tf.getClause("relationship");
+			Clause c = tf.getClause(OboFormatTag.TAG_RELATIONSHIP);
 			Object v = c.getValue();
 			System.out.println("V="+v);
-			assertTrue(v.equals("has_part")); // should be converted back to symbolic form
+			assertEquals("has_part", v); // should be converted back to symbolic form
 		}
 		if (true) {
 			Frame tf = obodoc.getTermFrame("GO:0004055");
-			Clause c = tf.getClause("relationship");
+			Clause c = tf.getClause(OboFormatTag.TAG_RELATIONSHIP);
 			Object v = c.getValue();
 			System.out.println("V="+v);
-			assertTrue(v.equals("part_of")); // should be converted back to symbolic form
+			assertEquals("part_of", v); // should be converted back to symbolic form
 		}
 		if (true) {
 			Frame tf = obodoc.getTypedefFrame("has_part");
-			Collection<Clause> cs = tf.getClauses("xref");
-			assertTrue(cs.size() == 1);
-			String v = cs.iterator().next().getValue().toString();
+			Collection<Clause> cs = tf.getClauses(OboFormatTag.TAG_XREF);
+			assertEquals(1, cs.size());
+			String v = cs.iterator().next().getValue(Xref.class).getIdref();
 			System.out.println("(expect BFO) V="+v);
-			assertTrue(v.equals("BFO:0000051")); // should be converted back to symbolic form
+			assertEquals("BFO:0000051", v); // should be converted back to symbolic form
 		}
 
 

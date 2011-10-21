@@ -3,7 +3,6 @@ package org.obolibrary.obo2owl.test;
 import static junit.framework.Assert.*;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -13,11 +12,9 @@ import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -60,8 +57,8 @@ public class GCIQualifierTest extends OboFormatTestBasics  {
 		// test that relation IDs are converted back to symbolic form
 		if (true) {
 			Frame tf = obodoc.getTermFrame("X:1");
-			Clause c1 = tf.getClause("is_a");
-			Clause c2 = tf.getClause("relationship");
+			Clause c1 = tf.getClause(OboFormatTag.TAG_IS_A);
+			Clause c2 = tf.getClause(OboFormatTag.TAG_RELATIONSHIP);
 			System.out.println("c1="+c1);
 			System.out.println("c2="+c2);
 			//Object v1 = c1.getValue();

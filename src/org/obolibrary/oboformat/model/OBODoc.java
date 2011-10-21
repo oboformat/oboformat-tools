@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obolibrary.oboformat.model.Frame.FrameType;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 /**
  * An OBODoc is a container for a header frame and zero or more entity frames
@@ -50,7 +51,7 @@ public class OBODoc {
 	public Frame getTermFrame(String id, boolean followImport) {
 		//this set is check for cycles
 		Set<String> set = new HashSet<String>();
-		set.add(this.toString());
+		set.add(this.getHeaderDescriptor());
 		return _getTermFrame(id, followImport, set);
 	}
 
@@ -62,9 +63,9 @@ public class OBODoc {
 			return f;
 		}else if(followImport){
 			for(OBODoc doc: importedOBODocs){
-				
-				if( !visitedDocs.contains(doc.toString())){
-					visitedDocs.add(doc.toString());
+				String headerDescriptor = doc.getHeaderDescriptor();
+				if( !visitedDocs.contains(headerDescriptor)){
+					visitedDocs.add(headerDescriptor);
 					f = doc.getTermFrame(id, followImport);
 				}
 				
@@ -83,7 +84,7 @@ public class OBODoc {
 
 	public Frame getTypedefFrame(String id, boolean followImports) {
 		Set<String> set = new HashSet<String>();
-		set.add(this.toString());
+		set.add(this.getHeaderDescriptor());
 		return _getTypedefFrame(id, followImports, set);
 
 	}
@@ -96,8 +97,9 @@ public class OBODoc {
 		}else if(followImports){
 			for(OBODoc doc: importedOBODocs){
 				
-				if( !visitedDocs.contains(doc.toString())){
-					visitedDocs.add(doc.toString());
+				String headerDescriptor = doc.getHeaderDescriptor();
+				if( !visitedDocs.contains(headerDescriptor)){
+					visitedDocs.add(headerDescriptor);
 					f = doc.getTypedefFrame(id, followImports);
 				}
 				
@@ -208,13 +210,11 @@ public class OBODoc {
 			addInstanceFrame(f);
 	}
 	
-	public  void addDefaultOntologyHeader(String defaultOnt) {
+	public void addDefaultOntologyHeader(String defaultOnt) {
 		Frame hf = getHeaderFrame();
-		Clause ontClause = hf.getClause("ontology");
+		Clause ontClause = hf.getClause(OboFormatTag.TAG_ONTOLOGY);
 		if (ontClause == null) {
-			ontClause = new Clause();
-			ontClause.setTag("ontology");
-			ontClause.setValue(defaultOnt);
+			ontClause = new Clause(OboFormatTag.TAG_ONTOLOGY, defaultOnt);
 			hf.addClause(ontClause);
 		}
 	}
@@ -237,8 +237,11 @@ public class OBODoc {
 		//	sb.append(f.toString());
 		//}
 		//return "OBODoc("+headerFrame+" Frames("+sb.toString()+"))";
-		return "OBODoc("+headerFrame+")";
+		return getHeaderDescriptor();
 	}
 
+	private String getHeaderDescriptor() {
+		return "OBODoc("+headerFrame+")";
+	}
 
 }

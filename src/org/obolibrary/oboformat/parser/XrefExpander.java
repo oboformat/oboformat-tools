@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.FrameMergeException;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
@@ -24,18 +24,17 @@ public class XrefExpander {
 	public XrefExpander(OBODoc src) throws InvalidXrefMapException {
 		sourceOBODoc = src;
 		Frame shf = src.getHeaderFrame();
-		String ontId = shf.getClause(OboFormatTag.TAG_ONTOLOGY.getTag()).getValue().toString();
+		String ontId = shf.getTagValue(OboFormatTag.TAG_ONTOLOGY, String.class);
 		String tgtOntId = ontId + "/xref_expansions";
 		targetOBODoc = new OBODoc();
 		Frame thf = new Frame(FrameType.HEADER);
-		thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), tgtOntId));
+		thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY, tgtOntId));
 		targetOBODoc.setHeaderFrame(thf);
 		sourceOBODoc.addImportedOBODoc(targetOBODoc);
 		setUp();		
 	}
 	public XrefExpander(OBODoc src, String targetBase) throws InvalidXrefMapException {
 		sourceOBODoc = src;
-		Frame shf = src.getHeaderFrame();
 		this.targetBase = targetBase;
 		setUp();		
 	}
@@ -52,7 +51,7 @@ public class XrefExpander {
 
 		for (Clause c : sourceOBODoc.getHeaderFrame().getClauses()) {
 			String [] parts;
-			parts = c.getValue().toString().split("\\s");
+			parts = c.getValue(String.class).split("\\s");
 			String idSpace = parts[0];
 			if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag())) {
 				addRule(parts[0], new EquivalenceExpansion());
@@ -83,7 +82,7 @@ public class XrefExpander {
 				// create a new bridge ontology for every expansion macro
 				OBODoc tgt = new OBODoc();
 				Frame thf = new Frame(FrameType.HEADER);
-				thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY.getTag(), targetBase + "-" + idSpace.toLowerCase()));
+				thf.addClause(new Clause(OboFormatTag.TAG_ONTOLOGY, targetBase + "-" + idSpace.toLowerCase()));
 				tgt.setHeaderFrame(thf);
 				targetDocMap.put(idSpace, tgt);
 				sourceOBODoc.addImportedOBODoc(tgt);
@@ -124,13 +123,16 @@ public class XrefExpander {
 
 	public void expandXrefs() {
 		for (Frame f : sourceOBODoc.getTermFrames()) {
-			String id = f.getClause("id").getValue().toString();
-			Collection<Clause> clauses = f.getClauses(OboFormatTag.TAG_XREF.toString());
+			String id = f.getTagValue(OboFormatTag.TAG_ID, String.class);
+			Collection<Clause> clauses = f.getClauses(OboFormatTag.TAG_XREF);
 			for (Clause c : clauses) {
-				String x = c.getValue().toString();
-				String s = getIDSpace(x);
-				if (treatMap.containsKey(s)) {
-					treatMap.get(s).expand(f, id, x);
+				Xref x = c.getValue(Xref.class);
+				if (x != null) {
+					String xid = x.getIdref();
+					String s = getIDSpace(xid);
+					if (treatMap.containsKey(s)) {
+						treatMap.get(s).expand(f, id, xid);
+					}
 				}
 			}
 		}
@@ -167,7 +169,7 @@ public class XrefExpander {
 
 	public class EquivalenceExpansion extends Rule {
 		public void expand(Frame sf, String id, String xref) {
-			Clause c = new Clause(OboFormatTag.TAG_EQUIVALENT_TO.toString(), xref);
+			Clause c = new Clause(OboFormatTag.TAG_EQUIVALENT_TO, xref);
 			sf.addClause(c);
 		}
 
@@ -175,7 +177,7 @@ public class XrefExpander {
 
 	public class HasSubClassExpansion extends Rule {
 		public void expand(Frame sf, String id, String xref) {
-			Clause c = new Clause(OboFormatTag.TAG_IS_A.toString(), id);
+			Clause c = new Clause(OboFormatTag.TAG_IS_A, id);
 			getTargetFrame(xref).addClause(c);
 		}			
 	}
@@ -190,8 +192,8 @@ public class XrefExpander {
 		}
 
 		public void expand(Frame sf, String id, String xref) {
-			Clause gc = new Clause(OboFormatTag.TAG_INTERSECTION_OF.toString(), xref);
-			Clause dc = new Clause(OboFormatTag.TAG_INTERSECTION_OF.toString());
+			Clause gc = new Clause(OboFormatTag.TAG_INTERSECTION_OF, xref);
+			Clause dc = new Clause(OboFormatTag.TAG_INTERSECTION_OF);
 			dc.setValue(rel);
 			dc.addValue(tgt);
 			getTargetFrame(id).addClause(gc);
@@ -209,8 +211,8 @@ public class XrefExpander {
 		}
 
 		public void expand(Frame sf, String id, String xref) {
-			Clause gc = new Clause(OboFormatTag.TAG_INTERSECTION_OF.toString(), id);
-			Clause dc = new Clause(OboFormatTag.TAG_INTERSECTION_OF.toString());
+			Clause gc = new Clause(OboFormatTag.TAG_INTERSECTION_OF, id);
+			Clause dc = new Clause(OboFormatTag.TAG_INTERSECTION_OF);
 			dc.setValue(rel);
 			dc.addValue(tgt);
 			getTargetFrame(xref).addClause(gc);
@@ -221,7 +223,7 @@ public class XrefExpander {
 	public class IsaExpansion extends Rule {
 
 		public void expand(Frame sf, String id, String xref) {
-			Clause c = new Clause(OboFormatTag.TAG_IS_A.toString(), xref);
+			Clause c = new Clause(OboFormatTag.TAG_IS_A, xref);
 			getTargetFrame(id).addClause(c);
 		}			
 	}
@@ -233,7 +235,7 @@ public class XrefExpander {
 			this.rel = rel;
 		}
 		public void expand(Frame sf, String id, String xref) {
-			Clause c = new Clause(OboFormatTag.TAG_RELATIONSHIP.toString(), rel);
+			Clause c = new Clause(OboFormatTag.TAG_RELATIONSHIP, rel);
 			c.addValue(xref);
 			getTargetFrame(id).addClause(c);
 		}			

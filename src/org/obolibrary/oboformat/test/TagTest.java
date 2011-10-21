@@ -12,6 +12,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class TagTest extends OboFormatTestBasics {
 	
@@ -44,7 +45,7 @@ public class TagTest extends OboFormatTestBasics {
 		assertTrue(obodoc.getTermFrames().size() == 2);
 		Frame frame = obodoc.getTermFrame("x");
 		System.out.println(frame);
-		assertTrue(frame.getClause("name").getValue().equals("foo"));
+		assertTrue(frame.getClause(OboFormatTag.TAG_NAME).getValue().equals("foo"));
 	}
 
 	@Test
@@ -55,14 +56,14 @@ public class TagTest extends OboFormatTestBasics {
 		for (Clause cl : frame.getClauses()) {
 			System.out.println(cl);
 		}
-		assertTrue(frame.getClause("name").getValue().equals("foo"));
+		assertTrue(frame.getClause(OboFormatTag.TAG_NAME).getValue().equals("foo"));
 	}
 	
 	@Test
 	public void testParseDefTag() {
 		Clause cl = parseLine("def: \"a b c\" [foo:1, bar:2]");
 		System.out.println("DEF:"+cl);
-		assertTrue(cl.getTag().equals("def"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_DEF.getTag()));
 		assertTrue(cl.getValue().equals("a b c"));
 		assertTrue(cl.getValues().size() == 1);
 	}
@@ -71,28 +72,28 @@ public class TagTest extends OboFormatTestBasics {
 	public void testParseDefTag2() {
 		Clause cl = parseLine("def: \"a b c\" [foo:1 \"blah blah\", bar:2]");
 		System.out.println("DEF2:"+cl);
-		assertTrue(cl.getTag().equals("def"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_DEF.getTag()));
 		assertTrue(cl.getValue().equals("a b c"));
 	}
 
 	@Test
 	public void testParseCreationDateTag() {
 		Clause cl = parseLine("creation_date: 2009-04-28T10:29:37Z");
-		assertTrue(cl.getTag().equals("creation_date"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_CREATION_DATE.getTag()));
 		System.out.println("cr:"+cl.getValue());
 	}
 
 	@Test
 	public void testParseNameTag() {
 		Clause cl = parseLine("name: a b c");
-		assertTrue(cl.getTag().equals("name"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_NAME.getTag()));
 		assertTrue(cl.getValue().equals("a b c"));
 	}
 	
 	@Test
 	public void testParseNameTag2() {
 		Clause cl = parseLine("name:    a b c");
-		assertTrue(cl.getTag().equals("name"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_NAME.getTag()));
 		System.out.println("n2 ='"+cl.getValue()+"'");
 		assertTrue(cl.getValue().equals("a b c"));
 	}
@@ -100,14 +101,14 @@ public class TagTest extends OboFormatTestBasics {
 	@Test
 	public void testParseNamespaceTag() {
 		Clause cl = parseLine("namespace: foo");
-		assertTrue(cl.getTag().equals("namespace"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_NAMESPACE.getTag()));
 		assertTrue(cl.getValue().equals("foo"));
 	}
 	
 	@Test
 	public void testParseIsATag() {
 		Clause cl = parseLine("is_a: x ! foo");
-		assertTrue(cl.getTag().equals("is_a"));
+		assertTrue(cl.getTag().equals(OboFormatTag.TAG_IS_A.getTag()));
 		assertTrue(cl.getValue().equals("x"));
 	}
 	

@@ -15,11 +15,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -84,7 +84,7 @@ public class EquivalentToTest extends OboFormatTestBasics {
 		// test ECA between named classes is persisted using correct tag
 		if (true) {
 			Frame tf = obodoc.getTermFrame("X:1");
-			Collection<Clause> cs = tf.getClauses("equivalent_to");
+			Collection<Clause> cs = tf.getClauses(OboFormatTag.TAG_EQUIVALENT_TO);
 			assertTrue(cs.size() == 1);
 			Object v = cs.iterator().next().getValue();
 			System.out.println("V="+v);
@@ -93,7 +93,7 @@ public class EquivalentToTest extends OboFormatTestBasics {
 		// test ECA between named class and anon class is persisted as genus-differentia intersection_of tags
 		if (true) {
 			Frame tf = obodoc.getTermFrame("X:1");
-			Collection<Clause> cs = tf.getClauses("intersection_of");
+			Collection<Clause> cs = tf.getClauses(OboFormatTag.TAG_INTERSECTION_OF);
 			assertTrue(cs.size() == 2);
 			boolean okGenus = false;
 			boolean okDifferentia = false;
@@ -121,18 +121,18 @@ public class EquivalentToTest extends OboFormatTestBasics {
 		if (true) {
 			Frame tf2 = obodoc.getTermFrame("X:2");
 			System.out.println(tf2);
-			Collection<Clause> cs2 = tf2.getClauses("equivalent_to");
+			Collection<Clause> cs2 = tf2.getClauses(OboFormatTag.TAG_EQUIVALENT_TO);
 			Frame tf1 = obodoc.getTermFrame("X:1");
 			System.out.println(tf1);
-			Collection<Clause> cs1 = tf1.getClauses("equivalent_to");
+			Collection<Clause> cs1 = tf1.getClauses(OboFormatTag.TAG_EQUIVALENT_TO);
 			boolean ok = false;
 			if (cs2.size() == 1) {
-				if (cs2.iterator().next().getValue().toString().equals("X:1")) {
+				if (cs2.iterator().next().getValue(String.class).equals("X:1")) {
 					ok = true;
 				}
 			}
 			if (cs1.size() == 1) {
-				if (cs1.iterator().next().getValue().toString().equals("X:2")) {
+				if (cs1.iterator().next().getValue(String.class).equals("X:2")) {
 					ok = true;
 				}
 			}

@@ -29,10 +29,6 @@ public class OBOFormatParser {
 	
 	static final Logger LOG = Logger.getLogger(OBOFormatParser.class); 
 	
-	//final String DATA_VERSION = "data-version";
-	//final String ID = "id";
-	//final String NAME = "name";
-    
     public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
 	
 	SimpleDateFormat headerDateFormat = new SimpleDateFormat("dd:MM:yyyy HH:mm");
@@ -45,20 +41,6 @@ public class OBOFormatParser {
 	protected enum ParseState {
 		HEADER, BODY
 	}
-	
-	/*protected enum Tag {
-		ID,
-		DATA_VERSION,
-		NAMESPACE,
-		NAME
-	}
-	
-	public HashMap<String,Tag> tagMap = new HashMap<String,Tag>();
-	
-	protected void initTagMap() {
-		tagMap.put("id",Tag.ID);
-		
-	}*/
 	
 	protected class MyStream {
 		int pos=0;
@@ -109,10 +91,8 @@ public class OBOFormatParser {
 				lineNo++;
 				pos = 0;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.err.println("lineNo: "+lineNo);
-				throw new Error("uh-oh");
+				LOG.error("lineNo: "+lineNo);
+				throw new Error("Error reading from input.", e);
 			}
 		}
 		
@@ -282,8 +262,8 @@ public class OBOFormatParser {
 				Frame hf= obodoc.getHeaderFrame();
 				List<OBODoc> imports = new LinkedList<OBODoc>();
 				if(hf != null){
-					for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT.getTag())){
-						String path = resolvePath(cl.getValue() + "");
+					for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT)){
+						String path = resolvePath(cl.getValue(String.class));
 						//TBD -- changing the relative path to absolute
 						cl.setValue(path);
 						if(followImport){
@@ -358,14 +338,14 @@ public class OBOFormatParser {
 						||_tag == OboFormatTag.TAG_IS_A){
 					
 					if(c.getValues().size() >1){
-						String error = checkRelation(c.getValue().toString(), tag, f.getId(), doc);
+						String error = checkRelation(c.getValue(String.class), tag, f.getId(), doc);
 						if(error != null)
 							danglingReferences.add(error);
-						error =checkClassReference(c.getValue2().toString(), tag, f.getId(), doc);
+						error =checkClassReference(c.getValue2(String.class), tag, f.getId(), doc);
 						if(error != null)
 							danglingReferences.add(error);
 					}else{
-						String error =checkClassReference(c.getValue().toString(), tag, f.getId(), doc);
+						String error =checkClassReference(c.getValue(String.class), tag, f.getId(), doc);
 						if(error != null){
 							danglingReferences.add(error);
 						}
@@ -391,7 +371,7 @@ public class OBOFormatParser {
 						||_tag == OboFormatTag.TAG_DISJOINT_OVER
 						){
 					
-					String error= checkRelation(c.getValue().toString(),tag, f.getId(), doc);
+					String error= checkRelation(c.getValue(String.class),tag, f.getId(), doc);
 					if(error != null)
 						danglingReferences.add(error);
 				}else if(_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN
@@ -995,16 +975,16 @@ public class OBOFormatParser {
 	private boolean parseDeprecatedSynonym(String tag, Clause cl) {
 		String scope = null;
 		if (tag.equals("exact_synonym")) {
-			scope = "EXACT";
+			scope = OboFormatTag.TAG_EXACT.getTag();
 		}
 		else if (tag.equals("narrow_synonym")) {
-			scope = "NARROW";		
+			scope = OboFormatTag.TAG_NARROW.getTag();		
 		}
 		else if (tag.equals("broad_synonym")) {
-			scope = "BROAD";
+			scope = OboFormatTag.TAG_BROAD.getTag();
 		}
 		else if (tag.equals("related_synonym")) {
-			scope = "RELATED";
+			scope = OboFormatTag.TAG_RELATED.getTag();
 		}
 		else {
 			return false;

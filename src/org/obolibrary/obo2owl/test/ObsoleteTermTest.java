@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -59,7 +60,7 @@ public class ObsoleteTermTest extends OboFormatTestBasics {
 		// CONVERT BACK TO OBO
 		OBODoc obodoc = convert(ontology);
 		Frame tf = obodoc.getTermFrame("XX:0000034");
-		Clause c = tf.getClause("is_obsolete");
+		Clause c = tf.getClause(OboFormatTag.TAG_IS_OBSELETE);
 		Object v = c.getValue();
 		System.out.println("V="+v);
 		assertTrue(v.equals("true")); // should this be a Boolean object? TODO
