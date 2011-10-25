@@ -8,8 +8,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
@@ -843,10 +845,6 @@ public class OBOFormatParser {
 		return mapDeprecatedTag(tag);
 	}
 	
-	private boolean parseId(Clause cl) {
-		return parseIdRef(cl);
-	}
-	
 	private boolean parseIdRef(Clause cl) {
 		String id = getParseUntil(" !{");
 		if (id == null || id.equals(""))
@@ -1006,20 +1004,31 @@ public class OBOFormatParser {
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('[')) {
 				// neither scope nor type specified
-				return parseXrefList(cl);
+				return parseSynonymXrefs(cl, true);
 			}
 			else if (parseSynonymScope(cl)) {
 				parseZeroOrMoreWs();
 				if (s.peekCharIs('[')) {
-					return parseXrefList(cl);
+					return parseSynonymXrefs(cl, true);
 				}
 				else if (parseSynontmType(cl)) {
 					parseZeroOrMoreWs();
-					return parseXrefList(cl);
+					return parseSynonymXrefs(cl, s.peekCharIs('['));
 				}
 			}
 		}
 		return false;
+	}
+
+	protected boolean parseSynonymXrefs(Clause cl, boolean createEmpty) {
+		boolean parseXrefList = parseXrefList(cl);
+		if (createEmpty) {
+			Collection<Xref> xrefs = cl.getXrefs();
+			if (xrefs == null) {
+				cl.setXrefs(new Vector<Xref>(0));
+			}
+		}
+		return parseXrefList;
 	}
 
 	private boolean parseSynontmType(Clause cl) {
@@ -1183,10 +1192,6 @@ public class OBOFormatParser {
 		}
 		// throw
 		return false;
-	}
-
-	private boolean parseNamespace(Clause cl) {
-		return parseIdRef(cl);	
 	}
 
 	protected boolean parseIdLine(Frame f) {

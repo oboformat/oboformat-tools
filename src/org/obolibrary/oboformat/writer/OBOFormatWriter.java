@@ -47,8 +47,6 @@ public class OBOFormatWriter {
 		return isCheckStructure;
 	}
 
-
-
 	public void setCheckStructure(boolean isCheckStructure) {
 		this.isCheckStructure = isCheckStructure;
 	}
@@ -252,7 +250,7 @@ public class OBOFormatWriter {
 				String annotation = xref.getAnnotation();
 				if (annotation != null) {
 					sb.append(" \"");
-					sb.append(escapeOboString(annotation));
+					sb.append(escapeOboString(annotation, EscapeMode.quotes));
 					sb.append('"');
 				}
 			}
@@ -273,7 +271,7 @@ public class OBOFormatWriter {
 		for(int i=0;i<values.size();i++) {
 			String value = valuesIterator.next().toString();
 			if (i==1) { sb.append('"'); }
-			sb.append(escapeOboString(value));
+			sb.append(escapeOboString(value, EscapeMode.quotes));
 			if (i==1) { sb.append('"'); }
 			if (valuesIterator.hasNext()) { sb.append(' '); }
 		}
@@ -290,7 +288,7 @@ public class OBOFormatWriter {
 		while (valuesIterator.hasNext()) {
 			if (first) { sb.append('"'); }
 			String value = valuesIterator.next().toString();
-			sb.append(escapeOboString(value));
+			sb.append(escapeOboString(value, EscapeMode.quotes));
 			if (first) { sb.append('"'); }
 			if (valuesIterator.hasNext()) { sb.append(' ');}
 			first = false;
@@ -397,7 +395,11 @@ public class OBOFormatWriter {
 
 				}
 			}
-			sb.append(escapeOboString(value));
+			EscapeMode mode = EscapeMode.all;
+			if (OboFormatTag.TAG_COMMENT.getTag().equals(clause.getTag())) {
+				mode = EscapeMode.simple;
+			}
+			sb.append(escapeOboString(value, mode));
 			if (valuesIterator.hasNext()) {
 				sb.append(' ');
 			}
@@ -432,7 +434,7 @@ public class OBOFormatWriter {
 				QualifierValue qv = qvsIterator.next();
 				sb.append(qv.getQualifier());
 				sb.append("=\"");
-				sb.append(escapeOboString(qv.getValue().toString()));
+				sb.append(escapeOboString(qv.getValue().toString(), EscapeMode.quotes));
 				sb.append("\"");
 				if (qvsIterator.hasNext()) {
 					sb.append(", ");
@@ -442,7 +444,14 @@ public class OBOFormatWriter {
 		}
 	}
 
-	private CharSequence escapeOboString(String in) {
+	private enum EscapeMode {
+		all, // all
+		parenthesis, // newline and parenthesis
+		quotes, // newlines and quotes
+		simple // only newlines
+	}
+	
+	private CharSequence escapeOboString(String in, EscapeMode mode) {
 		boolean modfied = false;
 		StringBuilder sb = new StringBuilder();
 		int length = in.length();
@@ -452,15 +461,15 @@ public class OBOFormatWriter {
 				modfied = true;
 				sb.append("\\n");
 			}
-			else if (c == '"') {
+			else if (c == '"' && (mode == EscapeMode.all || mode == EscapeMode.quotes)) {
 				modfied = true;
 				sb.append("\\\"");
 			}
-			else if (c == '{') {
+			else if (c == '{' && (mode == EscapeMode.all || mode == EscapeMode.parenthesis)) {
 				modfied = true;
 				sb.append("\\{");
 			}
-			else if (c == '}') {
+			else if (c == '}' && (mode == EscapeMode.all || mode == EscapeMode.parenthesis)) {
 				modfied = true;
 				sb.append("\\}");
 			}
