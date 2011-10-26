@@ -43,6 +43,7 @@ import org.obolibrary.oboformat.test.*;
 	XrefExpanderTest.class,
 	OboEscapeCharsTest.class,
 	ChebiXRefTest.class,
+	EmptyLinesTest.class,
 	
 	// macro expansion
 	ExpandExpressionTest.class,

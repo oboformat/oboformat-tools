@@ -59,7 +59,7 @@ public class OBOFormatParser {
 			reader = r;
 		}
 		
-		public char peekChar() {
+		private char peekChar() {
 			prepare();
 			return line.charAt(pos);
 		}
@@ -422,7 +422,7 @@ public class OBOFormatParser {
 	}
 	
 	public boolean parseHeaderFrame(Frame h) {
-		if (s.peekChar() == '[') 
+		if (s.peekCharIs('[')) 
 			return false;
 		while (parseHeaderClauseNl(h)) {
 			
@@ -435,7 +435,7 @@ public class OBOFormatParser {
 	 */
 	protected boolean parseHeaderClauseNl(Frame h) {
 		parseZeroOrMoreWsOptCmtNl();
-		if (s.peekChar() == '[') 
+		if (s.peekCharIs('[')) 
 			return false;
 
 		if (parseHeaderClause(h)) {
@@ -1233,9 +1233,7 @@ public class OBOFormatParser {
 		while (parseWs()) {
 			
 		}
-		if (s.eol() || s.eof())
-			return false;
-		if (s.peekChar() == '!') {
+		if (s.peekCharIs('!')) {
 			s.forceEol();
 			return true;
 		}
