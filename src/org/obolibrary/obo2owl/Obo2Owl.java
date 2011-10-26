@@ -63,7 +63,7 @@ public class Obo2Owl {
 
 	public static final String IRI_PROP_isReversiblePropertyChain =  Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_isReversiblePropertyChain";
 
-	private static String defaultIDSpace = "";
+	private String defaultIDSpace = "";
 	OWLOntologyManager manager;
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
@@ -1260,7 +1260,7 @@ public class Obo2Owl {
 		}
 
 
-		String uriPrefix = DEFAULT_IRI_PREFIX+db;
+		String uriPrefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX+db;
 		if (idSpaceMap.containsKey(db)) {
 			uriPrefix = idSpaceMap.get(db);
 		}
