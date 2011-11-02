@@ -246,7 +246,7 @@ public class OBOFormatWriter {
 			sb.append(clause.getTag());
 			sb.append(": ");
 			if (xref.getIdref() != null) {
-				sb.append(xref.getIdref());
+				sb.append(escapeOboString(xref.getIdref(), EscapeMode.xref));
 				String annotation = xref.getAnnotation();
 				if (annotation != null) {
 					sb.append(" \"");
@@ -315,7 +315,7 @@ public class OBOFormatWriter {
 
 		Iterator<Xref> xrefsIterator = sortedXrefs.iterator();
 		while (xrefsIterator.hasNext()) {
-			sb.append(xrefsIterator.next().getIdref());
+			sb.append(escapeOboString(xrefsIterator.next().getIdref(), EscapeMode.xrefList));
 			if (xrefsIterator.hasNext()) {
 				sb.append(", ");
 			}
@@ -395,7 +395,7 @@ public class OBOFormatWriter {
 
 				}
 			}
-			EscapeMode mode = EscapeMode.all;
+			EscapeMode mode = EscapeMode.most;
 			if (OboFormatTag.TAG_COMMENT.getTag().equals(clause.getTag())) {
 				mode = EscapeMode.simple;
 			}
@@ -445,10 +445,12 @@ public class OBOFormatWriter {
 	}
 
 	private enum EscapeMode {
-		all, // all
-		parenthesis, // newline and parenthesis
-		quotes, // newlines and quotes
-		simple // only newlines
+		most, // all except xref and xrefList
+		parenthesis, // simple + parenthesis
+		quotes, // simple + quotes
+		xref, // simple + comma
+		xrefList, // xref + closing brackets
+		simple // newline and backslash
 	}
 	
 	private CharSequence escapeOboString(String in, EscapeMode mode) {
@@ -461,17 +463,29 @@ public class OBOFormatWriter {
 				modfied = true;
 				sb.append("\\n");
 			}
-			else if (c == '"' && (mode == EscapeMode.all || mode == EscapeMode.quotes)) {
+			else if (c == '\\') {
+				modfied = true;
+				sb.append("\\\\");
+			}
+			else if (c == '"' && (mode == EscapeMode.most || mode == EscapeMode.quotes)) {
 				modfied = true;
 				sb.append("\\\"");
 			}
-			else if (c == '{' && (mode == EscapeMode.all || mode == EscapeMode.parenthesis)) {
+			else if (c == '{' && (mode == EscapeMode.most || mode == EscapeMode.parenthesis)) {
 				modfied = true;
 				sb.append("\\{");
 			}
-			else if (c == '}' && (mode == EscapeMode.all || mode == EscapeMode.parenthesis)) {
+			else if (c == '}' && (mode == EscapeMode.most || mode == EscapeMode.parenthesis)) {
 				modfied = true;
 				sb.append("\\}");
+			}
+			else if (c == ',' && (mode == EscapeMode.xref || mode == EscapeMode.xrefList)) {
+				modfied = true;
+				sb.append("\\,");
+			}
+			else if (c == ']' && mode == EscapeMode.xrefList) {
+				modfied = true;
+				sb.append("\\]");
 			}
 			else {
 				sb.append(c);
