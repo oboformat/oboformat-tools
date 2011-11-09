@@ -34,6 +34,7 @@ xref: FlyBrain_NDB:10089
 is_a: FBbt:00005106  ! neuron
 relationship: synapsed_by FBbt:00006007 ! outer photoreceptor cell
 relationship: synapsed_to FBbt:00003744 ! centrifugal neuron C3
+relationship: synapsed_to FBbt:00003743 ! centrifugal neuron C2
 
 [Term]
 id: FBbt:00006007
@@ -48,6 +49,9 @@ name: centrifugal neuron C3
 namespace: fly_anatomy.ontology
 def: "A centrifugal neuron with wide field arborizations in the medulla layers M1-2, M5, and M8-10 and more restricted arborizations in the lamina (Fischbach and Dittrich, 1989). In the lamina it is presynaptic to lamina monopolar neurons. In the medulla it is presynaptic to monopolar lamina neuron L2 and to T1, and postsynaptic to L1." [FlyBase:FBrf0049410]
 is_a: FBbt:00005106  ! neuron
+
+[Term]
+id: FBbt:00003743 ! centrifugal neuron C2
 
 [Term]
 id: FBbt:00003271
