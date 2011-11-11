@@ -90,8 +90,8 @@ public class MacroExpansionVisitor {
 			if(DEBUG)
 				log.debug("Template to Expand" + expandTo);
 			
-			expandTo = expandTo.replaceAll("\\?X", ManchesterSyntaxTool.getId((IRI)ax.getSubject()));
-			expandTo = expandTo.replaceAll("\\?Y", ManchesterSyntaxTool.getId((IRI)ax.getValue()));
+			expandTo = expandTo.replaceAll("\\?X", manchesterSyntaxTool.getId((IRI)ax.getSubject()));
+			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId((IRI)ax.getValue()));
 
 			if(DEBUG)
 				log.debug("Expanding " + expandTo);
@@ -158,7 +158,7 @@ public class MacroExpansionVisitor {
 					String tStr = expandExpressionMap.get(iri);
 					
 					System.out.println("t: "+tStr);
-					String exStr = tStr.replaceAll("\\?Y", ManchesterSyntaxTool.getId( templateVal));
+					String exStr = tStr.replaceAll("\\?Y", manchesterSyntaxTool.getId( templateVal));
 					System.out.println("R: "+exStr);
 
 					try {

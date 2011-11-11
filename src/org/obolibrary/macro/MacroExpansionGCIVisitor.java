@@ -76,8 +76,8 @@ public class MacroExpansionGCIVisitor {
 			if(DEBUG)
 				log.debug("Template to Expand" + expandTo);
 			
-			expandTo = expandTo.replaceAll("\\?X", ManchesterSyntaxTool.getId((IRI) ax.getSubject()));
-			expandTo = expandTo.replaceAll("\\?Y", ManchesterSyntaxTool.getId((IRI) ax.getValue()));
+			expandTo = expandTo.replaceAll("\\?X", manchesterSyntaxTool.getId((IRI) ax.getSubject()));
+			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId((IRI) ax.getValue()));
 
 			if(DEBUG)
 				log.debug("Expanding " + expandTo);
@@ -103,12 +103,12 @@ public class MacroExpansionGCIVisitor {
 		@Override
 		OWLClassExpression expandOWLObjSomeVal(OWLClassExpression filler, OWLObjectPropertyExpression p) {
 			OWLClassExpression gciRHS = expandObject(filler, p);
-			OWLClassExpression gciLHS = dataFactory.getOWLObjectSomeValuesFrom(p, filler);
-			OWLEquivalentClassesAxiom ax = 
-				this.dataFactory.getOWLEquivalentClassesAxiom(
-					gciLHS, gciRHS
-					);
-			output(ax);
+			if (gciRHS != null) {
+				OWLClassExpression gciLHS = dataFactory.getOWLObjectSomeValuesFrom(p, filler);
+				OWLEquivalentClassesAxiom ax = 
+					this.dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
+				output(ax);
+			}
 			return gciRHS;
 		}
 	
@@ -116,12 +116,12 @@ public class MacroExpansionGCIVisitor {
 		OWLClassExpression expandOWLObjHasVal(OWLObjectHasValue desc, OWLIndividual filler,
 				OWLObjectPropertyExpression p) {
 			OWLClassExpression gciRHS = expandObject(filler, p);
-			OWLClassExpression gciLHS = dataFactory.getOWLObjectHasValue(p, filler);
-			OWLEquivalentClassesAxiom ax = 
-				this.dataFactory.getOWLEquivalentClassesAxiom(
-					gciLHS, gciRHS
-					);
-			output(ax);
+			if (gciRHS != null) {
+				OWLClassExpression gciLHS = dataFactory.getOWLObjectHasValue(p, filler);
+				OWLEquivalentClassesAxiom ax = 
+						this.dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
+				output(ax);
+			}
 			return gciRHS;
 		}
 
@@ -151,7 +151,7 @@ public class MacroExpansionGCIVisitor {
 					String tStr = expandExpressionMap.get(iri);
 					
 					System.out.println("t: "+tStr);
-					String exStr = tStr.replaceAll("\\?Y", ManchesterSyntaxTool.getId( templateVal));
+					String exStr = tStr.replaceAll("\\?Y", manchesterSyntaxTool.getId( templateVal));
 					System.out.println("R: "+exStr);
 	
 					try {

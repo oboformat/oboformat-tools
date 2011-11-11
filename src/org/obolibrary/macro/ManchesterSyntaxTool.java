@@ -12,10 +12,13 @@ import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owlapi.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.util.IRIShortFormProvider;
+import org.semanticweb.owlapi.util.ShortFormProvider;
+import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
 
 
 /**
@@ -29,6 +32,8 @@ class ManchesterSyntaxTool {
 	private static final Logger log = Logger.getLogger(ManchesterSyntaxTool.class);
 	private static final boolean DEBUG = log.isDebugEnabled();
 	
+	private final IRIShortFormProvider iriShortFormProvider;
+	
 	private final OWLDataFactory dataFactory;
 	private OWLEntityChecker entityChecker;
 
@@ -36,11 +41,25 @@ class ManchesterSyntaxTool {
 		super();
 		OWLOntologyManager manager = inputOntology.getOWLOntologyManager();
 		this.dataFactory = manager.getOWLDataFactory();
+
+		// re-use the same short form provider for translation and parsing 
+		iriShortFormProvider = new SimpleIRIShortFormProvider();
+		ShortFormProvider shortFormProvider = new ShortFormProvider() {
+
+			public void dispose() {
+				// do nothing
+			}
+
+			public String getShortForm(OWLEntity owlEntity) {
+				return iriShortFormProvider.getShortForm(owlEntity.getIRI());
+			}
+		};
+		
 		entityChecker = new ShortFormEntityChecker(
                 new BidirectionalShortFormProviderAdapter(
                         manager,
                         Collections.singleton(inputOntology),
-                        new SimpleShortFormProvider()));
+                        shortFormProvider));
 	}
 	
 	Set<OntologyAxiomPair> parseManchesterExpressionFrames(String expression) throws ParserException {
@@ -70,25 +89,13 @@ class ManchesterSyntaxTool {
 	}
 
 	/**
-	 * TODO: document behavior
+	 * Translate the {@link IRI} into the short form as expected by the parser.
 	 * 
 	 * @param iri
-	 * @return
+	 * @return short form
 	 */
-	static String getId(IRI iri){
-		String iriString = iri.toString();
-		String id = null;
-		
-		String s[] =iriString.split("#");
-		
-		if(s.length>1){
-			id = s[1];
-		}else{
-			int index = iriString.lastIndexOf("/");
-			id = iriString.substring(index+1);
-		}
-		
-		return id;
+	String getId(IRI iri){
+		return iriShortFormProvider.getShortForm(iri);
 		
 	}
 }

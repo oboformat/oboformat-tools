@@ -66,6 +66,23 @@ id: GO:0045202
 [Term]
 id: GO:0045211
 
+[Term]
+id: FBbt:00004154
+name: chemosensory labral sensillum 7
+subset: cur
+is_a: FBbt:00007232 ! eo-type sensillum
+relationship: has_function_in GO:0050907 ! detection of chemical stimulus involved in sensory perception
+relationship: part_of FBbt:00004146 ! adult labral sense organ
+
+[Term]
+id: FBbt:00007232
+
+[Term]
+id: FBbt:00004146
+
+[Term]
+id: GO:0050907
+
 [Typedef]
 id: overlaps
 name: overlaps
