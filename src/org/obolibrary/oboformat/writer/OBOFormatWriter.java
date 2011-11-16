@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -104,7 +103,7 @@ public class OBOFormatWriter {
 		write(doc, writer);
 	}
 
-	public void write(OBODoc doc, String outFile) throws IOException, URISyntaxException{
+	public void write(OBODoc doc, String outFile) throws IOException {
 
 		FileOutputStream os = new FileOutputStream(new File( outFile )); 
 		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
@@ -120,8 +119,9 @@ public class OBOFormatWriter {
 			doc.check();
 		}
 		Frame headerFrame = doc.getHeaderFrame();
+		NameProvider nameProvider = new OBODocNameProvider(doc);
 
-		writeHeader(headerFrame, writer, doc);
+		writeHeader(headerFrame, writer, nameProvider);
 
 		List<Frame> termFrames = new ArrayList<Frame>();
 		termFrames.addAll(doc.getTermFrames());
@@ -133,11 +133,11 @@ public class OBOFormatWriter {
 
 
 		for(Frame f: termFrames){
-			write(f, writer, doc);
+			write(f, writer, nameProvider);
 		}
 
 		for(Frame f: typeDefFrames){
-			write(f, writer, doc);
+			write(f, writer, nameProvider);
 		}
 	}
 
@@ -164,12 +164,12 @@ public class OBOFormatWriter {
 		return tags;
 	}
 
-	public void writeHeader(Frame frame, BufferedWriter writer, OBODoc oboDoc) throws IOException{
+	public void writeHeader(Frame frame, BufferedWriter writer, NameProvider nameProvider) throws IOException{
 
 		List<String> tags = duplicateTags(frame.getTags());
 		Collections.sort(tags, HeaderTagsComparator.instance);
 
-		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer, oboDoc);
+		write(new Clause(OboFormatTag.TAG_FORMAT_VERSION.getTag(), "1.2"), writer, nameProvider);
 		
 		for(String tag: tags){
 
@@ -185,7 +185,7 @@ public class OBOFormatWriter {
 				}else if(tag.equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())){
 					writeSynonymtypedef(clause, writer);
 				}else
-					write(clause, writer, oboDoc);
+					write(clause, writer, nameProvider);
 			}
 		}
 
@@ -194,7 +194,7 @@ public class OBOFormatWriter {
 
 	}
 
-	public void write(Frame frame, BufferedWriter writer, OBODoc oboDoc) throws IOException{
+	public void write(Frame frame, BufferedWriter writer, NameProvider nameProvider) throws IOException{
 
 		Comparator<String> comparator = null;
 
@@ -232,7 +232,7 @@ public class OBOFormatWriter {
 				else if (OboFormatTag.TAG_XREF.getTag().equals(clause.getTag()))
 					writeXRefClause(clause, writer);
 				else
-					write(clause, writer, oboDoc);
+					write(clause, writer, nameProvider);
 			}
 		}
 		writeEmptyLine(writer);
@@ -365,14 +365,14 @@ public class OBOFormatWriter {
 		writeClauseWithQuotedString(clause, writer);
 	}
 
-	public void write(Clause clause, BufferedWriter writer, OBODoc oboDoc) throws IOException{
+	public void write(Clause clause, BufferedWriter writer, NameProvider nameProvider) throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(clause.getTag());
 		sb.append(": ");
 
 		Iterator<Object> valuesIterator = clause.getValues().iterator();
 		StringBuilder idsLabel = null;
-		if (oboDoc != null && tagsInformative.contains(clause.getTag())) {
+		if (nameProvider != null && tagsInformative.contains(clause.getTag())) {
 			idsLabel = new StringBuilder();
 		}
 
@@ -380,19 +380,13 @@ public class OBOFormatWriter {
 			String value = valuesIterator.next().toString();
 			if(idsLabel != null && !valuesIterator.hasNext()){
 				// only try to resolve the last value as id
-				Frame f= oboDoc.getTermFrame(value);
-				if(f == null){
-					f = oboDoc.getTypedefFrame(value);
-				}
-
-				if(f != null){
-					Clause cl = f.getClause(OboFormatTag.TAG_NAME);
-					if(cl != null){
+				if (nameProvider != null) {
+					String label = nameProvider.getName(value);
+					if (label != null) {
 						if(idsLabel.length() > 0)
 							idsLabel.append(" ");
-						idsLabel.append(cl.getValue(String.class));
+						idsLabel.append(label);
 					}
-
 				}
 			}
 			EscapeMode mode = EscapeMode.most;
@@ -748,4 +742,52 @@ public class OBOFormatWriter {
 		}
 	}
 
+	/**
+	 * Provide names for given OBO identifiers.
+	 * 
+	 * This abstraction layer allows to find names from different sources, 
+	 * including {@link OBODoc}.
+	 */
+	public static interface NameProvider {
+		
+		/**
+		 * Try to retrieve the valid name for the given identifier. 
+		 * If not available return null.
+		 * 
+		 * @param id identifier
+		 * @return name or null
+		 */
+		public String getName(String id);
+	}
+	
+	/**
+	 * Default implementation of a {@link NameProvider} using an 
+	 * underlying {@link OBODoc}.
+	 */
+	public static class OBODocNameProvider implements NameProvider {
+		private final OBODoc oboDoc;
+
+		/**
+		 * @param oboDoc
+		 */
+		public OBODocNameProvider(OBODoc oboDoc) {
+			super();
+			this.oboDoc = oboDoc;
+		}
+
+		public String getName(String id) {
+			String name = null;
+			Frame frame = oboDoc.getTermFrame(id);
+			if(frame == null) {
+				frame = oboDoc.getTypedefFrame(id);
+			}
+			if(frame != null){
+				Clause cl = frame.getClause(OboFormatTag.TAG_NAME);
+				if(cl != null){
+					name = cl.getValue(String.class);
+				}
+			}
+			return name;
+		}
+	}
 }
