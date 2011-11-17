@@ -62,7 +62,7 @@ public class OBOFormatWriter {
 		set.add( OboFormatTag.TAG_INTERSECTION_OF.getTag());
 		set.add( OboFormatTag.TAG_UNION_OF.getTag());
 		set.add( OboFormatTag.TAG_EQUIVALENT_TO.getTag());
-		set.add( OboFormatTag.TAG_REPLACED_BY.getTag());
+		// set.add( OboFormatTag.TAG_REPLACED_BY.getTag()); // removed to be compatible with OBO-Edit
 		set.add( OboFormatTag.TAG_PROPERTY_VALUE.getTag());
 		set.add( OboFormatTag.TAG_DOMAIN.getTag());
 		set.add( OboFormatTag.TAG_RANGE.getTag());
@@ -378,11 +378,13 @@ public class OBOFormatWriter {
 
 		while (valuesIterator.hasNext()) {
 			String value = valuesIterator.next().toString();
-			if(idsLabel != null && !valuesIterator.hasNext()){
-				// only try to resolve the last value as id
+			if(idsLabel != null){
 				if (nameProvider != null) {
 					String label = nameProvider.getName(value);
-					if (label != null) {
+					if (label != null && (isOpaqueIdentifier(value) || !valuesIterator.hasNext())) {
+						// only print label if the label exists
+						// and the label is different from the id
+						// relationships: ID part_of LABEL part_of
 						if(idsLabel.length() > 0)
 							idsLabel.append(" ");
 						idsLabel.append(label);
@@ -417,6 +419,34 @@ public class OBOFormatWriter {
 			}
 		}
 		writeLine(sb, writer);
+	}
+	
+	/**
+	 * Check if the value is an identifier.
+	 * 
+	 * @param value
+	 * @return boolean
+	 */
+	private boolean isOpaqueIdentifier(String value) {
+		boolean result = false;
+		if (value != null && value.length() > 0) {
+			// check for colon
+			int colonPos = value.indexOf(':');
+			if (colonPos > 1) {
+				// check that the suffix after the colon contains only digits
+				if (value.length() > (colonPos + 1)) {
+					result = true;
+					for (int i = colonPos; i < value.length(); i++) {
+						char c = value.charAt(i);
+						if (!Character.isDigit(c)) {
+							result = false;
+							break;
+						}
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	private void appendQualifiers(StringBuilder sb, Clause clause) {
