@@ -111,25 +111,27 @@ body {
 						 alt="The Open Biological and Biomedical Ontology Foundry" /></a>
 <h1 class="mainTitle">
 OBO Flat File Format 1.4 Syntax and Semantics [WORKING DRAFT]</h1>
-<h2><a id="editordraft" name="editordraft"></a>Editor's Draft: $Date$</h2>
+<h2><a id="editordraft" name="editordraft"></a>Editor's Draft: November 2011</h2>
 <dl>
-  <dt>This version: </dt>  <dd><a href="http://purl.obolibrary.org/obo/oboformat/2011-08-28/doc/obo-syntax.html">http://purl.obolibrary.org/obo/oboformat/2011-08-28/doc/obo-syntax.html</a></dd>
+  <dt>This version: </dt>  <dd><a href="http://purl.obolibrary.org/obo/oboformat/2011-11-29/doc/obo-syntax.html">http://purl.obolibrary.org/obo/oboformat/2011-08-28/doc/obo-syntax.html</a></dd>
   <dt>Editor's version: </dt>  <dd><a href="http://oboformat.googlecode.com/svn/trunk/doc/obo-syntax.html">http://oboformat.googlecode.com/svn/trunk/doc/obo-syntax.html</a></dd>
   <dt>Latest version: </dt>  <dd><a href="http://purl.obolibrary.org/obo/oboformat/spec.html">http://purl.obolibrary.org/obo/oboformat/spec.html</a></dd>
-  <dt>Previous version: </dt>  <dd><a href="http://www.cs.man.ac.uk/~horrocks/obo/syntax.html">http://www.cs.man.ac.uk/~horrocks/obo/syntax.html</a></dd>
+  <dt>Previous version: </dt>  <dd><a href="http://purl.obolibrary.org/obo/oboformat/2011-08-28/doc/obo-syntax.html">http://purl.obolibrary.org/obo/oboformat/2011-08-28/doc/obo-syntax.html</a></dd>
  <dt>Editors: </dt>
   <dd>Chris Mungall, Lawrence Berkeley National Laboratory</dd>
   <dd>Alan Ruttenberg, University at Buffalo</dd>
+  <dd>Ian Horrocks, University of Oxford</dd>
   <dd>David Osumi-Sutherland, Cambridge University</dd>
  <dt>Contributors: </dt>
   <dd>Erick Antezana, Bayer CropScience</dd>
   <dd>James Balhoff, National Evolutionary Synthesis Center</dd>
   <dd>Melanie Courtot,  British Columbia Cancer Research Center</dd>
+  <dd>Heiko Dietze, Lawrence Berkeley National Laboratory</dd>
   <dd>John Day-Richter, Google</dd>
   <dd>Amelia Ireland, The Jackson Laboratory</dd>
+  <dd>Suzanna Lewis, Lawrence Berkeley National Laboratory</dd>
   <dd>Shahid Manzoor, Lawrence Berkeley National Laboratory</dd>
   <dd>Syed Hamid Tirmizi, University of Texas</dd>
-
 </dl>
 <hr>
 </div>
@@ -184,50 +186,59 @@ OBO Flat File Format 1.4 Syntax and Semantics [WORKING DRAFT]</h1>
 
 <h2><a name="1"></a>1 Introduction</h2>
 
-<p>On completion, this document will provide a formalisation (using
-BNF) of
-the <a href="http://www.godatabase.org/dev/doc/obo_format_spec.html">OBO
-Flat File Format Specification, version 1.4</a> (which we will refer
-to from now on as OBOF), and a semantics for the language defined via
-a translation to the OWL DL abstract syntax.</p>
+<p>This document specifies the syntax and semantics of OBO Format (OBOF)</p>
 
 <p>
-  The first part of this document describes the syntax of OBO Format
-  using BNF. OBO Files are parsed into abstract OBO documents. A
-  mapping is provided between abstract OBO documents and OWL2 and
-  community metadata vocabularies.
+  The first part of this specification describes the syntax and
+  structure of OBO Format using BNF. This states how strings of
+  characters in OBOF Files are parsed into abstract OBO documents, and
+  describes constraints on the structure of these documents. The
+  second part of this specification describes the semantics of an OBO
+  document via a mapping to OWL2-DL and community metadata
+  vocabularies.
 </p>
 
-<h2><a name="1.1"></a>1.1 Relationship to previous translations</h2>
+<h2><a name="1.1"></a>1.1 Relationship to previous specifications and translations</h2>
 
+<p>
+This specification builds on previous attempts to specify the syntax
+            and/or semantics of OBOF.
+</p>
+
+<h2><a name="1.1.1"></a>1.1.1 Golbreich and Horrocks translation</h2>
 <p>
   This document is derived from and indebted to a previous document by
   Ian Horrocks [<cite><a href="#obo-owl-horrocks" title="">OBO-OWL
   Horrocks</a></cite>], later described in an accompanying paper
   [<cite><a href="#obo-owl-golbreich" title="">OBO-OWL
   Golbreich</a></cite>]. This document provided a semantics for OBO
-  Format in terms of OWL-DL and what was then OWL1.1. The syntax was
-  underspecified and the mapping was incomplete as there was no
-  treatment of annotation properties.
+  Format in terms of OWL-DL and what was then called OWL1.1 (later to
+  become OWL2). The syntax was underspecified and the mapping was
+  incomplete as there was no treatment of annotation properties.
 </p>
-
 <p>
-  The OboInOwl vocabulary attempted to fill in the gaps in the
-  Horrocks translation by providing a full translation of all of
-  obof1.2, including synonyms and definitions using the n-ary
-  relations pattern. [<cite><a href="#obo-owl-ncbo" title="">OBO-OWL
-  NCBO</a></cite>]. This vocabulary has been implemented in many
-  tools, including OboEdit2.1 and the Berkeley OBO converter. This
-  vocabulary is also currently (Aug 2010) used in the official OBO
-  Foundry conversions available from the Berkeley ontologies download
-  site and the accompanying Neurocommons triplestore. However, whilst
-  the n-ary relations pattern represented OBO metadata correctly, the
-  mapping has undesirable side-effects, such as introducing modeling
-  classes and individuals into an ontology, affecting both reasoning
-  and usability. The mapping was never adopted by Protege4.
+<b>implementation:</b> This mapping was implemented in the OWLAPI, and
+            is consequently used by current versions of Protege4
 </p>
 
+<h2><a name="1.1.2"></a>1.1.2 OboInOwl</h2>
+<p>
+  The OboInOwl mapping attempted to fill in the gaps in the Horrocks
+  translation by providing a full translation of all of OBOF 1.2,
+  including synonyms and definitions[<cite><a href="#obo-owl-ncbo"
+  title="">OBO-OWL NCBO</a></cite>]. This mapping requires use of the
+  n-ary relations pattern to represent OBO metadata in its entirety.
+  This has undesirable side-effects, such as introducing modeling
+  classes and individuals into an ontology, affecting both reasoning
+  and usability.
+</p>
+<p>
+<b>implementation:</b>This mapping was implemented via an XSLT
+  translation from OBO-XML. All class and ontology URIs are of the
+  form <b>http://purl.org/obo/owl</b>.
+</p>
 
+<h2><a name="1.1.3"></a>1.1.3. OBO Format 1.3 mapping</h2>
 <p>
   OBO Format 1.3 was accompanied by a grammar and mapping to FOL
   [<cite><a href="#obolog" title="">Obolog</a></cite>]. This mapping
@@ -236,35 +247,78 @@ a translation to the OWL DL abstract syntax.</p>
   relations and ternary temporally-qualified instance-level
   relations. However, this introduced too large an impedance mismatch
   between OBOF and OWL, and as a consequence OBOF1.3 and Obolog have
-  been deprecated.
+  been <b>deprecated</b>.
+</p>
+<p>
+<b>implementation:</b>Deprecated.
 </p>
 
+<h2><a name="1.1.4"></a>1.1.4 Tirmizi et al</h2>
 <p>
   More recent work by Tirmizi provides an implementation of a fully
   roundtrippable mapping between OBO to OWL and back
   [<cite><a href="#obo-owl-swat4ls" title="">OBO-OWL
   SWAT4LS</a></cite>] [<cite><a href="#obo-owl-jbms" title="">OBO-OWL
   JBMS</a></cite>]. This did not attempt to provide a full grammar,
-  and relied on previous efforts for defining the semantics. 
+  and implemented the same specification as <a href="#1.1.2">1.1.2</a>
 </p>
+<p>
+<b>implementation:</b>OBO-Edit 2.0 (removed from OBO-Edit-2.1)
+</p>
+
+<h2><a name="1.1.5"></a>1.1.5 OBO Format Guides</h2>
+<p>
+The OBO Format 1.2 guide is too loose to be regarded as a full
+            specification. It served as a basis for
+            (<a href="#1.1.1">1.1.1</a>).
+</p>
+<h2><a name="1.1.6"></a>1.1.6 Normative mapping</h2>
+<p>
+  This document supersedes previous efforts. The goal is to provide a
+  complete, normative specification of both the syntax and semantics
+  of OBOF1.4. The syntax and semantics specified here also hold for
+  any OBOF1.2 document.
+</p>
+<p>
+  The mapping provided here is consistent with the original
+  Golbreich/Horrocks translation (<a href="#1.1.1">1.1.1</a>). It improves
+  on this translation by specifying the grammar in full, and by
+  providing a full mapping of all OBOF constructs to OWL2, through a
+  combined use of the Information Artefact Ontology (IAO) and the
+  OboInOwl vocabulary.
+</p>
+<p>
+  This mapping uses a different means of translating OBOF
+  terminological elements (synonyms, definitions, etc) to OWL2 than
+  the one provided in <a href="#1.1.2">1.1.2</a>. The n-ary relations
+  pattern has been abandoned, and replaced by the use of OWL2
+  AxiomAnnotations. Many of the OboInOwl vocabulary elements have been
+  replaced by IAO annotation properties. This mapping also uses a
+  different URI scheme. In place of the
+  deprecated <b>http://purl.org/obo/owl</b> URIs, the OBO Foundry
+  standard <b>http://purl.obolibrary/org/obo</b> scheme is now used.
+</p>
+<p>
+  The semantics specified in this document are inconsistent with the
+  abandoned OBOF1.3 specification <a href="#1.1.3">1.1.3</a>, which is
+  strongly deprecated.
+</p>
+<p>
+  This specification also introduces new constructs absent from
+  previous versionsof OBOF, and clarifies many syntactic and semantic
+  elements that were previously unclear.
+</p>
+<p>
+<b>implementation:</b> the reference implementation of this ontology
+            can be found at <a href="http://oboformat.googlecode.com">the oboformat site</a>
+</p>
+
+<h2><a name="1.2"></a>1.2 Additional introductory material</h2>
 
 <p>
-  This document supersedes previous efforts. It is based on OBO-Format
-  1.4 which introduces extra constructs and is intended to be closely
-  aligned to OWL and the IAO ontology metadata ontology. The grammar
-  provided here is intended to be complete, formally specifying the
-  syntax of an OBO format file at the character level. The semantics
-  are also complete, and a translation is provided for all OBOF
-  constructs, including new constructs which allow a wider range of
-  expressivity within OWL2. The NCBO oboInOwl vocabulary and n-ary
-  relations approach has been deprecated, and the intention is to use
-  IAO in its place (although the mapping of all vocabulary elements is
-  not complete), with OWL2 axiom annotations replacing the n-ary
-  relations pattern. An additional section on OWL macros describes how
-  to effectively increase the expressivity of OBOF whilst remaining
-  within a simple OBOF environment.
+More material can be found
+at <a href="http://oboformat.googlecode.com">the oboformat site</a>
 </p>
-
 
 <a name="Preliminary_Definitions"></a><h2> <span class="mw-headline">2  Preliminary Definitions </span></h2>
 
@@ -347,8 +401,6 @@ Documents in the obo-format consist of sequences of Unicode characters
 TODO - language tags
 
 <h3><a name="2.2"></a>2.2 Spacing Characters</h3>
-
-INCOMPLETE
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">WhiteSpaceChar</span> ::= ' ' | \t | U+0020 | U+0009
@@ -1118,7 +1170,7 @@ relationship: has_part GO:0005634 {gci_relation="part_of", gci_filler="NCBITaxon
 
                   </span>
 
-                  the relationship is translated to:
+                  the relationship is translated as:
 
                   <span style="white-space: pre;"> 
 
@@ -1128,6 +1180,15 @@ SubClassOf(
 )
 
                   </span>
+
+The resulting axiom would be (in Manchester-like syntax, informative):
+
+                  <span style="white-space: pre;"> 
+
+(erythrocyte and part_of some 'Danio rerio') SubClassOf has_part some nucleus
+
+                  </span>
+
 
                 </p>
               </span>
@@ -1410,7 +1471,7 @@ AnnotationAssertion(<span class="name">T</span>(Qualifiers) <span class="name">T
               
 <table border="1" cellspacing="0">
 <caption><a id="translation-i" name="translationI" />
-	Translation of Instance frames to OWL</caption>
+	Additional axioms generated by equivalent_to_chain clauses</caption>
 
 <thead>
 <tr><th>Typedef frame with id:Rel-ID</th>
@@ -1602,6 +1663,9 @@ The following qualifiers are not translated to annotations:
                   </li>
                   <li>
                     rdfs  - http://www.w3.org/2000/01/rdf-schema#
+                  </li>
+                  <li>
+                    dc  - http://purl.org/dc/elements/1.1/
                   </li>
 
                 </ul>
@@ -1886,7 +1950,7 @@ in ontologies. These have also proven useful for NLP purposes.
 
 
 
-<h3><a name="5.n"></a>5.n Post-Processing OWL DL</h3>
+<h3><a name="5.10"></a>5.10 Post-Processing OWL DL</h3>
 
 <table border="1" cellspacing="0">
 <caption><a id="postProcessing" name="postProcessing" />
@@ -1938,7 +2002,7 @@ in ontologies. These have also proven useful for NLP purposes.
 <p>
 </p>
 
-<h2><a name="5.n"></a>5.x OWL to OBO</h2>
+<h2><a name="5.11"></a>5.11 OWL to OBO</h2>
 
                 <p>
                   Not every OWL ontology can be converted to OBO
@@ -1956,13 +2020,28 @@ in ontologies. These have also proven useful for NLP purposes.
                   </ul>
                 </p>
 <p>
-  TODO - some owl to obo translations may introduce owl:Thing - give this special status in OBO?
+  Note that all classes in an OBO Document are assumed to
+  satisfiable. Any axioms refering to owl:Thing should be removed. An
+  ontology with unsatisfiable classes is not translateable.
 </p>
 
 
 <h2><a name="6"></a>6 OBO Sublanguages</h2>
 
 <p>
+We introduce the concept of an OBO sublanguage. This is similar to an
+                  OWL profile, but the goal is not to provide
+                  sublanguages for reasoning purposes. Sublanguages
+                  are intended for legacy applications that make
+                  unwarranted assumptions about OBO format. The
+                  assumptions do not hold about OBO documents as a
+                  whole, but they may hold for particular
+                  sublanguages.
+</p>
+<p>
+At this time, only one sublanguage is specified - OBO basic. To
+                  define this sublanguage, we first introduce a number
+                  of sublanguage characteristics.
 </p>
 
 <h3><a name="6.1"></a>6.1 OBO Sublanguage Characteristics</h3>
@@ -1983,10 +2062,16 @@ Note that the relationship type (i.e. ObjectProperty) is irrelevant here.
 The ontology is a DAG if the transitive closure of E contains no cycles.
 </p>
 
+<b>Rationale:</b> the original Gene Ontology paper described the GO as
+                a DAG. Consequently a large body of legacy software
+                exists that assumes the ontology is a DAG. This
+                software breaks or loops indefinitely if there is a
+                cycle involving any set of is_a or relationship tags
+
 <h3><a name="6.1.2"></a>6.1.2 Dangling Clauses</h3>
 
 <p>
-A dangling clause is an is_a, relationship, intersection_of, uniom_of,
+A dangling clause is an is_a, relationship, intersection_of, union_of,
 transitive_over, equivalent_to_chain, holds_over_chain, disjoint_from,
 domain or range clause in which any of the values is not declared in
 the ontology document. Here declaration means there exists a frame
@@ -2073,6 +2158,28 @@ no two entities share the same name, considering only the source
 ontology but not its import closure.
 </p>
 
+<h3><a name="6.1.8"></a>6.1.8 No equivalence axioms</h3>
+
+<p>
+An OBO document has no equivalence axioms if the OWL translation 
+contains no EquivalentClasses axioms.
+</p>
+
+<h3><a name="6.1.9"></a>6.1.9 No obo-namespace crossing</h3>
+
+<p>
+An OBO document has no obo-namespace crossing if there are no is_a,
+                  relationship, intersection_of or union_of clauses
+                  that span two obo-namespaces. Note that an
+                  obo-namespace is not the same as an OWL
+                  namespace. It is specified by the namespace tag in
+                  OBOF. An example is found in the GO, which is a
+                  single ontology partitioned into 3
+                  obo-namespaces. Some legacy software assumes no
+                  namespace crossings, so the basic version of the GO
+                  released by the GOC has no obo-namespace crossings.
+</p>
+
 <h3><a name="6.2"></a>6.2 OBO Basic</h3>
 
 <p>
@@ -2107,6 +2214,9 @@ An ontology is OBO Basic if and only if it has the following characteristics:
                   </li>
                   <li>
                     Fully Labeled
+                  </li>
+                  <li>
+                    No equivalence axioms
                   </li>
                 </ul>
                 </p>
