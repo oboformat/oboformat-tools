@@ -32,6 +32,7 @@ public class ExpandSynapsedToTest extends OboFormatTestBasics {
 		Set<OWLAxiom> axioms = gciOntology.getAxioms();
 		for (OWLAxiom axiom : axioms) {
 			System.out.println(axiom);
+			// TODO - do actual tests
 		}
 	}
 }
