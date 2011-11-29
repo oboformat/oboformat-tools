@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.obolibrary.macro.test.ExpandExpressionGCITest;
 import org.obolibrary.macro.test.ExpandExpressionTest;
+import org.obolibrary.macro.test.ExpandSynapsedToTest;
 import org.obolibrary.oboformat.test.*;
 
 @RunWith(Suite.class)
@@ -46,6 +47,7 @@ import org.obolibrary.oboformat.test.*;
 	EmptyLinesTest.class,
 	
 	// macro expansion
+	ExpandSynapsedToTest.class,
 	ExpandExpressionTest.class,
 	ExpandExpressionGCITest.class
 })
