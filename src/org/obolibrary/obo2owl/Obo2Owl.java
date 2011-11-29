@@ -275,7 +275,7 @@ public class Obo2Owl {
 			owlOntology = manager.createOntology(ontIRI);
 		}
 		else {
-			defaultIDSpace = "TODO";
+			defaultIDSpace = "TEMP";
 			IRI ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX + defaultIDSpace);
 
 			// TODO - warn
@@ -377,7 +377,6 @@ public class Obo2Owl {
 
 				for(Clause clause: headerFrame.getClauses(t)){
 					Object values[] = clause.getValues().toArray();
-
 					//OWLNamedIndividual indv= (OWLNamedIndividual) trIndividual( values[0].toString()  );
 					OWLAnnotationProperty childAnnotProp = this.trAnnotationProp( values[0].toString() );
 					//add (fac.getOWLClassAssertionAxiom(cls, indv) );

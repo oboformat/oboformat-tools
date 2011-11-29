@@ -901,6 +901,12 @@ public class Owl2Obo {
 		}
 	}
 	
+	/**
+	 * E.g. http://purl.obolibrary.org/obo/go.owl --> "go"
+	 * 
+	 * @param ontology
+	 * @return The OBO ID of the ontology
+	 */
 	public static String getOntologyId(OWLOntology ontology){
 		//	String id = getIdentifier(ontology.getOntologyID().getOntologyIRI());
 
@@ -1224,6 +1230,12 @@ public class Owl2Obo {
 	}*/
 
 
+	/**
+	 * See table 5.9.2. Translation of identifiers
+	 * 
+	 * @param iriId
+	 * @return
+	 */
 	public static String getIdentifier(IRI iriId) {
 		String id = _getIdentifier(iriId);
 		if(id != null && id.startsWith("Error")){
@@ -1255,10 +1267,12 @@ public class Owl2Obo {
 
 		String s[]= id.split("#_");
 
+		// table 5.9.2 row 2 - NonCanonical-Prefixed-ID
 		if(s.length>1){
 			return s[0] + ":" + s[1];
 		}
 
+		// row 3 - Unprefixed-ID 
 		s= id.split("#");
 		if(s.length>1){
 			//			prefixURI = prefixURI + s[0] + "#";
@@ -1272,14 +1286,13 @@ public class Owl2Obo {
 
 			return prefix + s[1];
 		}
-		//		}
 
-
-
+		// row 1 - Canonical-Prefixed-ID
 		s= id.split("_");
 
 		if(s.length==2 && !id.contains("#") && !s[1].contains("_")){
-			return s[0] + ":" + s[1];
+			String localId = java.net.URLDecoder.decode(s[1]);
+			return s[0] + ":" + localId;
 		}
 		if(s.length > 2 && !id.contains("#")) {
 			if (s[s.length-1].replaceAll("[0-9]","").length() == 0) {

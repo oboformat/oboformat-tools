@@ -101,6 +101,13 @@ public class IDsTest {
 		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("BFO:0000050".equals(oboId));
 		
+		// MGI IDs are perverse - they have a double-separator
+		iri= bridge.oboIdToIRI("MGI:MGI:1");
+		assertTrue("http://purl.obolibrary.org/obo/MGI_MGI%3A1".equals(iri.toString()));
+		
+		//OWL 2 obo 
+		oboId = Owl2Obo.getIdentifier(iri);
+		assertTrue("MGI:MGI:1".equals(oboId));
 		
 		
 	}
