@@ -50,6 +50,7 @@ is_a: regulates ! regulates
 id: part_of
 name: part_of
 xref: OBO_REL:part_of
+xref: BFO:0000050
 is_transitive: true
 
 [Typedef]
