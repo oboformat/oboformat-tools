@@ -620,6 +620,31 @@ public class OBOFormatWriter {
 	}
 
 
+	private static final class ClauseListComparator implements Comparator<Clause> {
+	
+		private static final ClauseListComparator instance = new ClauseListComparator();
+		
+		public int compare(Clause c1, Clause c2) {
+			String t1 = c1.getTag();
+			String t2 = c2.getTag();
+			int compare = TermsTagsComparator.instance.compare(t1, t2);
+			if (compare == 0) {
+				compare = ClauseComparator.instance.compare(c1, c2);
+			}
+			return compare;
+		}
+	}
+
+
+	/**
+	 * Sort a list of term frame clauses according to in the OBO format 
+	 * specified tag and value order. 
+	 * 
+	 * @param clauses
+	 */
+	public static void sortTermClauses(List<Clause> clauses) {
+		Collections.sort(clauses, ClauseListComparator.instance);
+	}
 
 	private static class TypeDefTagsComparator implements Comparator<String>{
 
