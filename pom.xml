@@ -6,11 +6,19 @@
 	<artifactId>oboformat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-  
+	<name>oboformat</name>
+ 	<url>http://code.google.com/p/oboformat/</url>
+	<description>A java library for converting obo format documents to OWL, and for converting (a subset of) OWL to obo format.</description>
+	<inceptionYear>2010</inceptionYear>
+	<scm>
+		<url>https://oboformat.googlecode.com/svn/trunk/</url>
+	</scm>
+	<issueManagement>
+		<url>http://code.google.com/p/oboformat/issues/list</url>
+	</issueManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -35,6 +43,32 @@
 	  		</plugin>
 	  		<plugin>
 	  			<groupId>org.apache.maven.plugins</groupId>
+	  			<artifactId>maven-source-plugin</artifactId>
+	  			<version>2.1.2</version>
+	  			<executions>
+	  				<execution>
+	  					<id>attach-sources</id>
+	  					<goals>
+	  						<goal>jar</goal>
+	  					</goals>
+	  				</execution>
+	  			</executions>
+	  		</plugin>
+	  		<plugin>
+	  			<groupId>org.apache.maven.plugins</groupId>
+	  			<artifactId>maven-javadoc-plugin</artifactId>
+	  			<version>2.8</version>
+	  			<executions>
+	  				<execution>
+	  					<id>attach-javadocs</id>
+	  					<goals>
+	  						<goal>jar</goal>
+	  					</goals>
+	  				</execution>
+	  			</executions>
+	  		</plugin>
+	  		<plugin>
+	  			<groupId>org.apache.maven.plugins</groupId>
 	  			<artifactId>maven-deploy-plugin</artifactId>
 	  			<version>2.6</version>
 	  			<dependencies>
@@ -45,6 +79,35 @@
 	  				</dependency>
 	  			</dependencies>
 	  		</plugin>
+	  		<plugin>
+	  			<artifactId>maven-assembly-plugin</artifactId>
+	  			<version>2.2.1</version>
+				<configuration>
+					<finalName>oboformat-all-${project.version}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<attach>false</attach>
+					<outputDirectory>${project.basedir}/runlibs</outputDirectory>
+					<descriptors>
+						<descriptor>assembly/oboformat-all.xml</descriptor>
+					</descriptors>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<mainClass>org.obolibrary.cli.OBORunner</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 	  	</plugins>
 	</build>
 
