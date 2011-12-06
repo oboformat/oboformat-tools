@@ -213,24 +213,32 @@ public class OBOFormatWriter {
 
 		List<String> tags = duplicateTags(frame.getTags());
 		Collections.sort(tags, comparator);
+		String defaultOboNamespace = nameProvider.getDefaultOboNamespace();
 
 		for(String tag: tags){
 			List<Clause> clauses = new ArrayList<Clause>(frame.getClauses(tag));
 			Collections.sort(clauses, ClauseComparator.instance);
 			for( Clause clause : clauses){
-
-				if(OboFormatTag.TAG_ID.getTag().equals(clause.getTag()))
+				final String clauseTag = clause.getTag();
+				if(OboFormatTag.TAG_ID.getTag().equals(clauseTag))
 					continue;
-				else if(OboFormatTag.TAG_DEF.getTag().equals(clause.getTag()))
+				else if(OboFormatTag.TAG_DEF.getTag().equals(clauseTag))
 					writeDef(clause, writer);
-				else if(OboFormatTag.TAG_SYNONYM.getTag().equals(clause.getTag()))
+				else if(OboFormatTag.TAG_SYNONYM.getTag().equals(clauseTag))
 					writeSynonym(clause, writer);
-				else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clause.getTag()))
+				else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clauseTag))
 					writePropertyValue(clause, writer);
-				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clause.getTag()) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag()))
+				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clauseTag) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clauseTag))
 					writeClauseWithQuotedString(clause, writer);
-				else if (OboFormatTag.TAG_XREF.getTag().equals(clause.getTag()))
+				else if (OboFormatTag.TAG_XREF.getTag().equals(clauseTag))
 					writeXRefClause(clause, writer);
+				else if (OboFormatTag.TAG_NAMESPACE.getTag().equals(clauseTag)) {
+					// only write OBO namespace,
+					// if it is different from the default OBO namespace
+					if (!clause.getValue().equals(defaultOboNamespace)) {
+						write(clause, writer, nameProvider);
+					}
+				}
 				else
 					write(clause, writer, nameProvider);
 			}
@@ -813,6 +821,13 @@ public class OBOFormatWriter {
 		 * @return name or null
 		 */
 		public String getName(String id);
+		
+		/**
+		 * Retrieve the default OBO namespace
+		 * 
+		 * @return default OBO namespace or null
+		 */
+		public String getDefaultOboNamespace();
 	}
 	
 	/**
@@ -821,6 +836,7 @@ public class OBOFormatWriter {
 	 */
 	public static class OBODocNameProvider implements NameProvider {
 		private final OBODoc oboDoc;
+		private final String defaultOboNamespace;
 
 		/**
 		 * @param oboDoc
@@ -828,6 +844,13 @@ public class OBOFormatWriter {
 		public OBODocNameProvider(OBODoc oboDoc) {
 			super();
 			this.oboDoc = oboDoc;
+			Frame headerFrame = oboDoc.getHeaderFrame();
+			if (headerFrame != null) {
+				defaultOboNamespace = headerFrame.getTagValue(OboFormatTag.TAG_DEFAULT_NAMESPACE, String.class);
+			}
+			else {
+				defaultOboNamespace = null;
+			}
 		}
 
 		public String getName(String id) {
@@ -843,6 +866,10 @@ public class OBOFormatWriter {
 				}
 			}
 			return name;
+		}
+
+		public String getDefaultOboNamespace() {
+			return defaultOboNamespace;
 		}
 	}
 }

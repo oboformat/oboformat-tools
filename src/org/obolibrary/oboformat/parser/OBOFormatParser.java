@@ -185,7 +185,7 @@ public class OBOFormatParser {
 	}
 	
 	/**
-	 * Parses a local file to an OBODoc
+	 * Parses a local file or URL to an OBODoc
 	 * 
 	 * @param fn
 	 * @return parsed obo document
@@ -194,11 +194,21 @@ public class OBOFormatParser {
 	public OBODoc parse(String fn) throws IOException {
 		if (fn.startsWith("http:"))
 			return parse(new URL(fn));
-		
-		 this.location = fn;
-		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(fn), DEFAULT_CHARACTER_ENCODING));
+		 return parse(new File(fn));
+	}
+	
+	/**
+	 * Parses a local file to an OBODoc
+	 * 
+	 * @param file
+	 * @return parsed obo document
+	 * @throws IOException
+	 */
+	public OBODoc parse(File file) throws IOException {
+		 this.location = file;
+		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), DEFAULT_CHARACTER_ENCODING));
 		 return parse(in);
-	}	
+	}
 
 	/**
 	 * Parses a remote URL to an OBODoc
@@ -313,6 +323,13 @@ public class OBOFormatParser {
 		}
 		parseZeroOrMoreWsOptCmtNl();
 		if (s.eof()) {
+			// set OBO namespace in frames
+			final String defaultOboNamespace = h.getTagValue(OboFormatTag.TAG_DEFAULT_NAMESPACE, String.class);
+			if (defaultOboNamespace != null) {
+				addOboNamespace(obodoc.getTermFrames(), defaultOboNamespace);
+				addOboNamespace(obodoc.getTypedefFrames(), defaultOboNamespace);
+				addOboNamespace(obodoc.getInstanceFrames(), defaultOboNamespace);
+			}
 			return true;
 		}
 		else {
@@ -320,6 +337,18 @@ public class OBOFormatParser {
 			return false;
 		}
 		
+	}
+	
+	private void addOboNamespace(Collection<Frame> frames, String defaultOboNamespace) {
+		if (frames != null && !frames.isEmpty()) {
+			for (Frame termFrame : frames) {
+				Clause clause = termFrame.getClause(OboFormatTag.TAG_NAMESPACE);
+				if (clause == null) {
+					clause = new Clause(OboFormatTag.TAG_NAMESPACE, defaultOboNamespace);
+					termFrame.addClause(clause);
+				}
+			}
+		}
 	}
 	
 	public List<String> checkDanglingReferences(OBODoc doc) throws OBOFormatDanglingReferenceException{

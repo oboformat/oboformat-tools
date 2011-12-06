@@ -1,4 +1,5 @@
 ontology: simplego
+default-namespace: gene_ontology
 
 [Term]
 id: GO:0018901
