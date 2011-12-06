@@ -92,7 +92,7 @@ public class Obo2Owl {
 		// use the given manager and its factory
 		this.manager = manager;
 		fac = this.manager.getOWLDataFactory();
-		
+
 		// clear all internal maps.
 		idSpaceMap.clear();
 		apToDeclare.clear();
@@ -196,7 +196,7 @@ public class Obo2Owl {
 	protected OWLOntology getOwlOntology() {
 		return owlOntology;
 	}
-	
+
 	/**
 	 * @param owlOntology the owlOntology to set
 	 */
@@ -494,7 +494,7 @@ public class Obo2Owl {
 			for (Xref xref: xrefs) {
 				if (xref != null) {
 					String xid = xref.getIdref();
-					
+
 					// RO and BFO have special status.
 					// avoid cycles (in case of self-xref)
 					if ((xid.startsWith("RO") ||
@@ -708,7 +708,6 @@ public class Obo2Owl {
 					cSet, 
 					annotations);
 		}
-
 		else {
 			return trGenericClause(cls, tag, clause);
 		}
@@ -795,9 +794,6 @@ public class Obo2Owl {
 			ax = fac.getOWLSubPropertyChainOfAxiom(chain , p, annotations);
 			//System.out.println("chain:"+ax);
 			// TODO - annotations for equivalent to
-		}else if (_tag == OboFormatTag.TAG_PROPERTY_VALUE){
-
-
 		}else if (_tag == OboFormatTag.TAG_IS_TRANSITIVE && "true".equals(clause.getValue().toString())) {
 			ax = fac.getOWLTransitiveObjectPropertyAxiom(p, annotations);
 		}
@@ -875,6 +871,7 @@ public class Obo2Owl {
 
 		OWLAxiom ax = null;
 		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+		//System.out.println("CLAUSE: "+clause+" // TAG="+_tag);
 		if (_tag == OboFormatTag.TAG_NAME) {
 			ax = fac.getOWLAnnotationAssertionAxiom(
 					trTagToAnnotationProp(tag),
@@ -900,6 +897,33 @@ public class Obo2Owl {
 					sub, 
 					trAnnotationProp(v.toString()).getIRI(), 
 					annotations);
+		}
+		else if (_tag == OboFormatTag.TAG_PROPERTY_VALUE) {
+			Collection<Object> values = clause.getValues();
+			Object v = clause.getValue();
+			Object v2 = clause.getValue2();
+			if (v == null) {
+				// TODO: Throw Exceptions
+				LOG.warn("Cannot translate: "+clause);
+			}
+			if (values.size() == 2) {
+				ax = fac.getOWLAnnotationAssertionAxiom(
+						trAnnotationProp((String)v),
+						sub, 
+						trAnnotationProp(v2.toString()).getIRI(), 
+						annotations);
+			}
+			if (values.size() == 3) {
+				ax = fac.getOWLAnnotationAssertionAxiom(
+						trAnnotationProp((String)v),
+						sub, 
+						this.trLiteral(v2),
+						annotations);
+			}
+			else {
+				LOG.warn("Cannot translate: "+clause);
+				// TODO 
+			}
 		}
 		else if (_tag == OboFormatTag.TAG_SYNONYM) {
 
