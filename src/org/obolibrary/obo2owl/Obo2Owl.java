@@ -146,6 +146,7 @@ public class Obo2Owl {
 	/**
 	 * Table 5.8 Translation of Annotation Vocabulary.
 	 * 
+	 * @return property map
 	 */
 	private static HashMap<String, IRI> initAnnotationPropertyMap() {
 
@@ -645,7 +646,7 @@ public class Obo2Owl {
 	 * @param cls
 	 * @param tag
 	 * @param clause
-	 * @return
+	 * @return axiom
 	 */
 	private OWLAxiom trTermClause(OWLClass cls, String tag, Clause clause) {
 		OWLAxiom ax;
@@ -905,15 +906,15 @@ public class Obo2Owl {
 			if (v == null) {
 				// TODO: Throw Exceptions
 				LOG.warn("Cannot translate: "+clause);
-			}
-			if (values.size() == 2) {
+			} 
+			else if (values.size() == 2) {
 				ax = fac.getOWLAnnotationAssertionAxiom(
 						trAnnotationProp((String)v),
 						sub, 
 						trAnnotationProp(v2.toString()).getIRI(), 
 						annotations);
-			}
-			if (values.size() == 3) {
+			} 
+			else if (values.size() == 3) {
 				ax = fac.getOWLAnnotationAssertionAxiom(
 						trAnnotationProp((String)v),
 						sub, 
@@ -1119,6 +1120,9 @@ public class Obo2Owl {
 
 	/**
 	 * See section "header macros" and treat-xrefs-as-equivalent
+	 * 
+	 * @param id 
+	 * @return mapped id
 	 */
 	private String mapPropId(String id) {
 		Frame f = obodoc.getTypedefFrame(id);
