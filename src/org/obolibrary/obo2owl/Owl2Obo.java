@@ -1215,9 +1215,14 @@ public class Owl2Obo {
 				// see BFOROXrefTest
 				// 5.9.3. Special Rules for Relations
 				if(propId.equals("shorthand")){
-					return ((OWLLiteral)ax.getValue()).getLiteral();
+					final OWLAnnotationValue value = ax.getValue();
+					if (value != null && value instanceof OWLLiteral) {
+						return ((OWLLiteral) value).getLiteral();
+					}
+					// TODO throw Exception? 
+					// This is a static method: no access to the strict conversion flag!
+					LOG.error("Untranslatable axiom, expected literal value, but was: "+value+" in axiom: "+ax);
 				}
-
 			}
 		}
 
