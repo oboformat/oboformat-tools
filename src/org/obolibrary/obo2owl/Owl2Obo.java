@@ -315,21 +315,25 @@ public class Owl2Obo {
 			return;
 		}
 
-		OboFormatTag tag = OboFormatTag.TAG_HOLDS_OVER_CHAIN;
-
-		for(OWLAnnotation ann: ax.getAnnotations()){
-
-			if(Obo2Owl.IRI_PROP_isReversiblePropertyChain.equals(ann.getProperty().getIRI().toString())){
-				tag = OboFormatTag.TAG_EQUIVALENT_TO_CHAIN;
-				break;
-			}
+		Clause clause;
+		
+		if (rel1.equals(f.getId())) {
+			clause = new Clause(OboFormatTag.TAG_TRANSITIVE_OVER, rel2);
 		}
-
-
-		Clause clause = new Clause();
-		clause.setTag(tag.getTag());
-		clause.addValue(rel1);
-		clause.addValue(rel2);
+		else {
+			OboFormatTag tag = OboFormatTag.TAG_HOLDS_OVER_CHAIN;
+	
+			for(OWLAnnotation ann: ax.getAnnotations()){
+	
+				if(Obo2Owl.IRI_PROP_isReversiblePropertyChain.equals(ann.getProperty().getIRI().toString())){
+					tag = OboFormatTag.TAG_EQUIVALENT_TO_CHAIN;
+					break;
+				}
+			}
+			clause = new Clause(tag);
+			clause.addValue(rel1);
+			clause.addValue(rel2);
+		}
 		f.addClause(clause);
 
 		addQualifiers(clause, ax.getAnnotations());

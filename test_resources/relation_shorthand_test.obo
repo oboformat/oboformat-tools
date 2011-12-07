@@ -27,3 +27,18 @@ name: part_of
 is_transitive: true
 xref: OBO_REL:part_of   ! this should be ignored
 xref: BFO:0000050       ! this should take priority
+
+[Typedef]
+id: negatively_regulates
+name: negatively_regulates
+is_a: regulates ! regulates
+
+[Typedef]
+id: positively_regulates
+name: positively_regulates
+is_a: regulates ! regulates
+
+[Typedef]
+id: regulates
+name: regulates
+transitive_over: part_of ! part_of

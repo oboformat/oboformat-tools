@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
@@ -15,7 +16,13 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
@@ -107,5 +114,31 @@ public class OboFormatTestBasics {
 		manager.saveOntology(ontology, format, iri);
 		
 		return tempFile;
+	}
+	
+	protected static void renderOBO(OBODoc oboDoc) throws IOException {
+		OBOFormatWriter writer = new OBOFormatWriter();
+		writer.setCheckStructure(true);
+		StringWriter out = new StringWriter();
+		BufferedWriter stream = new BufferedWriter(out);
+		writer.write(oboDoc, stream);
+		stream.close();
+		System.out.println(out.getBuffer());
+	}
+	
+	protected IRI getIriByLabel(OWLOntology ontology, String label) {
+		for (OWLAnnotationAssertionAxiom aa : ontology.getAxioms(AxiomType.ANNOTATION_ASSERTION)) {
+			OWLAnnotationValue v = aa.getValue();
+			OWLAnnotationProperty property = aa.getProperty();
+			if (property.isLabel() && v instanceof OWLLiteral) {
+				if (label.equals( ((OWLLiteral)v).getLiteral())) {
+					OWLAnnotationSubject subject = aa.getSubject();
+					if (subject instanceof IRI) {
+						return (IRI)subject;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

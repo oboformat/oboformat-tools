@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -779,6 +780,12 @@ public class Obo2Owl {
 			ax = fac.getOWLObjectPropertyRangeAxiom(p,
 					trClass(v), 
 					annotations);
+		}
+		else if (_tag == OboFormatTag.TAG_TRANSITIVE_OVER) {
+			List<OWLObjectPropertyExpression> chain = new ArrayList<OWLObjectPropertyExpression>(2);
+			chain.add(p);
+			chain.add(trObjectProp(v));
+			ax = fac.getOWLSubPropertyChainOfAxiom(chain, p, annotations);
 		}
 		else if (_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN || _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN) {
 

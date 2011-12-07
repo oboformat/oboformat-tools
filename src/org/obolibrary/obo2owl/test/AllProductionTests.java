@@ -23,6 +23,7 @@ import org.obolibrary.oboformat.test.*;
 	ObsoleteTermTest.class,
 	Owl2OboTest.class,
 	PropertyChainTest.class,
+	TransitiveOverTest.class,
 	RelationShorthandTest.class,
 	RoundTripTestSimpleGo.class,
 	//RoundTripImportTest.class,
