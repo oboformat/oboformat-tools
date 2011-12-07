@@ -1201,11 +1201,35 @@ public class Owl2Obo {
 
 	}
 
-	public  String getIdentifier(OWLObject obj) {
-		return getIdentifierFromObject(obj, this.owlOntology);
+	public String getIdentifier(OWLObject obj) {
+		try {
+			return getIdentifierFromObject(obj, this.owlOntology);
+		} catch (UntranslatableAxiomException e) {
+			String message = e.getMessage();
+			if (strictConversion) {
+				LOG.error("The conversion is halted: "+message);
+				throw new RuntimeException(message);
+			}
+			LOG.warn(message);
+		}
+		return null;
 	}	
 
-	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont) {
+	public static class UntranslatableAxiomException extends Exception {
+		
+		// generated
+		private static final long serialVersionUID = 4674805484349471665L;
+
+		public UntranslatableAxiomException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public UntranslatableAxiomException(String message) {
+			super(message);
+		}
+	}
+	
+	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont) throws UntranslatableAxiomException {
 
 		if(obj instanceof OWLObjectProperty){
 			OWLObjectProperty prop = (OWLObjectProperty) obj;
@@ -1219,9 +1243,7 @@ public class Owl2Obo {
 					if (value != null && value instanceof OWLLiteral) {
 						return ((OWLLiteral) value).getLiteral();
 					}
-					// TODO throw Exception? 
-					// This is a static method: no access to the strict conversion flag!
-					LOG.error("Untranslatable axiom, expected literal value, but was: "+value+" in axiom: "+ax);
+					throw new UntranslatableAxiomException("Untranslatable axiom, expected literal value, but was: "+value+" in axiom: "+ax);
 				}
 			}
 		}
