@@ -1233,6 +1233,43 @@ public class Owl2Obo {
 		}
 	}
 	
+	/**
+	 * Retrieve the identifier for a given {@link OWLObject}. 
+	 * This methods uses also shorthand hints to resolve the 
+	 * identifier. 
+	 * Should the translation process encounter a problem or 
+	 * not find an identifier the defaultValue is returned.
+	 * 
+	 * @param obj the {@link OWLObject} to resolve
+	 * @param ont the target ontology
+	 * @param defaultValue the value to return in case of an error or no id
+	 * @return identifier or the default value
+	 */
+	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont, String defaultValue) {
+		String id = defaultValue;
+		try {
+			id = getIdentifierFromObject(obj, ont);
+			if (id == null) {
+				id = defaultValue;
+			}
+		} catch (UntranslatableAxiomException e) {
+			LOG.warn(e.getMessage());
+		}
+		return id;
+	}
+	
+	/**
+	 * Retrieve the identifier for a given {@link OWLObject}. 
+	 * This methods uses also shorthand hints to resolve the 
+	 * identifier. 
+	 * Should the translation process encounter an unexpected 
+	 * axiom an {@link UntranslatableAxiomException} is thrown.
+	 * 
+	 * @param obj the {@link OWLObject} to resolve
+	 * @param ont the target ontology
+	 * @return identifier or null
+	 * @throws UntranslatableAxiomException
+	 */
 	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont) throws UntranslatableAxiomException {
 
 		if(obj instanceof OWLObjectProperty){
