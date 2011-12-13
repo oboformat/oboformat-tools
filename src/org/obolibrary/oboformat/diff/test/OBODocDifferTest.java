@@ -22,7 +22,7 @@ public class OBODocDifferTest extends OboFormatTestBasics {
 		for (Diff diff : diffs) {
 			System.out.println("Diff="+diff);
 		}
-		assertTrue(diffs.size() == 0);
+		assertEquals(0, diffs.size());
 	}
 	
 	@Test
@@ -34,8 +34,7 @@ public class OBODocDifferTest extends OboFormatTestBasics {
 		for (Diff diff : diffs) {
 			System.out.println("MDiff="+diff);
 		}
-		System.out.println(diffs.size());
-		assertTrue(diffs.size() == 18);
+		assertEquals(19, diffs.size());
 	}
 	
 }
