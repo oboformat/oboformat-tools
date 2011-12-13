@@ -379,22 +379,25 @@ at <a href="http://oboformat.googlecode.com">the oboformat site</a>
 </div>
 
 <p>Because generic tag-value pairs occur in very many places in the syntax,
-to save space the grammar has meta-productions for basic tag-values and for the tags themselves:
+to save space the grammar has meta-productions for basic Tag-Values
+  Pairs (TVPs), Boolean Tags (BTs) and for the tags themselves (T):
 </p>
-<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;T&gt;-TVP</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' {ws} <span class="nonterminal">UnquotedString</span>
-<span class="nonterminal">&lt;T&gt;-BT</span>   ::= '<span class="terminal">&lt;T&gt;:</span>' {ws} ( 'true' | 'false' )
-<span class="nonterminal">&lt;T&gt;-Tag</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' {ws}
+<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;T&gt;-TVP</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span> <span class="nonterminal">UnquotedString</span>
+<span class="nonterminal">&lt;T&gt;-BT</span>   ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span> ( 'true' | 'false' )
+<span class="nonterminal">&lt;T&gt;-Tag</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span>
 </p>
 <p>
-For example, <span>property_value-Tag</span> should be interpreted as: <span>'property_value:' { ws }</span>
+For example, <span class="nonterminal">property_value-Tag</span> should be interpreted as: <span>'property_value:' <span class="nonterminal">ws</span> </span>
 </p>
 
 <p>We provide an additional List meta-production, for comma-delimited lists
 </p>
-<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;NT&gt;List</span>  ::= [<span class="terminal">&lt;NT&gt;:</span> {',' {ws} <span class="terminal">&lt;NT&gt;:</span> }]
+<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;NT&gt;List</span>  ::= [<span class="nonterminal">&lt;NT&gt;</span> {',' <span class="nonterminal">ws</span> <span class="nonterminal">&lt;NT&gt;</span> }]
 </p>
 <p>
-For example, <span>property_value-Tag</span> should be interpreted as: <span>'property_value:' { ws }</span>
+For example, <span class="nonterminal">QualifierList</span> should be
+interpreted as: [ <span class="nonterminal">Qualifier</span> { ','
+<span class="nonterminal">ws</span> <span class="nonterminal">Qualifier</span>} ]
 </p>
 
 
@@ -402,8 +405,6 @@ For example, <span>property_value-Tag</span> should be interpreted as: <span>'pr
 Documents in the obo-format consist of sequences of Unicode characters
 [<cite><a href="#ref-unicode" title="">UNICODE</a></cite>] and are encoded in UTF-8
 [<cite><a href="#ref-rfc-3629" title="">RFC 3629</a></cite>].
-
-TODO - language tags
 
 <h3><a name="2.2"></a>2.2 Spacing Characters</h3>
 
@@ -428,9 +429,9 @@ tag-value qualifiers.
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">EOL</span> ::=  <span class="nonterminal">ws*</span> [ <span class="nonterminal">QualifierBlock</span> ] <span class="nonterminal">ws*</span> [ <span class="nonterminal">HiddenComment</span> ] <span class="nonterminal">ws*</span> <span class="nonterminal">NewLineChar</span>
-<span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> } 
+<span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> '}' 
 <span class="nonterminal">HiddenComment</span> ::= '!' { ( <span class="nonterminal">Char</span> - <span class="nonterminal">NewlineChar</span> ) } 
-<span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' {ws} <span class="terminal">Qualifier</span> }
+<span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' <span class="nonterminal">ws</span> <span class="terminal">Qualifier</span> }
 <span class="nonterminal">Qualifier</span> ::= <span class="nonterminal">Rel-ID</span> '=' <span class="nonterminal">QuotedString</span> 
 </p>
 
@@ -489,9 +490,9 @@ tag-value qualifiers.
 
 <p class="grammar" style="white-space: pre;">
 
-<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' {ws} <span class="nonterminal">XrefNoComma</span> } ] ']'
-<span class="nonterminal">XrefNoComma</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ {ws} <span class="nonterminal">QuotedString</span> ]
-<span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ {ws} <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefNoComma</span> } ] ']'
+<span class="nonterminal">XrefNoComma</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
 
 </p>
 
