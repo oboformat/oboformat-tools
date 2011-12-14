@@ -16,7 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
-public class HeaderLostBug extends OboFormatTestBasics {
+public class HeaderLostBugTest extends OboFormatTestBasics {
 
 	private File owlFile = null;
 	

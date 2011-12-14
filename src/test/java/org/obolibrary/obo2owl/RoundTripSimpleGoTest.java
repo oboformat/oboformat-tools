@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
-public class RoundTripTestSimpleGo extends RoundTripTest {
+public class RoundTripSimpleGoTest extends RoundTripTest {
 
 	@Test
 	public void testRoundTrip() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
