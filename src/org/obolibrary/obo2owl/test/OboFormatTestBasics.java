@@ -126,6 +126,11 @@ public class OboFormatTestBasics {
 		System.out.println(out.getBuffer());
 	}
 	
+	protected static void renderOWL(OWLOntology owlOntology) throws OWLOntologyStorageException {
+		OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
+		manager.saveOntology(owlOntology, new OWLXMLOntologyFormat(), System.out);
+	}
+	
 	protected IRI getIriByLabel(OWLOntology ontology, String label) {
 		for (OWLAnnotationAssertionAxiom aa : ontology.getAxioms(AxiomType.ANNOTATION_ASSERTION)) {
 			OWLAnnotationValue v = aa.getValue();

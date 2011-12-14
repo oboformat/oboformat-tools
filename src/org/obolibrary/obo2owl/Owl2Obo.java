@@ -1,8 +1,10 @@
 package org.obolibrary.obo2owl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +46,11 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectCardinalityRestriction;
+import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
+import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -55,7 +60,7 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
+import org.semanticweb.owlapi.model.OWLQuantifiedObjectRestriction;
 import org.semanticweb.owlapi.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLSubAnnotationPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -368,27 +373,6 @@ public class Owl2Obo {
 
 	private void tr(OWLDisjointObjectPropertiesAxiom ax){
 		trNaryPropertyAxiom(ax, OboFormatTag.TAG_DISJOINT_FROM.getTag());
-		/*Set<OWLObjectPropertyExpression> set = ax.getProperties();
-
-		if(set.size()>1){
-			boolean first = true;
-			OWLObjectProperty prop = null;
-			String disjointFrom = null;
-			for(OWLObjectPropertyExpression ex: set){
-				if(first){
-					first = false;
-					if(ex instanceof OWLObjectProperty)
-						prop = (OWLObjectProperty)ex;
-				}else{
-					disjointFrom = getIdentifier(ex);
-				}
-			}
-
-			trObjectProperty(prop, OboFormatTag.TAG_DISJOINT_FROM.getTag(), disjointFrom);
-
-		}else{
-			LOG.warn("Unhandeled axiom: " + ax);
-		}*/
 	}
 
 	private void tr(OWLReflexiveObjectPropertyAxiom ax){
@@ -624,7 +608,7 @@ public class Owl2Obo {
 			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
 				String tg = owlObjectToTag(axiom.getProperty());
 				if(OboFormatTag.TAG_NAME.getTag().equals(tg)){
-					name = getLiteral((OWLLiteral)axiom.getValue());
+					name = ((OWLLiteral)axiom.getValue()).getLiteral();
 				}else if(OboFormatTag.TAG_SCOPE.getTag().equals(tg)){
 					scope = owlObjectToTag(axiom.getValue());
 				}
@@ -647,7 +631,7 @@ public class Owl2Obo {
 			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
 				String tg = owlObjectToTag(axiom.getProperty());
 				if(OboFormatTag.TAG_COMMENT.getTag().equals(tg)){
-					comment = getLiteral((OWLLiteral)axiom.getValue());
+					comment = ((OWLLiteral)axiom.getValue()).getLiteral();
 					break;
 				}
 			}
@@ -696,25 +680,6 @@ public class Owl2Obo {
 		}
 
 
-	}
-
-
-	private Pattern CRLF = Pattern.compile("(\r\n|\r|\n|\n\r)");
-
-	private String getLiteral(OWLLiteral literal){
-		String val = literal.getLiteral();
-
-
-		Matcher m = CRLF.matcher(val);
-		if(m.find())
-			val= m.replaceAll("\\\\n");
-
-		//val = val.replaceAll("\n|\r", "\\\\\n");
-		//	val = val.replaceAll("[\\]", "\\\\\\\\");
-		//val = val.replace("\\", "\\\\");
-		//val.re
-
-		return val;
 	}
 
 	private Pattern absoulteURLPattern = Pattern.compile("<\\s*http.*?>");
@@ -769,7 +734,7 @@ public class Owl2Obo {
 			String value = annVal.toString();
 
 			if(annVal instanceof OWLLiteral){
-				value = getLiteral((OWLLiteral) annVal);
+				value = ((OWLLiteral) annVal).getLiteral();
 			}else if(annVal instanceof IRI){
 				value = getIdentifier((IRI)annVal); //getIdentifier((IRI)aanAx.getValue());
 			}
@@ -838,7 +803,7 @@ public class Owl2Obo {
 							OWLAnnotationValue owlAnnotationValue = annotation.getValue();
 							if (owlAnnotationValue instanceof OWLLiteral) {
 								unprocessedQualifiers.remove(annotation);
-								String xrefAnnotation = getLiteral((OWLLiteral) owlAnnotationValue);
+								String xrefAnnotation = ((OWLLiteral) owlAnnotationValue).getLiteral();
 								if (xrefAnnotation != null) {
 									xrefAnnotation = xrefAnnotation.trim();
 									if (xrefAnnotation.length() > 0) {
@@ -915,7 +880,7 @@ public class Owl2Obo {
 			String value = ann.getValue().toString();
 
 			if(ann.getValue() instanceof OWLLiteral){
-				value = getLiteral((OWLLiteral) ann.getValue());
+				value = ((OWLLiteral) ann.getValue()).getLiteral();
 			}else if(ann.getValue() instanceof IRI){
 				value = getIdentifier((IRI)ann.getValue()); //getIdentifier((IRI)aanAx.getValue());
 			}
@@ -1187,22 +1152,6 @@ public class Owl2Obo {
 			return;
 		}
 
-		/*
-		if(entity.getIRI().toString().startsWith("http://www.geneontology.org/formats/oboInOwl#"))
-			return;
-
-		String logErr = "the axiom is not translated : " + axiom;
-		String err = "The conversion is halted as the axiom is not translated: " + axiom;
-		if(strictConversion){
-			logErr = err;
-		}
-
-		LOG.warn(logErr);
-
-		if(strictConversion)
-			throw new RuntimeException(err);
-		 */
-
 	}
 
 	public String getIdentifier(OWLObject obj) {
@@ -1297,33 +1246,11 @@ public class Owl2Obo {
 		return null;
 	}
 
-	/*public String iriToOBoId(IRI iriId){
-		String id = getIdentifier(iriId);
-
-		if(id.contains("_")){
-			id = id.replace("_", ":");
-		}else{
-			id = ontologyId + ":" + id;
-		}
-
-
-		return id;
-	}
-
-	public String iriToOBoId(OWLObject obj){
-		if(obj instanceof OWLEntity)
-			return iriToOBoId(((OWLEntity)obj).getIRI());
-
-		return null;
-
-	}*/
-
-
 	/**
 	 * See table 5.9.2. Translation of identifiers
 	 * 
 	 * @param iriId
-	 * @return
+	 * @return obo identifier or null
 	 */
 	public static String getIdentifier(IRI iriId) {
 		String id = _getIdentifier(iriId);
@@ -1406,133 +1333,6 @@ public class Owl2Obo {
 
 
 
-
-
-
-
-		/*
-
-		if(iriId == null)
-			return null;
-
-		String iri = iriId.toString();
-
-		int indexSlash = iri.lastIndexOf("/");
-
-
-		String prefixURI = null;
-		String id = null;
-
-		if(indexSlash>-1){
-			prefixURI = iri.substring(0, indexSlash+1);
-			id = iri.substring(indexSlash+1);
-		}else
-			id = iri;
-
-
-		String s[]= id.split("#");
-
-		if(s.length>1){
-			prefixURI = prefixURI + s[0] + "#";
-			id = s[1];
-		}
-
-		String prefix =null;
-
-		if(prefixURI != null)
-			prefix = idSpaceMap.get(prefixURI);
-
-		if(prefix == null && s.length>1){
-			prefix = s[0];
-		}
-
-		String prefix2 = null;
-
-		int uderscoreIndex = id.indexOf("_");
-		String id2 = null;
-		if(uderscoreIndex>-1){
-			prefix2 = id.substring(0, uderscoreIndex);
-			id2 =  id.substring(uderscoreIndex+1);
-		}else{
-			id2 = id;
-			if(prefix != null)
-				prefix2 = prefix;
-			else
-				prefix2 = this.ontologyId;
-		}
-
-		if(prefix2 != ontologyId && prefix != null && !prefix2.equals(prefix)){
-			 id2 = id;
-			 prefix2 = prefix;
-		}
-
-		if(!"http://purl.obolibrary.org/obo/".equals(prefixURI) && prefix != ontologyId){
-			idSpaceMap.put(prefixURI, prefix);
-		}
-
-
-		return prefix2 + ":" + id2;
-
-
-
-		 */
-
-		/*
-		if(iriId == null)
-			return null;
-
-		String iri = iriId.toString();
-
-		if(iri.contains("topObjectProperty")){
-			System.out.println("-------------------");
-		}
-
-		int indexSlash = iri.lastIndexOf("/");
-
-
-		String prefixURI = null;
-		String id = null;
-
-		String s[]= iri.split("#");
-
-		if(s.length>1){
-			prefixURI = s[0] + "#";
-			id = s[1];
-		}else if(indexSlash>-1){
-			prefixURI = iri.substring(0, indexSlash+1);
-			id = iri.substring(indexSlash+1);
-		}else
-			id = iri;
-
-		String prefix = idSpaceMap.get(prefixURI);
-
-
-		String prefix2 = null;
-		s = id.split("_");
-		String id2 = null;
-		if(s.length>1){
-			prefix2 = s[0];
-			id2 = s[1];
-		}else{
-			id2 = id;
-			prefix2 = this.ontologyId;
-		}
-
-		if(prefix2 != ontologyId && prefix != null && !prefix2.equals(prefix)){
-			 id2 = id;
-			 prefix2 = prefix;
-		}
-
-		if(!"http://purl.obolibrary.org/obo/".equals(prefixURI) && prefix != ontologyId){
-			idSpaceMap.put(prefixURI, prefix);
-		}
-
-
-		return prefix2 + ":" + id2;
-
-		 */
-
-
 	}
 
 
@@ -1568,8 +1368,6 @@ public class Owl2Obo {
 				}
 
 			}
-
-			//String prefix = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_";
 			String prefix = Obo2OWLConstants.OIOVOCAB_IRI_PREFIX;
 
 			if (iri.startsWith(prefix)) {
@@ -1579,25 +1377,7 @@ public class Owl2Obo {
 
 		}
 		return tag;
-
-
 	}
-
-
-
-	/*
-	public static String propToTag(OWLAnnotationProperty prop) {
-		String iri = prop.getIRI().toString();
-		String tag = annotationPropertyMap.get(iri);
-
-		if (tag == null) {
-			String prefix = Obo2Owl.DEFAULT_IRI_PREFIX + "IAO_";
-			if (iri.startsWith(prefix)) {
-				tag = iri.substring(prefix.length());
-			}
-		}
-		return tag;
-	}*/
 
 	private Frame getTermFrame(OWLEntity entity) {
 		String id = getIdentifier(entity.getIRI());
@@ -1705,9 +1485,8 @@ public class Owl2Obo {
 	}
 
 	private void tr(OWLSubClassOfAxiom ax) {
-		OWLSubClassOfAxiom a = (OWLSubClassOfAxiom) ax;
-		OWLClassExpression sub = a.getSubClass();
-		OWLClassExpression sup = a.getSuperClass();
+		OWLClassExpression sub = ax.getSubClass();
+		OWLClassExpression sup = ax.getSuperClass();
 		Set<QualifierValue> qvs = new HashSet<QualifierValue>();
 
 		// 5.2.2
@@ -1755,65 +1534,226 @@ public class Owl2Obo {
 				c.setQualifierValues(qvs);
 				f.addClause(c);
 				addQualifiers(c, ax.getAnnotations());
-			} else if (sup instanceof OWLObjectSomeValuesFrom ||sup instanceof OWLObjectAllValuesFrom ) {
-				OWLQuantifiedRestriction r = (OWLQuantifiedRestriction) sup;
+			} else if (sup instanceof OWLQuantifiedObjectRestriction) {
+				// OWLObjectSomeValuesFrom
+				// OWLObjectAllValuesFrom
+				OWLQuantifiedObjectRestriction r = (OWLQuantifiedObjectRestriction) sup;
 				String fillerId = this.getIdentifier(r.getFiller());
 
 				if(fillerId == null){
-					String logErr = "the axiom is not translated : " + ax;
-					String err = "The conversion is halted as the axiom is not translated: " + ax;
-					if(strictConversion){
-						logErr = err;
-					}
-
-					LOG.warn(logErr);
-
-					if(strictConversion)
-						throw new RuntimeException(err);
-
+					error(ax);
 					return;
 				}
-
-				Clause c = new Clause();
-				c.setTag(OboFormatTag.TAG_RELATIONSHIP.getTag());
-				c.addValue(this.getIdentifier(r.getProperty()));
-				c.addValue(fillerId);
-				c.setQualifierValues(qvs);
-				addQualifiers(c, ax.getAnnotations());
-
-				f.addClause(c);
-			} else {
-				String logErr = "the axiom is not translated : " + ax;
-				String err = "The conversion is halted as the axiom is not translated: " + ax;
-				if(strictConversion){
-					logErr = err;
+				f.addClause(createRelationshipClauseWithRestrictions(r,
+						fillerId, qvs, ax));
+			} else if (sup instanceof OWLObjectCardinalityRestriction) {
+				// OWLObjectExactCardinality
+				// OWLObjectMinCardinality
+				// OWLObjectMaxCardinality
+				OWLObjectExactCardinality cardinality = (OWLObjectExactCardinality) sup;
+				String fillerId = this.getIdentifier(cardinality.getFiller());
+				if(fillerId == null){
+					error(ax);
+					return;
 				}
-
-				LOG.warn(logErr);
-
-				if(strictConversion)
-					throw new RuntimeException(err);
-
+				f.addClause(createRelationshipClauseWithCardinality(cardinality, fillerId, qvs, ax));
+			} else if (sup instanceof OWLObjectIntersectionOf) {
+				OWLObjectIntersectionOf i = (OWLObjectIntersectionOf) sup;
+				List<Clause> clauses = new ArrayList<Clause>();
+				for(OWLClassExpression operand : i.getOperands()) {
+					if (operand instanceof OWLQuantifiedObjectRestriction) {
+						OWLQuantifiedObjectRestriction restriction = (OWLQuantifiedObjectRestriction) operand;
+						String fillerId = this.getIdentifier(restriction.getFiller());
+						if(fillerId == null){
+							error(ax);
+							return;
+						}
+						clauses.add(createRelationshipClauseWithRestrictions(restriction, fillerId, new HashSet<QualifierValue>(qvs), ax));
+					}
+					else if (operand instanceof OWLObjectCardinalityRestriction) {
+						OWLObjectCardinalityRestriction restriction = (OWLObjectCardinalityRestriction) operand;
+						String fillerId = this.getIdentifier(restriction.getFiller());
+						if(fillerId == null){
+							error(ax);
+							return;
+						}
+						clauses.add(createRelationshipClauseWithCardinality(restriction, 
+								fillerId, new HashSet<QualifierValue>(qvs), ax));
+					}
+					else {
+						error(ax);
+						return;
+					}
+				}
+				if (clauses.isEmpty()) {
+					error(ax);
+					return;
+				}
+				clauses = normalizeRelationshipClauses(clauses);
+				
+				for (Clause clause : clauses) {
+					f.addClause(clause);	
+				}
+			
+			} else {
+				error(ax);
 				return;
 
 			}
 		} else {
-			String logErr = "the axiom is not translated : " + ax;
-			String err = "The conversion is halted as the axiom is not translated: " + ax;
-			if(strictConversion){
-				logErr = err;
-			}
-
-			LOG.warn(logErr);
-
-			if(strictConversion)
-				throw new RuntimeException(err);
-
+			error(ax);
 			return;
 
 		}
 	}
 
+	private Clause createRelationshipClauseWithRestrictions(
+			OWLQuantifiedObjectRestriction r, String fillerId,
+			Set<QualifierValue> qvs, OWLSubClassOfAxiom ax) {
+		Clause c = new Clause();
+		c.setTag(OboFormatTag.TAG_RELATIONSHIP.getTag());
+		c.addValue(this.getIdentifier(r.getProperty()));
+		c.addValue(fillerId);
+		c.setQualifierValues(qvs);
+		addQualifiers(c, ax.getAnnotations());
+		return c;
+	}
 
+	private Clause createRelationshipClauseWithCardinality(
+			OWLObjectCardinalityRestriction restriction, String fillerId,
+			Set<QualifierValue> qvs, OWLSubClassOfAxiom ax) {
+		Clause c = new Clause();
+		c.setTag(OboFormatTag.TAG_RELATIONSHIP.getTag());
+		c.addValue(this.getIdentifier(restriction.getProperty()));
+		c.addValue(fillerId);
+		c.setQualifierValues(qvs);
+		String q = "cardinality";
+		if (restriction instanceof OWLObjectMinCardinality) {
+			q = "minCardinality";
+		}
+		else if (restriction instanceof OWLObjectMaxCardinality) {
+			q = "maxCardinality";
+		}
+		c.addQualifierValue(new QualifierValue(q, Integer.toString(restriction.getCardinality())));
+		addQualifiers(c, ax.getAnnotations());
+		return c;
+	}
+
+	/**
+	 * Join clauses and its {@link QualifierValue} which have the same 
+	 * relationship type and target. Try to resolve conflicts for multiple
+	 * statements. E.g., min=2 and min=3 is resolved to min=2, or  max=2 and max=4 
+	 * is resolved to max=4. It will not merge conflicting exact cardinality statements.
+	 * 
+	 * TODO How to merge "all_some", and "all_only"?
+	 * 
+	 * @param clauses
+	 * @return normalized list of {@link Clause}
+	 */
+	private List<Clause> normalizeRelationshipClauses(List<Clause> clauses) {
+		final List<Clause> normalized = new ArrayList<Clause>();
+		while (!clauses.isEmpty()) {
+			final Clause target = clauses.remove(0);
+			List<Clause> similar = findSimilarClauses(clauses, target);
+			normalized.add(target);
+			mergeSimilarIntoTarget(target, similar);
+		}
+		return normalized;
+	}
+
+	private List<Clause> findSimilarClauses(List<Clause> clauses, final Clause target) {
+		final String targetTag = target.getTag();
+		final Object targetValue = target.getValue();
+		final Object targetValue2 = target.getValue2();
+		List<Clause> similar = new ArrayList<Clause>();
+		Iterator<Clause> iterator = clauses.iterator();
+		while (iterator.hasNext()) {
+			final Clause current = iterator.next();
+			final Object currentValue = current.getValue();
+			final Object currentValue2 = current.getValue2();
+			if (targetTag.equals(current.getTag()) && targetValue.equals(currentValue)) {
+				if (targetValue2 == null) {
+					if (currentValue2 == null) {
+						similar.add(current);
+						iterator.remove();
+					}
+				}
+				else if (targetValue2.equals(currentValue2)) {
+					similar.add(current);
+					iterator.remove();
+				}
+			}
+		}
+		return similar;
+	}
+
+	private void mergeSimilarIntoTarget(final Clause target, List<Clause> similar) {
+		if (similar.isEmpty()) {
+			return;
+		}
+		final Collection<QualifierValue> targetQVs = target.getQualifierValues();
+		for (Clause current : similar) {
+			final Collection<QualifierValue> newQVs = current.getQualifierValues();
+			for (QualifierValue newQV : newQVs) {
+				final String newQualifier = newQV.getQualifier();
+				// if min or max cardinality check for possible merges
+				if ("minCardinality".equals(newQualifier) || "maxCardinality".equals(newQualifier)) {
+					QualifierValue match = findMatchingQualifierValue(newQV, targetQVs);
+					if (match != null) {
+						mergeQualifierValues(match, newQV);
+					}
+					else {
+						target.addQualifierValue(newQV);
+					}
+				}
+				else {
+					target.addQualifierValue(newQV);
+				}
+			}
+		}
+	}
+	
+	private QualifierValue findMatchingQualifierValue(QualifierValue query, Collection<QualifierValue> list) {
+		String queryQualifier = query.getQualifier();
+		for (QualifierValue qv : list) {
+			if (queryQualifier.equals(qv.getQualifier())) {
+				return qv;
+			}
+		}
+		return null;
+	}
+
+	private void mergeQualifierValues(QualifierValue target, QualifierValue newQV) {
+		// do nothing, if they are equal
+		if (!target.getValue().equals(newQV.getValue())) {
+			if("minCardinality".equals(target.getQualifier())) {
+				// try to merge, parse as integers
+				int currentValue = Integer.parseInt(target.getValue().toString());
+				int newValue = Integer.parseInt(newQV.getValue().toString());
+				int mergedValue = Math.min(currentValue, newValue);
+				target.setValue(Integer.toString(mergedValue));
+			}
+			else if("maxCardinality".equals(target.getQualifier())) {
+				// try to merge, parse as integers
+				int currentValue = Integer.parseInt(target.getValue().toString());
+				int newValue = Integer.parseInt(newQV.getValue().toString());
+				int mergedValue = Math.max(currentValue, newValue);
+				target.setValue(Integer.toString(mergedValue));
+			}
+		}
+	}
+	
+	private void error(OWLSubClassOfAxiom ax) {
+		String logErr = "the axiom is not translated : " + ax;
+		String err = "The conversion is halted as the axiom is not translated: " + ax;
+		if(strictConversion){
+			logErr = err;
+		}
+
+		LOG.warn(logErr);
+
+		if(strictConversion)
+			throw new RuntimeException(err);
+	}
 
 }
