@@ -1,5 +1,5 @@
 ontology: import_test_main
-import: http://oboformat.googlecode.com/svn/trunk/test_resources/import_test_imported.obo
+import: http://oboformat.googlecode.com/svn/trunk/src/test/resources/import_test_imported.obo
 
 [Term]
 id: TEST:1
