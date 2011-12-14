@@ -1,8 +1,0 @@
-#!/bin/bash
-# Set the classname of the Java class to execute
-export CLASSNAME=org.obolibrary.cli.OBORunnerGui
-
-PATH_TO_ME=`which $0`;
-PATH_TO_ME=`echo $PATH_TO_ME | sed -e "s/\(.*\)\/.*/\1/g"`
-
-bash $PATH_TO_ME/obolib-basic "$@"

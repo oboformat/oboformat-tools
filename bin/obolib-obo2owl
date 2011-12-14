@@ -1,7 +1,4 @@
 #!/bin/bash
-# Set the classname of the Java class to execute
-export CLASSNAME=org.obolibrary.cli.OBORunner
-
 PATH_TO_ME=`which $0`;
 PATH_TO_ME=`echo $PATH_TO_ME | sed -e "s/\(.*\)\/.*/\1/g"`
 
