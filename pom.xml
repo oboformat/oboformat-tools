@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bbop</groupId>
 	<artifactId>oboformat</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>oboformat</name>
  	<url>http://code.google.com/p/oboformat/</url>
@@ -20,17 +20,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>conf</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>test_resources</directory>
-			</testResource>
-		</testResources>
 	  	<plugins>
 	  		<plugin>
 	  			<groupId>org.apache.maven.plugins</groupId>
@@ -87,9 +76,9 @@
 					<appendAssemblyId>false</appendAssemblyId>
 					<attach>false</attach>
 					<outputDirectory>${project.basedir}/runlibs</outputDirectory>
-					<descriptors>
-						<descriptor>assembly/oboformat-all.xml</descriptor>
-					</descriptors>
+					<descriptorRefs>
+						<descriptorRef>oboformat-all</descriptorRef>
+					</descriptorRefs>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
@@ -161,10 +150,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
-			<!-- 
 			<scope>test</scope>  
-			this may be used as soon as the tests are in a separate source folder
-			 -->
 		</dependency>
 	</dependencies>
 	<distributionManagement>
