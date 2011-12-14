@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 public class RoundTripCardinalityTest extends RoundTripTest {
 	
 	private static final boolean RENDER_OWL = false;
+	private static final boolean RENDER_OBO = false;
 
 	@Test
 	public void testRoundTripCardinality() throws Exception {
@@ -97,7 +98,11 @@ public class RoundTripCardinalityTest extends RoundTripTest {
 			}
 			
 		}
-		renderOBO(convertedOboDoc);
+		if (RENDER_OBO) {
+			System.out.println("------------");
+			renderOBO(convertedOboDoc);
+			System.out.println("------------");
+		}
 	}
 	
 	@Test
