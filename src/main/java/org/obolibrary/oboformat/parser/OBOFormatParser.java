@@ -871,6 +871,14 @@ public class OBOFormatParser {
 		s.advance(i+1);
 		parseWs();
 		parseZeroOrMoreWs();
+		
+		// Memory optimization
+		// re-use the tag string
+		OboFormatTag formatTag = OBOFormatConstants.getTag(tag);
+		if (formatTag != null) {
+			tag = formatTag.getTag();
+		}
+		
 		return mapDeprecatedTag(tag);
 	}
 	
