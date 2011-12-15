@@ -213,8 +213,10 @@ public class OBOFormatWriter {
 
 		List<String> tags = duplicateTags(frame.getTags());
 		Collections.sort(tags, comparator);
-		String defaultOboNamespace = nameProvider.getDefaultOboNamespace();
-
+		String defaultOboNamespace = null;
+		if (nameProvider != null) {
+			defaultOboNamespace = nameProvider.getDefaultOboNamespace();
+		}
 		for(String tag: tags){
 			List<Clause> clauses = new ArrayList<Clause>(frame.getClauses(tag));
 			Collections.sort(clauses, ClauseComparator.instance);
@@ -235,7 +237,8 @@ public class OBOFormatWriter {
 				else if (OboFormatTag.TAG_NAMESPACE.getTag().equals(clauseTag)) {
 					// only write OBO namespace,
 					// if it is different from the default OBO namespace
-					if (!clause.getValue().equals(defaultOboNamespace)) {
+					if (defaultOboNamespace == null || 
+							clause.getValue().equals(defaultOboNamespace) == false) {
 						write(clause, writer, nameProvider);
 					}
 				}
