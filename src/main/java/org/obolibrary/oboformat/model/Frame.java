@@ -78,10 +78,13 @@ public class Frame {
 	 * @return null if no value set, otherwise first value
 	 */
 	public Clause getClause(String tag) {
-		Collection<Clause> tagClauses = getClauses(tag);
-		if (tagClauses.size() == 0)
-			return null;
-		return tagClauses.iterator().next(); // TODO - throw if > 1
+		for (Clause cl: clauses) {
+			if (cl.getTag().equals(tag)) {
+				return cl;
+			}
+			// TODO - throw exception if more than one clause of this type?
+		}
+		return null; 
 	}
 
 	public Clause getClause(OboFormatTag tag) {
