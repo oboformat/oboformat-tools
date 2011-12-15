@@ -736,11 +736,30 @@ public class OBOFormatWriter {
 
 	}
 
+	/**
+	 * This comparator sorts clauses with the same tag in the specified
+	 * write order.
+	 */
 	private static class ClauseComparator implements Comparator<Clause> {
 		
 		static final ClauseComparator instance = new ClauseComparator();
 		
 		public int compare(Clause o1, Clause o2) {
+			// special case for intersections
+			String tag = o1.getTag();
+			if (OboFormatTag.TAG_INTERSECTION_OF.getTag().equals(tag)) {
+				// sort by values size, prefer short ones.
+				int s1 = o1.getValues().size();
+				int s2 = o2.getValues().size();
+				if (s1 < s2) {
+					return -1; 
+				}
+				else if (s1 > s2) {
+					return 1;
+				}
+			}
+			
+			// sort by value
 			int comp = compareValues(o1.getValue(), o2.getValue());
 			if (comp != 0) {
 				return comp;
