@@ -63,6 +63,6 @@ fi
 
 echo CMDARGS=$CMDARGS
 
-CMD="$JAVAPATH -d64 -Xmx2048M -Xms2048M -DentityExpansionLimit=512000 -jar $PATH_TO_ME/oboformat-all.jar -DlauncherDir=$PATH_TO_ME $JAVAARGS $CMDARGS"
+CMD="$JAVAPATH -d64 -Xmx2048M -Xms2048M -DentityExpansionLimit=512000 -DlauncherDir=$PATH_TO_ME -jar $PATH_TO_ME/oboformat-all.jar  $JAVAARGS $CMDARGS"
 echo $CMD
 sh -c "$CMD"
