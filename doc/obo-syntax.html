@@ -382,12 +382,12 @@ at <a href="http://oboformat.googlecode.com">the oboformat site</a>
 to save space the grammar has meta-productions for basic Tag-Values
   Pairs (TVPs), Boolean Tags (BTs) and for the tags themselves (T):
 </p>
-<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;T&gt;-TVP</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span> <span class="nonterminal">UnquotedString</span>
-<span class="nonterminal">&lt;T&gt;-BT</span>   ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span> ( 'true' | 'false' )
-<span class="nonterminal">&lt;T&gt;-Tag</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' <span class="nonterminal">ws</span>
+<p class="grammar" style="white-space: pre;"><span class="nonterminal">&lt;T&gt;-TVP</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' [<span class="nonterminal">ws</span>] <span class="nonterminal">UnquotedString</span>
+<span class="nonterminal">&lt;T&gt;-BT</span>   ::= '<span class="terminal">&lt;T&gt;:</span>' [<span class="nonterminal">ws</span>] ( 'true' | 'false' )
+<span class="nonterminal">&lt;T&gt;-Tag</span>  ::= '<span class="terminal">&lt;T&gt;:</span>' [<span class="nonterminal">ws</span>]
 </p>
 <p>
-For example, <span class="nonterminal">property_value-Tag</span> should be interpreted as: <span>'property_value:' <span class="nonterminal">ws</span> </span>
+For example, <span class="nonterminal">property_value-Tag</span> should be interpreted as: <span>'property_value:' [<span class="nonterminal">ws</span>] </span>
 </p>
 
 <p>We provide an additional List meta-production, for comma-delimited lists
@@ -405,18 +405,41 @@ interpreted as: [ <span class="nonterminal">Qualifier</span> { ','
 Documents in the obo-format consist of sequences of Unicode characters
 [<cite><a href="#ref-unicode" title="">UNICODE</a></cite>] and are encoded in UTF-8
 [<cite><a href="#ref-rfc-3629" title="">RFC 3629</a></cite>].
+</p>
 
-<h3><a name="2.2"></a>2.2 Spacing Characters</h3>
+
+
+<h3><a name="2.2"></a>2.2 Characters</h3>
+
+<h4><a name="2.2.1"></a>2.2.1 Spacing Characters</h4>
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">WhiteSpaceChar</span> ::= ' ' | \t | U+0020 | U+0009
-<span class="nonterminal">ws</span> ::= { <span class="nonterminal">WhiteSpaceChar</span> }
+<span class="nonterminal">ws</span> ::= <span class="nonterminal">WhiteSpaceChar</span> { <span class="nonterminal">WhiteSpaceChar</span> }
 <span class="nonterminal">NewlineChar</span> ::= \r | \n | U+000A | U+000C | U+000D
-<span class="nonterminal">nl</span> ::= <span class="nonterminal">ws</span> <span class="nonterminal">NewLineChar</span>
+<span class="nonterminal">nl</span> ::= [<span class="nonterminal">ws</span>] <span class="nonterminal">NewLineChar</span>
 <span class="nonterminal">nl*</span> ::= { <span class="nonterminal">nl</span> }
-<span class="nonterminal">nl+</span> ::= <span class="nonterminal">nl</span>  { <span class="nonterminal">ws</span> <span class="nonterminal">NewLineChar</span> }
-<span class="nonterminal">OBOChar</span> ::= '\' <span class="nonterminal">Letter</span> | ( <span class="nonterminal">Char</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
 </p>
+
+<h4><a name="2.2.2"></a>2.2.2 Special Characters</h4>
+
+<p>
+We use the nonterminal <span class="nonterminal">UniCodeChar</span> to
+represent any Unicode character.
+</p>
+
+<p>
+An <span class="nonterminal">OBOChar</span> is either any non-newline
+unicode character, or a unicode character escaped by a backslash. This
+can be used to encode newline characters and other special characters
+in different contexts.
+</p>
+
+<p class="grammar" style="white-space: pre;">
+<span class="nonterminal">UniCodeChar</span> ::= <i>any Unicode character</i>
+<span class="nonterminal">OBOChar</span> ::= '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
+</p>
+
 
 <h3><a name="2.3"></a>2.3 Line Termination</h3>
 
@@ -428,9 +451,9 @@ tag-value qualifiers.
 </p>
 
 <p class="grammar" style="white-space: pre;">
-<span class="nonterminal">EOL</span> ::=  <span class="nonterminal">ws*</span> [ <span class="nonterminal">QualifierBlock</span> ] <span class="nonterminal">ws*</span> [ <span class="nonterminal">HiddenComment</span> ] <span class="nonterminal">ws*</span> <span class="nonterminal">NewLineChar</span>
+<span class="nonterminal">EOL</span> ::=  {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">QualifierBlock</span> ] {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">HiddenComment</span> ] {<span class="nonterminal">WhiteSpaceChar</span>} <span class="nonterminal">NewLineChar</span>
 <span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> '}' 
-<span class="nonterminal">HiddenComment</span> ::= '!' { ( <span class="nonterminal">Char</span> - <span class="nonterminal">NewlineChar</span> ) } 
+<span class="nonterminal">HiddenComment</span> ::= '!' { ( <span class="nonterminal">UniCodeChar</span> - <span class="nonterminal">NewlineChar</span> ) } 
 <span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' <span class="nonterminal">ws</span> <span class="terminal">Qualifier</span> }
 <span class="nonterminal">Qualifier</span> ::= <span class="nonterminal">Rel-ID</span> '=' <span class="nonterminal">QuotedString</span> 
 </p>
