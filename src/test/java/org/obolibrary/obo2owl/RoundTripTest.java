@@ -21,37 +21,37 @@ public class RoundTripTest extends OboFormatTestBasics {
 	public static void beforeClass() {
 		Logger.getRootLogger().setLevel(Level.ERROR);
 	}
-	
+
 	public List<Diff> roundTripOBOURL(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
 		OBODoc obodoc = parseOBOURL(fn);
 		return roundTripOBODoc(obodoc, isExpectRoundtrip);
 	}
-	
+
 	public List<Diff> roundTripOBOFile(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
 		OBODoc obodoc = parseOBOFile(fn);
 		return roundTripOBODoc(obodoc, isExpectRoundtrip);
 	}
-	
+
 	public List<Diff> roundTripOBODoc(OBODoc obodoc, boolean isExpectRoundtrip) throws OWLOntologyCreationException {
 
 		OWLOntology oo = convert(obodoc);
-		
+
 		OBODoc obodoc2 = convert(oo);
-		
+
 		try {
 			obodoc2.check();
 		} catch (FrameStructureException exception) {
 			exception.printStackTrace();
 			fail("No syntax errors allowed");
 		}
-		
+
 		try {
 			writeOBO(obodoc2, "roundtrip.obo");
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("No IOExceptions allowed");
 		} 
-		
+
 		OBODocDiffer dd = new OBODocDiffer();
 		List<Diff> diffs = dd.getDiffs(obodoc, obodoc2);
 		if (isExpectRoundtrip) {
@@ -63,4 +63,40 @@ public class RoundTripTest extends OboFormatTestBasics {
 		return diffs;
 	}
 	
+	public boolean roundTripOWLFile(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
+		OWLOntology oo = parseOWLFile(fn);
+		return roundTripOWLOOntology(oo, isExpectRoundtrip);
+	}
+
+
+	public boolean roundTripOWLOOntology(OWLOntology oo, boolean isExpectRoundtrip) throws OWLOntologyCreationException {
+
+
+		OBODoc obodoc = convert(oo);
+
+		try {
+			obodoc.check();
+		} catch (FrameStructureException exception) {
+			exception.printStackTrace();
+			fail("No syntax errors allowed");
+		}
+
+		OWLOntology oo2 = convert(obodoc);
+
+
+		boolean ok = compareOWLOntologiesPartial(oo, oo2, isExpectRoundtrip);
+
+
+		return ok || !isExpectRoundtrip;
+	}
+
+	private boolean compareOWLOntologiesPartial(OWLOntology oo, OWLOntology oo2,
+			boolean isExpectRoundtrip) {
+		if (isExpectRoundtrip) {
+			assertEquals("Expected same number of axioms", oo.getAxioms().size(), oo2.getAxioms().size());
+			return false;
+		}
+		return true;
+	}
+
 }
