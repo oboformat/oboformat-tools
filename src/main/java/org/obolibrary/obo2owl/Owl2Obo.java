@@ -87,6 +87,7 @@ public class Owl2Obo {
 
 	private void init() {
 		idSpaceMap = new HashMap<String, String>();
+		// legacy:
 		idSpaceMap.put("http://www.obofoundry.org/ro/ro.owl#", "OBO_REL");
 
 		manager = OWLManager.createOWLOntologyManager();
@@ -712,6 +713,7 @@ public class Owl2Obo {
 		//		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 
 		if (tag == null) {
+			// no built-in obo tag for this: use the generic property_value tag
 			Clause clause = new Clause();
 
 			clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
@@ -1330,9 +1332,6 @@ public class Owl2Obo {
 
 
 		return iri;
-
-
-
 	}
 
 
