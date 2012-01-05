@@ -365,30 +365,31 @@ public class OBOFormatWriter {
 
 	public void writePropertyValue(Clause clause, BufferedWriter writer) throws IOException{
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(clause.getTag());
-		sb.append(": ");
-
 		Collection<?> cols = clause.getValues();
 
 		if(cols.size()<2){
 			LOG.warn("The " + OboFormatTag.TAG_PROPERTY_VALUE.getTag() + " has incorrect number of values: " + clause);
 			return;
 		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
 
+		
 		Iterator<?> itr = cols.iterator();
-		sb.append(itr.next());
+		sb.append(escapeOboString(itr.next().toString(), EscapeMode.simple));
 		sb.append(" ");
 
 		String val = itr.next().toString();
 
 		if(val.contains(" ") || !val.contains(":")) {
 			sb.append(" \"");
-			sb.append(val);
+			sb.append(escapeOboString(val, EscapeMode.quotes));
 			sb.append("\"");
 		}
 		else {
-			sb.append(val);
+			sb.append(escapeOboString(val, EscapeMode.simple));
 		}
 		writeLine(sb, writer);
 	}
