@@ -6,9 +6,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -31,18 +33,12 @@ public class OBOFormatParser {
 	
 	static final Logger LOG = Logger.getLogger(OBOFormatParser.class); 
 	
-    public static final String DEFAULT_CHARACTER_ENCODING = "UTF-8";
-	
-	SimpleDateFormat headerDateFormat = new SimpleDateFormat("dd:MM:yyyy HH:mm");
-	SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+	// TODO use this to validate date strings for OboFormatTag.TAG_CREATION_DATE
+    SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
 	private boolean followImport;
 	
 	private Object location;
-	
-	protected enum ParseState {
-		HEADER, BODY
-	}
 	
 	protected class MyStream {
 		int pos=0;
@@ -206,7 +202,7 @@ public class OBOFormatParser {
 	 */
 	public OBODoc parse(File file) throws IOException {
 		 this.location = file;
-		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), DEFAULT_CHARACTER_ENCODING));
+		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), OBOFormatConstants.DEFAULT_CHARACTER_ENCODING));
 		 return parse(in);
 	}
 
@@ -219,7 +215,7 @@ public class OBOFormatParser {
 	 */
 	public OBODoc parse(URL url) throws IOException {
 		this.location = url;
-	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), DEFAULT_CHARACTER_ENCODING));
+	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), OBOFormatConstants.DEFAULT_CHARACTER_ENCODING));
 	    return parse(in);
 	}	
 
@@ -498,10 +494,9 @@ public class OBOFormatParser {
 		if (tag == OboFormatTag.TAG_SUBSETDEF) {
 			return parseSubsetdef(cl);
 		}
-
-		
-		
-		
+		if (tag == OboFormatTag.TAG_DATE) {
+			return parseHeaderDate(cl);
+		}
 		// default
 		return parseUnquotedString(cl);
 	}
@@ -948,6 +943,21 @@ public class OBOFormatParser {
 		return true;
 	}
 
+	private boolean parseHeaderDate(Clause cl) {
+		parseOneOrMoreWs();
+		String v = getParseUntil("!");
+		v = removeTrailingWS(v);
+		Date date;
+		try {
+			date = OBOFormatConstants.headerDateFormat.get().parse(v);
+		} catch (ParseException e) {
+			LOG.error("Could not parse date from string: "+v, e);
+			return false;
+		}
+		cl.addValue(date);
+		return true;
+	}
+	
 
 	private boolean parseRelationship(Clause cl) {
 		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
@@ -1122,7 +1132,7 @@ public class OBOFormatParser {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{", true);
 		if (id != null && !(id.equals(""))) {
-			id = id.replaceAll(" *$", "");
+			id = removeTrailingWS(id);
 			if (id.contains(" ")) {
 				// TODO
 				LOG.warn("accepting bad xref with spaces:"+id);
@@ -1138,7 +1148,7 @@ public class OBOFormatParser {
 		}
 		return false;
 	}
-	
+
 	// an xref that is a direct value of a clause
 	private boolean parseDirectXref(Clause cl) {
 		parseZeroOrMoreWs();
@@ -1281,7 +1291,7 @@ public class OBOFormatParser {
 		String v = getParseUntil("!{");
 
 		// strip whitespace from the end - TODO
-		v = v.replaceAll("\\s*$", "");
+		v = removeTrailingWS(v);
 		
 		cl.setValue(v);
 		//s.advanceLine();
@@ -1450,6 +1460,11 @@ public class OBOFormatParser {
 			return OboFormatTag.TAG_IS_TRANSITIVE.getTag();
 		}
 		return tag;
+	}
+
+	private String removeTrailingWS(String s) {
+		// TODO make this more efficient
+		return s.replaceAll("\\s*$", "");
 	}
 
 }

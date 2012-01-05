@@ -1,5 +1,6 @@
 package org.obolibrary.obo2owl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -781,7 +782,17 @@ public class Owl2Obo {
 			}else if (value.trim().length()>0) {
 				Clause clause = new Clause();
 				clause.setTag(tag);
-				clause.addValue(value);
+				if (_tag == OboFormatTag.TAG_DATE) {
+					try {
+						clause.addValue(OBOFormatConstants.headerDateFormat.get().parseObject(value));
+					} catch (ParseException e) {
+						LOG.error("Could not parse date string: "+value, e);
+						result = false;
+					}
+				}
+				else {
+					clause.addValue(value);
+				}
 				frame.addClause(clause);
 				Set<OWLAnnotation> unprocessedQualifiers = new HashSet<OWLAnnotation>(qualifiers);
 

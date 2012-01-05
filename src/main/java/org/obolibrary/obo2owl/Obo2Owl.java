@@ -56,8 +56,11 @@ public class Obo2Owl {
 
 	public static final boolean DEBUG = LOG.isDebugEnabled();
 
+	/**
+	 * Use conversion methods or Obo2OWLConstants.DEFAULT_IRI_PREFIX 
+	 */
 	@Deprecated
-	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
+	public static final String DEFAULT_IRI_PREFIX = Obo2OWLConstants.DEFAULT_IRI_PREFIX;
 
 	//	public static final String IRI_CLASS_SYNONYMTYPEDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_synonymtypedef";
 	//	public static final String IRI_CLASS_SUBSETDEF = Obo2OWLConstants.DEFAULT_IRI_PREFIX + "IAO_subsetdef";
@@ -396,6 +399,24 @@ public class Obo2Owl {
 					}
 				}
 
+			} else if (tag == OboFormatTag.TAG_DATE) {
+				Clause clause = headerFrame.getClause(tag);
+				Object value = clause.getValue();
+				String dateString = null;
+				if (value instanceof Date) {
+					dateString = OBOFormatConstants.headerDateFormat.get().format((Date) value);
+				}
+				else if (value instanceof String) {
+					dateString = (String) value;
+				}
+				if (dateString != null) {
+					addOntologyAnnotation(trTagToAnnotationProp(t), trLiteral(dateString));
+				}
+				else {
+					// TODO: Throw Exceptions
+					LOG.warn("Cannot translate: "+clause);
+				}
+				
 			}/*else if (tag == OboFormatTag.TAG_DATA_VERSION) {
 				//fac.getOWLVersionInfo();
 				Clause clause = headerFrame.getClause(t);

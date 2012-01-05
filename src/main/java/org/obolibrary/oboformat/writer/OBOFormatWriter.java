@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.QualifierValue;
 import org.obolibrary.oboformat.model.Xref;
+import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 
@@ -106,7 +108,7 @@ public class OBOFormatWriter {
 	public void write(OBODoc doc, String outFile) throws IOException {
 
 		FileOutputStream os = new FileOutputStream(new File( outFile )); 
-		OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+		OutputStreamWriter osw = new OutputStreamWriter(os, OBOFormatConstants.DEFAULT_CHARACTER_ENCODING);
 		BufferedWriter bw = new BufferedWriter(osw);
 		write(doc,bw);
 		bw.close();
@@ -184,6 +186,8 @@ public class OBOFormatWriter {
 					writeSynonymtypedef(clause, writer);
 				}else if(tag.equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())){
 					writeSynonymtypedef(clause, writer);
+				}else if(tag.equals(OboFormatTag.TAG_DATE.getTag())) {
+					writeHeaderDate(clause, writer);
 				}else
 					write(clause, writer, nameProvider);
 			}
@@ -285,6 +289,24 @@ public class OBOFormatWriter {
 			sb.append(escapeOboString(value, EscapeMode.quotes));
 			if (i==1) { sb.append('"'); }
 			if (valuesIterator.hasNext()) { sb.append(' '); }
+		}
+		writeLine(sb, writer);
+	}
+	
+	private void writeHeaderDate(Clause clause, BufferedWriter writer) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(clause.getTag());
+		sb.append(": ");
+		Object value = clause.getValue();
+		if (value instanceof Date) {
+			sb.append(OBOFormatConstants.headerDateFormat.get().format((Date) value));
+			
+		} else if (value instanceof String) {
+			sb.append(value);
+		}
+		else {
+			LOG.warn("Unknown datatype ('"+value.getClass().getName()+"') for value in clause: "+clause);
+			sb.append(value.toString());
 		}
 		writeLine(sb, writer);
 	}
