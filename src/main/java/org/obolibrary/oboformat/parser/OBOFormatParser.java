@@ -874,7 +874,7 @@ public class OBOFormatParser {
 	
 	private boolean parseIdRef(Clause cl) {
 		String id = getParseUntil(" !{");
-		if (id == null || id.equals(""))
+		if (id == null || id.length() < 1)
 			return false;
 		cl.addValue(id);
 		
@@ -968,21 +968,26 @@ public class OBOFormatParser {
 		
 		if(parseIdRef(cl) && parseOneOrMoreWs()){
 		
+			boolean success;
 			if(s.peekCharIs('\"')){
 				s.consume("\"");
 				String desc = getParseUntilAdv("\"");
 				cl.addValue(desc);
-				return true;
+				success = true;
 			}else{
-				return parseIdRef(cl);
+				success = parseIdRef(cl);
 			}
-			
+			if (success) {
+				// check if there is a third value to parse
+				parseZeroOrMoreWs();
+				String s = getParseUntil(" !{");
+				if (s != null && s.length() > 0) {
+					cl.addValue(s);
+				}
+				return true;
+			}
 		}
-			
 		return false;
-		
-		
-	//	return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
 	}
 
 	/**

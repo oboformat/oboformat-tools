@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.obolibrary.obo2owl.Obo2Owl;
@@ -132,14 +133,22 @@ public class OboFormatTestBasics {
 		return tempFile;
 	}
 	
-	protected static void renderOBO(OBODoc oboDoc) throws IOException {
+	protected static String renderOboToString(OBODoc oboDoc) throws IOException {
 		OBOFormatWriter writer = new OBOFormatWriter();
 		writer.setCheckStructure(true);
 		StringWriter out = new StringWriter();
 		BufferedWriter stream = new BufferedWriter(out);
 		writer.write(oboDoc, stream);
 		stream.close();
-		System.out.println(out.getBuffer());
+		return out.getBuffer().toString();
+	}
+	
+	protected static void renderOBO(OBODoc oboDoc) throws IOException {
+		OBOFormatWriter writer = new OBOFormatWriter();
+		writer.setCheckStructure(true);
+		BufferedWriter stream = new BufferedWriter(new PrintWriter(System.out));
+		writer.write(oboDoc, stream);
+		stream.close();
 	}
 	
 	protected static void renderOWL(OWLOntology owlOntology) throws OWLOntologyStorageException {

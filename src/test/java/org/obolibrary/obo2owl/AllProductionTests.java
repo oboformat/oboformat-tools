@@ -41,6 +41,7 @@ import org.obolibrary.oboformat.XrefExpanderTest;
 	RoundTripMultiLineDefTest.class,
 	RoundTripCAROTest.class,
 	RoundTripCardinalityTest.class,
+	RoundTripOWLROTest.class,
 	//SBOTest.class,
 	SubsetTest.class,
 	SynonymTest.class,

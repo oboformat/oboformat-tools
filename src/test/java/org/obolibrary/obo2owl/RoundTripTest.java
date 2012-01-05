@@ -3,7 +3,9 @@ package org.obolibrary.obo2owl;
 import static junit.framework.Assert.*;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -12,8 +14,10 @@ import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.FrameStructureException;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class RoundTripTest extends OboFormatTestBasics {
 
@@ -63,17 +67,18 @@ public class RoundTripTest extends OboFormatTestBasics {
 		return diffs;
 	}
 	
-	public boolean roundTripOWLFile(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
+	public boolean roundTripOWLFile(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		OWLOntology oo = parseOWLFile(fn);
 		return roundTripOWLOOntology(oo, isExpectRoundtrip);
 	}
 
 
-	public boolean roundTripOWLOOntology(OWLOntology oo, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
+	public boolean roundTripOWLOOntology(OWLOntology oo, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 
 
-		OBODoc obodoc = convert(oo);
-		this.writeOBO(obodoc, "owl2obo-roundtrip-intermediate.obo");
+		Owl2Obo bridge = new Owl2Obo();
+		OBODoc obodoc = bridge.convert(oo);
+		writeOBO(obodoc, "owl2obo-roundtrip-intermediate.obo");
 		try {
 			obodoc.check();
 		} catch (FrameStructureException exception) {
@@ -82,18 +87,26 @@ public class RoundTripTest extends OboFormatTestBasics {
 		}
 
 		OWLOntology oo2 = convert(obodoc);
+		writeOWL(oo2, "owl2obo-roundtrip.owl");
 
-
-		boolean ok = compareOWLOntologiesPartial(oo, oo2, isExpectRoundtrip);
+		boolean ok = compareOWLOntologiesPartial(oo, oo2, isExpectRoundtrip, bridge.getUntranslatableAxioms());
 
 
 		return ok || !isExpectRoundtrip;
 	}
 
 	private boolean compareOWLOntologiesPartial(OWLOntology oo, OWLOntology oo2,
-			boolean isExpectRoundtrip) {
+			boolean isExpectRoundtrip, Collection<OWLAxiom> untranslatableAxioms) {
 		if (isExpectRoundtrip) {
-			assertEquals("Expected same number of axioms", oo.getAxioms().size(), oo2.getAxioms().size());
+			int untranslatedSize = 0;
+			if (untranslatableAxioms != null) {
+				untranslatedSize = untranslatableAxioms.size();
+			}
+			Set<OWLAxiom> expectedAxioms = oo.getAxioms();
+			Set<OWLAxiom> foundAxioms = oo2.getAxioms();
+			int expectedSize = expectedAxioms.size();
+			int foundSize = foundAxioms.size();
+			assertEquals("Expected same number of axioms", expectedSize, foundSize+untranslatedSize);
 			return false;
 		}
 		return true;
