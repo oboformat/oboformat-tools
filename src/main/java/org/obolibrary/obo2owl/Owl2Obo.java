@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owlapi.model.OWLDisjointObjectPropertiesAxiom;
@@ -69,6 +70,8 @@ import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 import org.semanticweb.owlapi.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLTransitiveObjectPropertyAxiom;
+import org.semanticweb.owlapi.vocab.Namespaces;
+import org.semanticweb.owlapi.vocab.OWL2Datatype;
 
 public class Owl2Obo {
 
@@ -707,14 +710,74 @@ public class Owl2Obo {
 	private boolean tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,  Frame frame) {
 
 		boolean result = true;
-		//		OWLAnnotationProperty prop = aanAx.getProperty();
 		String tag = owlObjectToTag(prop);
-
-		//System.out.println("PROP: "+prop+" TAG:"+tag);
-		//		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 
 		if (tag == null) {
 			// no built-in obo tag for this: use the generic property_value tag
+			Clause clause = new Clause();
+
+			clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
+			String propId = this.getIdentifier(prop);
+			if (propId.equals("shorthand")) {
+				addQualifiers(clause, qualifiers);
+			}
+			else {
+				clause.addValue(propId);
+				
+				if(annVal instanceof OWLLiteral){
+					OWLLiteral owlLiteral = (OWLLiteral) annVal;
+					clause.addValue(owlLiteral.getLiteral());
+					OWLDatatype datatype = owlLiteral.getDatatype();
+					IRI dataTypeIri = datatype.getIRI();
+					if (!OWL2Datatype.isBuiltIn(dataTypeIri)) {
+						LOG.error("Untranslatable axiom due to unknown data type: "+annVal);
+						return false;
+					}
+					if (dataTypeIri.getStart().equals(Namespaces.XSD.toString())) {
+						clause.addValue("xsd:"+dataTypeIri.getFragment());
+					} else if (dataTypeIri.isPlainLiteral()) {
+						clause.addValue("xsd:string");
+					}
+					else {
+						clause.addValue(dataTypeIri.toString());
+					}
+					
+				}else if(annVal instanceof IRI){
+					clause.addValue(getIdentifier((IRI)annVal));
+				}
+				frame.addClause(clause);
+			}
+			return true;
+		}
+		
+		
+		String value = annVal.toString();
+		if(annVal instanceof OWLLiteral){
+			value = ((OWLLiteral) annVal).getLiteral();
+		}else if(annVal instanceof IRI){
+			value = getIdentifier((IRI)annVal);
+		}
+		
+		if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
+			//value = aanAx.getValue().toString();
+			//value = getLiteral((OWLLiteral)aanAx.getValue());
+			Matcher matcher = absoulteURLPattern.matcher(value);
+			while(matcher.find()){
+				String m = matcher.group();
+				m = m.replace("<", "");
+				m = m.replace(">", "");
+				int i = m.lastIndexOf("/");
+				m = m.substring(i+1);
+
+				value = value.replace(matcher.group(), m);
+			}
+
+		}
+
+
+		OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+		if(_tag == null){
+
 			Clause clause = new Clause();
 
 			clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
@@ -726,153 +789,102 @@ public class Owl2Obo {
 			}
 			else {
 				clause.addValue(propId);
-				clause.addValue(annVal.toString());
+				clause.addValue(value);
 				frame.addClause(clause);
 			}
-			return true;
-		}
-		
-		if (tag != null) {
 
-			String value = annVal.toString();
-
-			if(annVal instanceof OWLLiteral){
-				value = ((OWLLiteral) annVal).getLiteral();
-			}else if(annVal instanceof IRI){
-				value = getIdentifier((IRI)annVal); //getIdentifier((IRI)aanAx.getValue());
+			//				if(propId.endsWith("0000426"))
+			//				System.out.println(propId+"----- " + value);
+		}else if (value.trim().length()>0) {
+			Clause clause = new Clause();
+			clause.setTag(tag);
+			if (_tag == OboFormatTag.TAG_DATE) {
+				try {
+					clause.addValue(OBOFormatConstants.headerDateFormat.get().parseObject(value));
+				} catch (ParseException e) {
+					LOG.error("Could not parse date string: "+value, e);
+					result = false;
+				}
 			}
-
-			if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
-				//value = aanAx.getValue().toString();
-				//value = getLiteral((OWLLiteral)aanAx.getValue());
-				Matcher matcher = absoulteURLPattern.matcher(value);
-				while(matcher.find()){
-					String m = matcher.group();
-					m = m.replace("<", "");
-					m = m.replace(">", "");
-					int i = m.lastIndexOf("/");
-					m = m.substring(i+1);
-
-					value = value.replace(matcher.group(), m);
-				}
-
+			else {
+				clause.addValue(value);
 			}
+			frame.addClause(clause);
+			Set<OWLAnnotation> unprocessedQualifiers = new HashSet<OWLAnnotation>(qualifiers);
 
+			if(_tag == OboFormatTag.TAG_DEF){
 
-			OboFormatTag _tag = OBOFormatConstants.getTag(tag);
-			if(_tag == null){
+				for(OWLAnnotation aan: qualifiers){
+					String propId = owlObjectToTag(aan.getProperty());
 
-				Clause clause = new Clause();
-
-				clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
-				String propId = this.getIdentifier(prop); //getIdentifier(prop);
-				if (propId.equals("shorthand")) {
-
-					addQualifiers(clause, qualifiers);
-
-				}
-				else {
-					clause.addValue(propId);
-					clause.addValue(value);
-					frame.addClause(clause);
-				}
-
-				//				if(propId.endsWith("0000426"))
-				//				System.out.println(propId+"----- " + value);
-			}else if (value.trim().length()>0) {
-				Clause clause = new Clause();
-				clause.setTag(tag);
-				if (_tag == OboFormatTag.TAG_DATE) {
-					try {
-						clause.addValue(OBOFormatConstants.headerDateFormat.get().parseObject(value));
-					} catch (ParseException e) {
-						LOG.error("Could not parse date string: "+value, e);
-						result = false;
+					if("xref".equals(propId)){
+						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
+						Xref xref = new Xref(xrefValue);
+						clause.addXref(xref);
+						unprocessedQualifiers.remove(aan);
 					}
 				}
-				else {
-					clause.addValue(value);
-				}
-				frame.addClause(clause);
-				Set<OWLAnnotation> unprocessedQualifiers = new HashSet<OWLAnnotation>(qualifiers);
-
-				if(_tag == OboFormatTag.TAG_DEF){
-
-					for(OWLAnnotation aan: qualifiers){
-						String propId = owlObjectToTag(aan.getProperty());
-
-						if("xref".equals(propId)){
-							String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
-							Xref xref = new Xref(xrefValue);
-							clause.addXref(xref);
-							unprocessedQualifiers.remove(aan);
-						}
-					}
-				}
-				else if (_tag == OboFormatTag.TAG_XREF) {
-					Xref xref = new Xref(value);
-					for(OWLAnnotation annotation : qualifiers) {
-						if (fac.getRDFSLabel().equals(annotation.getProperty())) {
-							OWLAnnotationValue owlAnnotationValue = annotation.getValue();
-							if (owlAnnotationValue instanceof OWLLiteral) {
-								unprocessedQualifiers.remove(annotation);
-								String xrefAnnotation = ((OWLLiteral) owlAnnotationValue).getLiteral();
-								if (xrefAnnotation != null) {
-									xrefAnnotation = xrefAnnotation.trim();
-									if (xrefAnnotation.length() > 0) {
-										xref.setAnnotation(xrefAnnotation);
-									}
+			}
+			else if (_tag == OboFormatTag.TAG_XREF) {
+				Xref xref = new Xref(value);
+				for(OWLAnnotation annotation : qualifiers) {
+					if (fac.getRDFSLabel().equals(annotation.getProperty())) {
+						OWLAnnotationValue owlAnnotationValue = annotation.getValue();
+						if (owlAnnotationValue instanceof OWLLiteral) {
+							unprocessedQualifiers.remove(annotation);
+							String xrefAnnotation = ((OWLLiteral) owlAnnotationValue).getLiteral();
+							if (xrefAnnotation != null) {
+								xrefAnnotation = xrefAnnotation.trim();
+								if (xrefAnnotation.length() > 0) {
+									xref.setAnnotation(xrefAnnotation);
 								}
 							}
 						}
 					}
-					clause.setValue(xref);
 				}
-				else if(_tag == OboFormatTag.TAG_EXACT ||
-						_tag == OboFormatTag.TAG_NARROW ||
-						_tag == OboFormatTag.TAG_BROAD ||
-						_tag == OboFormatTag.TAG_RELATED){
-					clause.setTag(OboFormatTag.TAG_SYNONYM.getTag());
-					String scope = _tag.getTag();
-					String type = null;
-					clause.setXrefs(new Vector<Xref>());
-					for(OWLAnnotation aan: qualifiers){
-						String propId = owlObjectToTag(aan.getProperty());
-						//System.out.println("Qual: "+aan+" PropID: '"+propId+"' X:'"+OboFormatTag.TAG_HAS_SYNONYM_TYPE.);
-						if(OboFormatTag.TAG_XREF.getTag().equals(propId)){
-							String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
-							Xref xref = new Xref(xrefValue);
-							clause.addXref(xref);
-							unprocessedQualifiers.remove(aan);
-						}else if(OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag().equals(propId)){
-							type = getIdentifier(aan.getValue());
-							unprocessedQualifiers.remove(aan);
-						}
+				clause.setValue(xref);
+			}
+			else if(_tag == OboFormatTag.TAG_EXACT ||
+					_tag == OboFormatTag.TAG_NARROW ||
+					_tag == OboFormatTag.TAG_BROAD ||
+					_tag == OboFormatTag.TAG_RELATED){
+				clause.setTag(OboFormatTag.TAG_SYNONYM.getTag());
+				String scope = _tag.getTag();
+				String type = null;
+				clause.setXrefs(new Vector<Xref>());
+				for(OWLAnnotation aan: qualifiers){
+					String propId = owlObjectToTag(aan.getProperty());
+					//System.out.println("Qual: "+aan+" PropID: '"+propId+"' X:'"+OboFormatTag.TAG_HAS_SYNONYM_TYPE.);
+					if(OboFormatTag.TAG_XREF.getTag().equals(propId)){
+						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
+						Xref xref = new Xref(xrefValue);
+						clause.addXref(xref);
+						unprocessedQualifiers.remove(aan);
+					}else if(OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag().equals(propId)){
+						type = getIdentifier(aan.getValue());
+						unprocessedQualifiers.remove(aan);
 					}
+				}
 
 
-					if(scope != null){
-						clause.addValue(scope);
+				if(scope != null){
+					clause.addValue(scope);
 
-						if(type != null){
-							clause.addValue(type);
-						}
+					if(type != null){
+						clause.addValue(type);
 					}
-					else {
-						result = false;
-					}
-
-				}else {
+				}
+				else {
 					result = false;
 				}
-				addQualifiers(clause, unprocessedQualifiers);
-			}else{
+
+			}else {
 				result = false;
 			}
-		}else
+			addQualifiers(clause, unprocessedQualifiers);
+		}else{
 			result = false;
-
-
+		}
 		return result;
 
 	}

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,8 @@ import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLProperty;
+import org.semanticweb.owlapi.vocab.Namespaces;
+import org.semanticweb.owlapi.vocab.OWL2Datatype;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class Obo2Owl {
@@ -943,10 +946,21 @@ public class Obo2Owl {
 						annotations);
 			} 
 			else if (values.size() == 3) {
+				Iterator<Object> it = clause.getValues().iterator();
+				it.next();
+				it.next();
+				String v3String = (String) it.next();
+				IRI valueIRI;
+				if (v3String.startsWith("xsd:")) {
+					valueIRI = IRI.create(Namespaces.XSD + v3String.substring(4));
+				} else {
+					valueIRI = IRI.create(v3String);
+				}
+				OWLAnnotationValue value = fac.getOWLLiteral((String) v2, OWL2Datatype.getDatatype(valueIRI));
 				ax = fac.getOWLAnnotationAssertionAxiom(
 						trAnnotationProp((String)v),
 						sub, 
-						this.trLiteral(v2),
+						value,
 						annotations);
 			}
 			else {

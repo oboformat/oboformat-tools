@@ -376,20 +376,19 @@ public class OBOFormatWriter {
 		sb.append(clause.getTag());
 		sb.append(": ");
 
-		
-		Iterator<?> itr = cols.iterator();
-		sb.append(escapeOboString(itr.next().toString(), EscapeMode.simple));
-		sb.append(" ");
-
-		String val = itr.next().toString();
-
-		if(val.contains(" ") || !val.contains(":")) {
-			sb.append(" \"");
-			sb.append(escapeOboString(val, EscapeMode.quotes));
-			sb.append("\"");
-		}
-		else {
-			sb.append(escapeOboString(val, EscapeMode.simple));
+		for(Iterator<?> it = cols.iterator(); it.hasNext(); ) {
+			String val = it.next().toString(); // TODO replace toString() method
+			if(val.contains(" ") || !val.contains(":")) {
+				sb.append('"');
+				sb.append(escapeOboString(val, EscapeMode.quotes));
+				sb.append('"');
+			}
+			else {
+				sb.append(escapeOboString(val, EscapeMode.simple));
+			}
+			if (it.hasNext()) {
+				sb.append(' ');
+			}
 		}
 		writeLine(sb, writer);
 	}

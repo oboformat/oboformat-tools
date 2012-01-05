@@ -69,11 +69,11 @@ public class RoundTripTest extends OboFormatTestBasics {
 	}
 
 
-	public boolean roundTripOWLOOntology(OWLOntology oo, boolean isExpectRoundtrip) throws OWLOntologyCreationException {
+	public boolean roundTripOWLOOntology(OWLOntology oo, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
 
 
 		OBODoc obodoc = convert(oo);
-
+		this.writeOBO(obodoc, "owl2obo-roundtrip-intermediate.obo");
 		try {
 			obodoc.check();
 		} catch (FrameStructureException exception) {
