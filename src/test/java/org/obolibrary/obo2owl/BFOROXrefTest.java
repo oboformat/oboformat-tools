@@ -4,6 +4,7 @@ import static junit.framework.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.junit.Test;
 import org.obolibrary.obo2owl.Owl2Obo;
@@ -12,6 +13,10 @@ import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -19,9 +24,35 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 public class BFOROXrefTest extends OboFormatTestBasics {
 
 	@Test
-	public void testConvertXPs() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testRelationXrefConversion() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		OWLOntology owlOnt = convertOBOFile("rel_xref_test.obo");
-		
+
+		// test initial conversion
+		Set<OWLObjectProperty> ops =  owlOnt.getObjectPropertiesInSignature();
+		for (OWLObjectProperty op : ops) {
+			//System.out.println("OP:"+op);
+		}
+		assertTrue(ops.size() == 3);
+		Set<OWLAnnotationAssertionAxiom> aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/BFO_0000051"));
+		boolean ok = false;
+		for (OWLAnnotationAssertionAxiom a : aaas) {
+			System.out.println(a);
+			if (a.getProperty().getIRI().toString().equals("http://www.geneontology.org/formats/oboInOwl#shorthand")) {
+				OWLLiteral v = (OWLLiteral) a.getValue();
+				if (v.getLiteral().equals("has_part")) {
+					ok = true;
+				}
+			}
+		}
+		assertTrue(aaas.size() > 0);
+		assertTrue(ok);
+	
+		aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/BFO_0000050"));
+		assertTrue(aaas.size() > 0);
+
+		aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/RO_0002111"));
+		assertTrue(aaas.size() > 0);
+
 		Owl2Obo revbridge = new Owl2Obo();
 		OBODoc d2 = revbridge.convert(owlOnt);
 		

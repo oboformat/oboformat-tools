@@ -419,7 +419,7 @@ public class Obo2Owl {
 					// TODO: Throw Exceptions
 					LOG.warn("Cannot translate: "+clause);
 				}
-				
+
 			}/*else if (tag == OboFormatTag.TAG_DATA_VERSION) {
 				//fac.getOWLVersionInfo();
 				Clause clause = headerFrame.getClause(t);
@@ -516,17 +516,31 @@ public class Obo2Owl {
 			add(fac.getOWLDeclarationAxiom(p));
 
 			String id = typedefFrame.getId();
+
+			String xid = translateShorthandIdToExpandedId(id);
+			if (xid != id) {
+				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
+						trTagToAnnotationProp("shorthand"),
+						p.getIRI(), 
+						trLiteral(id), 
+						new HashSet<OWLAnnotation>());
+
+				add(ax);				
+			}
+
+			/*
+			// See 5.9.3 Special Rules for Relations
 			Collection<Xref> xrefs = typedefFrame.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
+			String xrefStr = null;
 			for (Xref xref: xrefs) {
 				if (xref != null) {
 					String xid = xref.getIdref();
 
-					// RO and BFO have special status.
-					// avoid cycles (in case of self-xref)
 					if ((xid.startsWith("RO") ||
 							xid.startsWith("BFO")) &&
 							!xid.equals(id)) {
-
+						// RO and BFO have special status. 
+						// avoid cycles (in case of self-xref)
 
 						//	fac.getOWLAnnotationAssertionAxiom(prop, p.getIRI(), trLiteral(id), new HashSet<OWLAnnotation>());
 						OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
@@ -542,6 +556,7 @@ public class Obo2Owl {
 					}
 				}
 			}
+			 */
 
 
 
@@ -1286,8 +1301,15 @@ public class Obo2Owl {
 
 		// TODO - treat_xrefs_as_equivalent
 		// special case rule for relation xrefs:
+		// 5.9.3. Special Rules for Relations
+		if (!id.contains(":")) {
+			String xid = translateShorthandIdToExpandedId(id);
+			if (!xid.equals(id))
+				return oboIdToIRI(xid);
+		}
+		/*
 		Frame tdf = obodoc.getTypedefFrame(id);
-		if (tdf != null) {
+		if (tdf != null && !id.contains(":")) {
 			Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
 			for (Xref xref : xrefs) {
 				if (xref != null) {
@@ -1303,6 +1325,7 @@ public class Obo2Owl {
 				}
 			}
 		}
+		*/
 
 		String[] idParts = id.split(":", 2);
 		String db;
@@ -1354,6 +1377,35 @@ public class Obo2Owl {
 		}
 
 		return  iri;	
+	}
+
+	// 5.9.3. Special Rules for Relations
+	private String translateShorthandIdToExpandedId(String id) {
+		if (id.contains(":"))
+			return id;
+		Frame tdf = obodoc.getTypedefFrame(id);
+		if (tdf == null)
+			return id;
+		Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
+		String matchingExpandedId = id;
+		for (Xref xref : xrefs) {
+			if (xref != null) {
+				String xid = xref.getIdref();
+				if (xid.equals(id))
+					continue;
+				if (xid == null) {
+					matchingExpandedId = xid;
+				}
+				else {
+					// RO and BFO take precedence over others
+					if ((xid.startsWith("RO") ||
+							xid.startsWith("BFO"))) {
+						matchingExpandedId = xid;
+					}
+				}
+			}
+		}
+		return matchingExpandedId;
 	}
 
 	private String getDefaultIDSpace() {
