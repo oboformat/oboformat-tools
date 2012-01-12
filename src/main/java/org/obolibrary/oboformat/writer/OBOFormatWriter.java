@@ -188,6 +188,8 @@ public class OBOFormatWriter {
 					writeSynonymtypedef(clause, writer);
 				}else if(tag.equals(OboFormatTag.TAG_DATE.getTag())) {
 					writeHeaderDate(clause, writer);
+				}else if(tag.equals(OboFormatTag.TAG_PROPERTY_VALUE.getTag())) {
+					writePropertyValue(clause, writer);
 				}else
 					write(clause, writer, nameProvider);
 			}

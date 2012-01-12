@@ -497,6 +497,9 @@ public class OBOFormatParser {
 		if (tag == OboFormatTag.TAG_DATE) {
 			return parseHeaderDate(cl);
 		}
+		if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
+			return parsePropertyValue(cl);
+		}
 		// default
 		return parseUnquotedString(cl);
 	}
@@ -837,9 +840,6 @@ public class OBOFormatParser {
 		if (tag == OboFormatTag.TAG_EXPAND_EXPRESSION_TO) {
 			return parseOwlDef(cl);
 		}
-
-		
-
 		return false;
 	}
 	
@@ -964,11 +964,20 @@ public class OBOFormatParser {
 	}
 
 	private boolean parsePropertyValue(Clause cl) {
-		
-		
-		if(parseIdRef(cl) && parseOneOrMoreWs()){
-		
-			boolean success;
+		// parse a pair or triple
+		// the first and second value, may be quoted strings
+		boolean success;
+		if(s.peekCharIs('\"')){
+			s.consume("\"");
+			String desc = getParseUntilAdv("\"");
+			cl.addValue(desc);
+			success = true;
+		}
+		else {
+			success = parseIdRef(cl);
+		}
+		success = success && parseOneOrMoreWs();
+		if(success){
 			if(s.peekCharIs('\"')){
 				s.consume("\"");
 				String desc = getParseUntilAdv("\"");

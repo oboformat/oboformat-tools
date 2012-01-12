@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.obolibrary.obo2owl.Obo2Owl;
@@ -141,6 +142,14 @@ public class OboFormatTestBasics {
 		writer.write(oboDoc, stream);
 		stream.close();
 		return out.getBuffer().toString();
+	}
+	
+	protected static OBODoc parseOboToString(String oboString) throws IOException {
+		OBOFormatParser p = new OBOFormatParser();
+		BufferedReader reader = new BufferedReader(new StringReader(oboString));
+		OBODoc parsedOboDoc = p.parse(reader);
+		reader.close();
+		return parsedOboDoc;
 	}
 	
 	protected static void renderOBO(OBODoc oboDoc) throws IOException {
