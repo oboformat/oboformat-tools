@@ -49,7 +49,6 @@ import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLNaryPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectCardinalityRestriction;
-import org.semanticweb.owlapi.model.OWLObjectExactCardinality;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
 import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
@@ -469,7 +468,7 @@ public class Owl2Obo {
 		OWLAnnotationProperty sub = ax.getSubProperty();
 
 		String _tag = owlObjectToTag(sup);
-		if (_tag .equals(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag())) {
+		if (OboFormatTag.TAG_SYNONYMTYPEDEF.getTag().equals(_tag)) {
 			String name = "";
 			String scope = "";
 			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
@@ -492,7 +491,7 @@ public class Owl2Obo {
 			return;
 
 		}
-		else if (_tag .equals(OboFormatTag.TAG_SUBSETDEF.getTag())) {
+		else if (OboFormatTag.TAG_SUBSETDEF.getTag().equals(_tag)) {
 			String comment = "";
 			for(OWLAnnotationAssertionAxiom axiom: sub.getAnnotationAssertionAxioms(owlOntology)){
 				String tg = owlObjectToTag(axiom.getProperty());
@@ -1326,7 +1325,7 @@ public class Owl2Obo {
 				// OWLObjectExactCardinality
 				// OWLObjectMinCardinality
 				// OWLObjectMaxCardinality
-				OWLObjectExactCardinality cardinality = (OWLObjectExactCardinality) sup;
+				OWLObjectCardinalityRestriction cardinality = (OWLObjectCardinalityRestriction) sup;
 				String fillerId = this.getIdentifier(cardinality.getFiller());
 				if(fillerId == null){
 					error(ax);
