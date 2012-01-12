@@ -32,7 +32,7 @@ public class BFOROXrefTest extends OboFormatTestBasics {
 		for (OWLObjectProperty op : ops) {
 			//System.out.println("OP:"+op);
 		}
-		assertTrue(ops.size() == 3);
+		assertTrue(ops.size() == 4);
 		Set<OWLAnnotationAssertionAxiom> aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/BFO_0000051"));
 		boolean ok = false;
 		for (OWLAnnotationAssertionAxiom a : aaas) {
@@ -51,6 +51,9 @@ public class BFOROXrefTest extends OboFormatTestBasics {
 		assertTrue(aaas.size() > 0);
 
 		aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/RO_0002111"));
+		assertTrue(aaas.size() > 0);
+
+		aaas = owlOnt.getAnnotationAssertionAxioms(IRI.create("http://purl.obolibrary.org/obo/BAR_0000001"));
 		assertTrue(aaas.size() > 0);
 
 		Owl2Obo revbridge = new Owl2Obo();
