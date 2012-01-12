@@ -15,6 +15,7 @@ import org.obolibrary.oboformat.SimpleGOTest;
 import org.obolibrary.oboformat.SingleIntersectionOfTagTest;
 import org.obolibrary.oboformat.TagTest;
 import org.obolibrary.oboformat.XrefExpanderTest;
+import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -59,6 +60,7 @@ import org.obolibrary.oboformat.XrefExpanderTest;
 	ChebiXRefTest.class,
 	EmptyLinesTest.class,
 	PropertyValueTest.class,
+	OBOFormatWriterTest.class,
 	
 	// macro expansion
 	ExpandSynapsedToTest.class,

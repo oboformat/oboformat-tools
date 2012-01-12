@@ -399,6 +399,21 @@ public class OBOFormatWriter {
 	}
 
 	public void write(Clause clause, BufferedWriter writer, NameProvider nameProvider) throws IOException{
+		if (OboFormatTag.TAG_IS_OBSELETE.getTag().equals(clause.getTag())) {
+			// only write the obsolete tag if the value is Boolean.TRUE or "true"
+			Object value = clause.getValue();
+			if (value instanceof Boolean) {
+				if(Boolean.FALSE.equals(value)) {
+					return;
+				}
+			}
+			else {
+				// also check for a String representation of Boolean.TRUE
+				if (Boolean.TRUE.toString().equals(value) == false) {
+					return;
+				}
+			}
+		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(clause.getTag());
 		sb.append(": ");

@@ -2,6 +2,8 @@ package org.obolibrary.oboformat.writer;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,4 +62,22 @@ public class OBOFormatWriterTest extends OboFormatTestBasics {
 		return clauses;
 	}
 
+	@Test
+	public void testWriteObsolete() throws Exception {
+		assertEquals("", writeObsolete(Boolean.FALSE));
+		assertEquals("", writeObsolete(Boolean.FALSE.toString()));
+		assertEquals("is_obsolete: true", writeObsolete(Boolean.TRUE));
+		assertEquals("is_obsolete: true", writeObsolete(Boolean.TRUE.toString()));
+	}
+	
+	private String writeObsolete(Object value) throws Exception {
+		Clause cl = new Clause(OboFormatTag.TAG_IS_OBSELETE);
+		cl.addValue(value);
+		OBOFormatWriter writer = new OBOFormatWriter();
+		StringWriter out = new StringWriter();
+		BufferedWriter bufferedWriter = new BufferedWriter(out);
+		writer.write(cl, bufferedWriter , null);
+		bufferedWriter.close();
+		return out.toString().trim();
+	}
 }
