@@ -226,12 +226,18 @@ public class Obo2Owl {
 
 	}
 
+	public OWLOntology convert(OBODoc obodoc, boolean useFreshManager) throws OWLOntologyCreationException {
+		this.obodoc = obodoc;
+		if (useFreshManager)
+			init(OWLManager.createOWLOntologyManager());
+		return tr();
+	}
+
 
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
-		this.obodoc = obodoc;
-		// always create a new manager, when loading a new obo document
-		init(OWLManager.createOWLOntologyManager());
-		return tr();
+		// always create a new manager, when loading a new obo document - TODO - why?
+		//                         creates problems for sharing ontologies
+		return convert(obodoc, true);
 	}
 
 
@@ -1387,13 +1393,16 @@ public class Obo2Owl {
 		if (tdf == null)
 			return id;
 		Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
-		String matchingExpandedId = id;
+		String matchingExpandedId = null;
 		for (Xref xref : xrefs) {
+			//System.err.println("ID:"+id+" xref:"+xref);
+
 			if (xref != null) {
 				String xid = xref.getIdref();
+				//System.err.println(" ID:"+id+" xid:"+xid);
 				if (xid.equals(id))
 					continue;
-				if (xid == null) {
+				if (matchingExpandedId == null) {
 					matchingExpandedId = xid;
 				}
 				else {
@@ -1405,6 +1414,9 @@ public class Obo2Owl {
 				}
 			}
 		}
+		if (matchingExpandedId == null)
+			return id;
+		//System.err.println("  ID:"+id+" matching:"+matchingExpandedId);
 		return matchingExpandedId;
 	}
 
