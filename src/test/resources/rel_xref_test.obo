@@ -37,3 +37,7 @@ name: releases_neurotransmitter
 xref: RO:0002111
 name: releases neurotransmitter
 
+[Typedef]
+id: foo
+name: foo
+xref: BAR:0000001
