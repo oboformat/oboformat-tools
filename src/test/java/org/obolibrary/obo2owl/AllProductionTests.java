@@ -43,6 +43,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	RoundTripCAROTest.class,
 	RoundTripCardinalityTest.class,
 	RoundTripOWLROTest.class,
+	RoundTripNamespaceIdRule.class,
 	//SBOTest.class,
 	SubsetTest.class,
 	SynonymTest.class,

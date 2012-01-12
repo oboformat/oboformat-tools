@@ -587,6 +587,7 @@ public class OBOFormatWriter {
 			table.put(OboFormatTag.TAG_SUBSETDEF.getTag(),35);
 			table.put(OboFormatTag.TAG_SYNONYMTYPEDEF.getTag(),40);
 			table.put(OboFormatTag.TAG_DEFAULT_NAMESPACE.getTag(),45);
+			table.put(OboFormatTag.TAG_NAMESPACE_ID_RULE.getTag(),46);
 			table.put(OboFormatTag.TAG_IDSPACE.getTag(),50);
 			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag(),55);
 			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_GENUS_DIFFERENTIA.getTag(),60);

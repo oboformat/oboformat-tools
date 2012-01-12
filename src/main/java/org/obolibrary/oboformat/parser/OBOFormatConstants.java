@@ -69,6 +69,7 @@ public class OBOFormatConstants {
 		TAG_CONSIDER("consider"),
 		TAG_INVERSE_OF("inverse_of"),
 		TAG_IS_ASYMMETRIC("is_asymmetric"),
+		TAG_NAMESPACE_ID_RULE("namespace-id-rule"),
 		
 		// these are keywords, bot tags, but we keep them here for convenience
 		TAG_SCOPE("scope"), // implicit, in synonymtypedef
