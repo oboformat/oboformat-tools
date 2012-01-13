@@ -102,6 +102,10 @@ public class XrefExpander {
 				targetDocMap.put(idSpace, tgt);
 				sourceOBODoc.addImportedOBODoc(tgt);
 				if (relation != null) {
+				    // See 4.4.2
+				    // "In addition, any Typedef frames for relations used in a header macro
+				    //   are also copied into the corresponding bridge ontology
+				    
 					Frame tdf = sourceOBODoc.getTypedefFrame(relation);
 					if (tdf != null) {
 						try {
