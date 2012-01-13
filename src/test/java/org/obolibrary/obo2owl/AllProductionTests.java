@@ -28,6 +28,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	//FlyXPTest.class,
 	HeaderLostBugTest.class,
 	IDsTest.class,
+	ImportOWLOntologiesFromOboTest.class,
 	Obo2OwlTest.class,
 	ObsoleteTermTest.class,
 	Owl2OboTest.class,

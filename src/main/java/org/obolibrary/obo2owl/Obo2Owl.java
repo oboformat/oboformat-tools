@@ -109,6 +109,19 @@ public class Obo2Owl {
 
 
 
+	/**
+	 * Static convenience method which:
+	 *  (1) creates an Obo2Owl bridge object
+	 *  (2) parses an obo file from a URL
+	 *  (3) converts that to an OWL ontology
+	 *  (4) saves the OWL ontology as RDF/XML
+	 *  
+	 * @param iri
+	 * @param outFile
+	 * @throws IOException
+	 * @throws OWLOntologyCreationException
+	 * @throws OWLOntologyStorageException
+	 */
 	public static void convertURL(String iri, String outFile) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		Obo2Owl bridge = new Obo2Owl();
 		OWLOntologyManager manager = bridge.getManager();
@@ -126,6 +139,7 @@ public class Obo2Owl {
 	}
 
 	/**
+	 * See {@link convertURL(String iri, String outFile)}
 	 * 
 	 * @param iri
 	 * @param outFile
@@ -212,6 +226,14 @@ public class Obo2Owl {
 		this.owlOntology = owlOntology;
 	}
 
+	/**
+	 * Creates an OBOFormatParser object to parse a file and then converts it using
+	 * the convert method
+	 * 
+	 * @param oboFile
+	 * @return
+	 * @throws OWLOntologyCreationException
+	 */
 	public OWLOntology convert(String oboFile) throws OWLOntologyCreationException {
 
 		try{
@@ -226,18 +248,33 @@ public class Obo2Owl {
 
 	}
 
+	/**
+	 * @param obodoc
+	 * @param useFreshManager
+	 * @return
+	 * @throws OWLOntologyCreationException
+	 */
 	public OWLOntology convert(OBODoc obodoc, boolean useFreshManager) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
 		if (useFreshManager)
 			init(OWLManager.createOWLOntologyManager());
+		else
+			init(manager);
 		return tr();
 	}
 
 
+	/**
+	 * Converts an OBO document to an OWL ontology 
+	 * 
+	 * @param obodoc
+	 * @return
+	 * @throws OWLOntologyCreationException
+	 */
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
 		// always create a new manager, when loading a new obo document - TODO - why?
 		//                         creates problems for sharing ontologies
-		return convert(obodoc, true);
+		return convert(obodoc, false);
 	}
 
 
@@ -313,9 +350,10 @@ public class Obo2Owl {
 		// TODO - individuals
 
 		for(Clause cl: hf.getClauses(OboFormatTag.TAG_IMPORT)){
-			String path = getURI(cl.getValue() + "");
+			String path = getURI(cl.getValue().toString());
 
 			IRI importIRI = IRI.create(path);
+			manager.loadOntology(importIRI);
 			AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
 			manager.applyChange(ai);
 

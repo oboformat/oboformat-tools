@@ -747,18 +747,32 @@ public class Owl2Obo {
 	 * @return The OBO ID of the ontology
 	 */
 	public static String getOntologyId(OWLOntology ontology){
+		return getOntologyId(ontology.getOntologyID().getOntologyIRI());
+	}
+	
+	public static String getOntologyId(IRI iriObj){
 		//	String id = getIdentifier(ontology.getOntologyID().getOntologyIRI());
-
-		String iri = ontology.getOntologyID().getOntologyIRI().toString();
+		String iri = iriObj.toString();
+		String id;
+		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
+			id = iri.replace("http://purl.obolibrary.org/obo/","");
+			if (id.endsWith(".owl")) {
+				id = id.replaceFirst(".owl$", "");
+			}
+		}
+		else {
+			id = iri;
+		}
+		/*
 		int index = iri.lastIndexOf("/");
 
-		String id = iri.substring(index+1);
+		id = iri.substring(index+1);
 
 		index = id.lastIndexOf(".owl");
 		if(index>0){
 			id = id.substring(0, index);
 		}
-
+		*/
 		return id;
 	}
 
@@ -770,6 +784,7 @@ public class Owl2Obo {
 
 			Clause c = new Clause();
 			c.setTag(OboFormatTag.TAG_IMPORT.getTag());
+			//c.setValue(getOntologyId(iri));
 			c.setValue(iri.toString());
 			f.addClause(c);
 
