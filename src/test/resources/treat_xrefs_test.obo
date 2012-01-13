@@ -67,3 +67,7 @@ xref: CARO:0000008 ! anatomical line
 xref: TGMA:0001828 ! anatomical line
 xref: FMA:9657 ! Anatomical line
 xref: AAO:0010267 ! anatomical line
+
+[Typedef]
+id: part_of
+xref: BFO:0000050

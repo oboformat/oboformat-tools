@@ -52,6 +52,8 @@ public class XrefExpanderTest extends OboFormatTestBasics {
 			System.out.println("BRIDGE: "+tid);
 			if (tid.equals("zfa")) {
 				assertTrue(tdoc.getTermFrame("ZFA:0001689").getClauses(OboFormatTag.TAG_INTERSECTION_OF).size() == 2);
+				Frame pf = tdoc.getTypedefFrame("part_of");
+				assertTrue(pf.getClause(OboFormatTag.TAG_XREF).getValue().toString().equals("BFO:0000050"));
 				n++;
 			}
 			if (tid.equals("ehdaa")) {
