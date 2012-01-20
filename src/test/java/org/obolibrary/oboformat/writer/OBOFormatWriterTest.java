@@ -80,4 +80,31 @@ public class OBOFormatWriterTest extends OboFormatTestBasics {
 		bufferedWriter.close();
 		return out.toString().trim();
 	}
+	
+	/**
+	 * Test that the OBO format writer only writes one new-line at the end of the file.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testWriteEndOfFile() throws Exception {
+		OBODoc oboDoc = parseOBOFile("caro.obo");
+		String oboString = renderOboToString(oboDoc);
+		int length = oboString.length();
+		assertTrue(length > 0);
+		int newLineCount = 0;
+		for(int i = length - 1; i >= 0; i--) {
+			char c = oboString.charAt(i);
+			if (Character.isWhitespace(c)) {
+				if (c == '\n') {
+					newLineCount++;
+				}
+			}
+			else {
+				break;
+			}
+		}
+		assertEquals("GO always had an empty newline at the end.",2, newLineCount);
+	}
+	
 }
