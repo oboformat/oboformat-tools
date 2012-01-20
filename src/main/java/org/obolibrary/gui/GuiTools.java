@@ -106,7 +106,11 @@ public class GuiTools {
 	        setMaximumSize(max);
 	    }
 	    
-	    /** Creates rigid filler. */
+	    /** 
+	     * Creates rigid filler with the given size.
+	     *  
+	     * @param size 
+	     */
 	    private Gap(int size) {
 	        Dimension dim = new Dimension(size, size);
 	        setMinimumSize(dim);
@@ -163,7 +167,19 @@ public class GuiTools {
 	     */
 	    public GBHelper indentLeft(int pixel) {
 	    	GBHelper duplicate = (GBHelper)this.clone();
-	    	duplicate.insets = new Insets(0, pixel, 0, 0);
+	    	duplicate.insets = new Insets(this.insets.top, this.insets.left + pixel, this.insets.bottom, this.insets.right);
+	    	return duplicate;
+	    }
+	    
+	    /**
+	     * Increase indent in the left. Return new instance to minimize side effects.
+	     * 
+	     * @param pixel
+	     * @return helper
+	     */
+	    public GBHelper indentRight(int pixel) {
+	    	GBHelper duplicate = (GBHelper)this.clone();
+	    	duplicate.insets = new Insets(this.insets.top, this.insets.left, this.insets.bottom, this.insets.right + pixel);
 	    	return duplicate;
 	    }
 	    
@@ -207,7 +223,8 @@ public class GuiTools {
 	     * Sets the height of the area in terms of rows.
 	     * 
 	     * Return new instance to minimize side effects.
-	     *
+	     * 
+	     * @param rowsHigh 
 	     * @return helper
 	     */
 	    public GBHelper height(int rowsHigh) {
@@ -220,7 +237,8 @@ public class GuiTools {
 	     * Sets the width of the area in terms of rows.
 	     * 
 	     * Return new instance to minimize side effects.
-	     *
+	     * 
+	     * @param columnsWide 
 	     * @return helper
 	     */
 	    public GBHelper width(int columnsWide) {
