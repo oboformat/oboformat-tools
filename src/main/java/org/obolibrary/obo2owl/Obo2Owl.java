@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
@@ -35,7 +36,9 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedObject;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -281,35 +284,6 @@ public class Obo2Owl {
 
 	private OWLOntology tr() throws OWLOntologyCreationException {
 
-		//	List<IRI> importIRIs = new ArrayList<IRI>();
-		/*	Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
-		for(OBODoc importDoc: obodoc.getImportedOBODocs()){
-			//if proxy doc just put import statment
-			if(importDoc.getTermFrames().isEmpty() && importDoc.getTypedefFrames().isEmpty()){
-				Frame importHf = importDoc.getHeaderFrame();
-				Clause ontCl = importHf.getClause(OboFormatTag.TAG_ONTOLOGY.getTag());
-				String path= ontCl.getValue() + "";
-
-				if(path.endsWith(".obo")){
-					path = path.substring(0, path.length()-4) + ".owl";
-				}
-
-				path = getURI(path);
-
-				IRI importIRI = IRI.create(path);
-				importIRIs.add(importIRI);
-				//AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
-				//manager.applyChange(ai);
-
-			}else{
-				//TODO convert importDoc to OWLOntology
-				Obo2Owl bridge = new Obo2Owl();
-				OWLOntology ont = bridge.convert(importDoc, this.manager);
-				ontologies.add(ont);
-			}
-
-		}*/		
-
 		Frame hf = obodoc.getHeaderFrame();
 		Clause ontClause = hf.getClause( OboFormatTag.TAG_ONTOLOGY);
 		if (ontClause != null) {
@@ -358,7 +332,58 @@ public class Obo2Owl {
 			manager.applyChange(ai);
 		}
 
+		postProcess(owlOntology);
+
 		return owlOntology;
+	}
+
+	/**
+	 * perform any necessary post-processing
+	 * 
+	 * currently this only includes the experimental logical-definitions-view-property
+	 * 
+	 * @param owlOntology
+	 */
+	private void postProcess(OWLOntology owlOntology) {
+		IRI pIRI = null;
+		for (OWLAnnotation ann : owlOntology.getAnnotations()) {
+			if (ann.getProperty().getIRI().equals(Obo2OWLVocabulary.IRI_OIO_LogicalDefinitionViewRelation.getIRI())) {
+				OWLAnnotationValue v = ann.getValue();
+				if (v instanceof OWLLiteral) {
+					String rel = ((OWLLiteral)v).getLiteral();
+					pIRI  = this.oboIdToIRI(rel);
+				}
+				else {
+					pIRI = (IRI) v;
+				}
+				break;
+			}
+		}
+		if (pIRI != null) {
+			OWLObjectProperty vp = fac.getOWLObjectProperty(pIRI);
+			Set<OWLAxiom> rmAxioms = new HashSet<OWLAxiom>();
+			Set<OWLAxiom> newAxioms = new HashSet<OWLAxiom>();
+			
+			for (OWLEquivalentClassesAxiom eca : owlOntology.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
+				int numNamed = 0;
+				Set<OWLClassExpression> xs = new HashSet<OWLClassExpression>();
+				for (OWLClassExpression x : eca.getClassExpressions()) {
+					if (x instanceof OWLClass) {
+						xs.add(x);
+						numNamed ++;
+						continue;
+					}
+					// anonymous class expressions are 'prefixed' with view property
+					xs.add(fac.getOWLObjectSomeValuesFrom(vp, x));
+				}
+				if (numNamed == 1) {
+					rmAxioms.add(eca);
+					newAxioms.add(fac.getOWLEquivalentClassesAxiom(xs));
+				}
+			}
+			manager.removeAxioms(owlOntology, rmAxioms);
+			manager.addAxioms(owlOntology, newAxioms);
+		}
 	}
 
 	private  String getURI(String path){

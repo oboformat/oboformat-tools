@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -23,6 +24,7 @@ import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -146,7 +148,7 @@ public class Owl2Obo {
 		init();
 		return tr();
 	}
-	
+
 	/**
 	 * @return the untranslatableAxioms
 	 */
@@ -157,6 +159,7 @@ public class Owl2Obo {
 	private OBODoc tr() throws OWLOntologyCreationException {
 		obodoc = new OBODoc();
 
+		preProcess(owlOntology);
 		tr(owlOntology);
 
 		for (OWLAxiom ax : owlOntology.getAxioms()) {
@@ -208,6 +211,60 @@ public class Owl2Obo {
 			}
 		}
 		return obodoc;
+	}
+
+	private void preProcess(OWLOntology owlOntology2)  {
+		// converse of postProcess in obo2owl
+		String viewRel = null;
+		for (OWLAnnotation ann : owlOntology.getAnnotations()) {
+			if (ann.getProperty().getIRI().equals(Obo2OWLVocabulary.IRI_OIO_LogicalDefinitionViewRelation.getIRI())) {
+				OWLAnnotationValue v = ann.getValue();
+				if (v instanceof OWLLiteral) {
+					viewRel = ((OWLLiteral)v).getLiteral();
+				}
+				else {
+					viewRel = this.getIdentifier((IRI)v);
+				}
+				break;
+			}
+		}
+
+		if (viewRel != null) {
+			//OWLObjectProperty vp = fac.getOWLObjectProperty(pIRI);
+			Set<OWLAxiom> rmAxioms = new HashSet<OWLAxiom>();
+			Set<OWLAxiom> newAxioms = new HashSet<OWLAxiom>();
+
+			for (OWLEquivalentClassesAxiom eca : owlOntology.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
+				int numNamed = 0;
+				Set<OWLClassExpression> xs = new HashSet<OWLClassExpression>();
+				for (OWLClassExpression x : eca.getClassExpressions()) {
+					if (x instanceof OWLClass) {
+						xs.add(x);
+						numNamed ++;
+						continue;
+					}
+					else if (x instanceof OWLObjectSomeValuesFrom) {
+						OWLObjectProperty p = (OWLObjectProperty) ((OWLObjectSomeValuesFrom) x).getProperty();
+						if (this.getIdentifier(p) != viewRel) {
+							LOG.error("Expected: "+viewRel+" got: "+p+" in "+eca);
+						}
+						xs.add(((OWLObjectSomeValuesFrom)x).getFiller());
+					}
+					else {
+						LOG.error("Unexpected: "+eca);
+					}
+				}
+				if (numNamed == 1) {
+					rmAxioms.add(eca);
+					newAxioms.add(fac.getOWLEquivalentClassesAxiom(xs));
+				}
+				else {
+					LOG.error("ECA did not fit expected pattern: "+eca);
+				}
+			}
+			manager.removeAxioms(owlOntology, rmAxioms);
+			manager.addAxioms(owlOntology, newAxioms);
+		}
 	}
 
 	private void add(Frame f) {
@@ -308,15 +365,15 @@ public class Owl2Obo {
 		}
 
 		Clause clause;
-		
+
 		if (rel1.equals(f.getId())) {
 			clause = new Clause(OboFormatTag.TAG_TRANSITIVE_OVER, rel2);
 		}
 		else {
 			OboFormatTag tag = OboFormatTag.TAG_HOLDS_OVER_CHAIN;
-	
+
 			for(OWLAnnotation ann: ax.getAnnotations()){
-	
+
 				if(Obo2Owl.IRI_PROP_isReversiblePropertyChain.equals(ann.getProperty().getIRI().toString())){
 					tag = OboFormatTag.TAG_EQUIVALENT_TO_CHAIN;
 					break;
@@ -546,7 +603,7 @@ public class Owl2Obo {
 		if (tagString == null) {
 			return trGenericPropertyValue(prop, annVal, qualifiers, frame);
 		}
-		
+
 		String value = getValue(annVal, tagString);
 		OboFormatTag tag = OBOFormatConstants.getTag(tagString);
 		if(tag == null){
@@ -652,10 +709,10 @@ public class Owl2Obo {
 	private boolean trGenericPropertyValue(OWLAnnotationProperty prop,
 			OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers,
 			Frame frame) {
-		
+
 		// no built-in obo tag for this: use the generic property_value tag
 		Clause clause = new Clause();
-	
+
 		clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
 		String propId = this.getIdentifier(prop);
 		if (propId.equals("shorthand")) {
@@ -663,7 +720,7 @@ public class Owl2Obo {
 		}
 		else {
 			clause.addValue(propId);
-			
+
 			if(annVal instanceof OWLLiteral){
 				OWLLiteral owlLiteral = (OWLLiteral) annVal;
 				clause.addValue(owlLiteral.getLiteral());
@@ -681,7 +738,7 @@ public class Owl2Obo {
 				else {
 					clause.addValue(dataTypeIri.toString());
 				}
-				
+
 			}else if(annVal instanceof IRI){
 				clause.addValue(getIdentifier((IRI)annVal));
 			}
@@ -697,7 +754,7 @@ public class Owl2Obo {
 		}else if(annVal instanceof IRI){
 			value = getIdentifier((IRI)annVal);
 		}
-		
+
 		if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
 			Matcher matcher = absoulteURLPattern.matcher(value);
 			while(matcher.find()){
@@ -751,7 +808,7 @@ public class Owl2Obo {
 	public static String getOntologyId(OWLOntology ontology){
 		return getOntologyId(ontology.getOntologyID().getOntologyIRI());
 	}
-	
+
 	public static String getOntologyId(IRI iriObj){
 		//	String id = getIdentifier(ontology.getOntologyID().getOntologyIRI());
 		String iri = iriObj.toString();
@@ -774,7 +831,7 @@ public class Owl2Obo {
 		if(index>0){
 			id = id.substring(0, index);
 		}
-		*/
+		 */
 		return id;
 	}
 
@@ -962,7 +1019,7 @@ public class Owl2Obo {
 	}	
 
 	public static class UntranslatableAxiomException extends Exception {
-		
+
 		// generated
 		private static final long serialVersionUID = 4674805484349471665L;
 
@@ -974,7 +1031,7 @@ public class Owl2Obo {
 			super(message);
 		}
 	}
-	
+
 	/**
 	 * Retrieve the identifier for a given {@link OWLObject}. 
 	 * This methods uses also shorthand hints to resolve the 
@@ -999,7 +1056,7 @@ public class Owl2Obo {
 		}
 		return id;
 	}
-	
+
 	/**
 	 * Retrieve the identifier for a given {@link OWLObject}. 
 	 * This methods uses also shorthand hints to resolve the 
@@ -1066,7 +1123,7 @@ public class Owl2Obo {
 		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
 			String canonicalId = iri.replace("http://purl.obolibrary.org/obo/", "");
 		}
-		*/
+		 */
 
 		int indexSlash = iri.lastIndexOf("/");
 
@@ -1388,11 +1445,11 @@ public class Owl2Obo {
 					return;
 				}
 				clauses = normalizeRelationshipClauses(clauses);
-				
+
 				for (Clause clause : clauses) {
 					f.addClause(clause);	
 				}
-			
+
 			} else {
 				error(ax);
 				return;
@@ -1510,7 +1567,7 @@ public class Owl2Obo {
 			}
 		}
 	}
-	
+
 	private QualifierValue findMatchingQualifierValue(QualifierValue query, Collection<QualifierValue> list) {
 		String queryQualifier = query.getQualifier();
 		for (QualifierValue qv : list) {
@@ -1540,17 +1597,17 @@ public class Owl2Obo {
 			}
 		}
 	}
-	
+
 	private void error(String message, OWLAxiom ax) {
 		untranslatableAxioms.add(ax);
 		error(message + ax);
 	}
-	
+
 	private void error(OWLAxiom ax) {
 		untranslatableAxioms.add(ax);
 		error("the axiom is not translated : " + ax);
 	}
-	
+
 	private void error(String message) {
 		LOG.warn(message);
 		if(strictConversion)

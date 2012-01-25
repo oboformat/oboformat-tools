@@ -45,7 +45,8 @@ public class Obo2OWLConstants {
 		hasSynonymType(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "hasSynonymType", "has_synonym_type", OboFormatTag.TAG_HAS_SYNONYM_TYPE.getTag()),
 		IRI_OIO_Subset(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "SubsetProperty", "subset_property", OboFormatTag.TAG_SUBSETDEF.getTag()),
 		IRI_OIO_SynonymType(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "SynonymTypeProperty", "synonym_type_property", OboFormatTag.TAG_SYNONYMTYPEDEF.getTag()),
-		IRI_OIO_NamespaceIdRule(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "NamespaceIdRule", "namespace-id-rule", OboFormatTag.TAG_NAMESPACE_ID_RULE.getTag());
+		IRI_OIO_NamespaceIdRule(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "NamespaceIdRule", "namespace-id-rule", OboFormatTag.TAG_NAMESPACE_ID_RULE.getTag()),
+		IRI_OIO_LogicalDefinitionViewRelation(Obo2OWLConstants.OIOVOCAB_IRI_PREFIX, "logical-definition-view-relation", "logical-definition-view-relation", OboFormatTag.TAG_LOGICAL_DEFINITION_VIEW_RELATION.getTag());
 		
 		IRI iri;
 		String namespace;
