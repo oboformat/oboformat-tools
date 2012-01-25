@@ -70,6 +70,7 @@ public class OBOFormatConstants {
 		TAG_INVERSE_OF("inverse_of"),
 		TAG_IS_ASYMMETRIC("is_asymmetric"),
 		TAG_NAMESPACE_ID_RULE("namespace-id-rule"),
+		TAG_LOGICAL_DEFINITION_VIEW_RELATION("logical-definition-view-relation"),
 		
 		// these are keywords, bot tags, but we keep them here for convenience
 		TAG_SCOPE("scope"), // implicit, in synonymtypedef
