@@ -356,10 +356,7 @@ public class Obo2Owl {
 			manager.loadOntology(importIRI);
 			AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
 			manager.applyChange(ai);
-
 		}
-
-
 
 		return owlOntology;
 	}
@@ -1329,7 +1326,7 @@ public class Obo2Owl {
 			return null;
 		}
 
-		// No conversion is required if this is already an IRI
+		// No conversion is required if this is already an IRI (ID-as-URI rule)
 		if (id.startsWith("http:")) { // TODO - roundtrip from other schemes
 			return IRI.create(id);
 		}
@@ -1351,25 +1348,6 @@ public class Obo2Owl {
 			if (!xid.equals(id))
 				return oboIdToIRI(xid);
 		}
-		/*
-		Frame tdf = obodoc.getTypedefFrame(id);
-		if (tdf != null && !id.contains(":")) {
-			Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
-			for (Xref xref : xrefs) {
-				if (xref != null) {
-					String xid = xref.getIdref();
-
-					// RO and BFO have special status.
-					// avoid cycles (in case of self-xref)
-					if ((xid.startsWith("RO") ||
-							xid.startsWith("BFO")) &&
-							!xid.equals(id)) {
-						return oboIdToIRI(xid);
-					}
-				}
-			}
-		}
-		*/
 
 		String[] idParts = id.split(":", 2);
 		String db;

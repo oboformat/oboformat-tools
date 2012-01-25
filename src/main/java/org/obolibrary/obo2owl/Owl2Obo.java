@@ -489,7 +489,6 @@ public class Owl2Obo {
 
 			addQualifiers(clause, ax.getAnnotations());
 			return;
-
 		}
 		else if (OboFormatTag.TAG_SUBSETDEF.getTag().equals(_tag)) {
 			String comment = "";
@@ -497,7 +496,8 @@ public class Owl2Obo {
 				String tg = owlObjectToTag(axiom.getProperty());
 				if(OboFormatTag.TAG_COMMENT.getTag().equals(tg)){
 					comment = ((OWLLiteral)axiom.getValue()).getLiteral();
-					break;
+					if (comment != null)
+						break;
 				}
 			}
 
@@ -742,6 +742,8 @@ public class Owl2Obo {
 
 	/**
 	 * E.g. http://purl.obolibrary.org/obo/go.owl --> "go"
+	 * 
+	 * if does not match this pattern, then retain original IRI
 	 * 
 	 * @param ontology
 	 * @return The OBO ID of the ontology
@@ -1054,11 +1056,17 @@ public class Owl2Obo {
 
 	private static String _getIdentifier(IRI iriId) {
 
-
 		if(iriId == null)
 			return null;
 
 		String iri = iriId.toString();
+
+		/*
+		// canonical IRIs
+		if (iri.startsWith("http://purl.obolibrary.org/obo/")) {
+			String canonicalId = iri.replace("http://purl.obolibrary.org/obo/", "");
+		}
+		*/
 
 		int indexSlash = iri.lastIndexOf("/");
 
