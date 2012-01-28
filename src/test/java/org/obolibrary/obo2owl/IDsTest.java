@@ -65,7 +65,7 @@ public class IDsTest {
 		System.out.println("roundtrip:"+oboId);
 		assertTrue("My_Ont:002".equals(oboId));
 		
-		
+		// unprefixed IDs are prefixed with the current ontology ID
 		iri= obo2owl.oboIdToIRI("003");
 		assertTrue("http://purl.obolibrary.org/obo/test#003".equals(iri.toString()));
 
@@ -73,7 +73,11 @@ public class IDsTest {
 		//OWL 2 obo 
 		oboId = Owl2Obo.getIdentifier(iri);
 		assertTrue("003".equals(oboId));
-		
+	
+		// arbitrary URL to obo ID
+		oboId = Owl2Obo.getIdentifier(IRI.create("http://purl.obolibrary.org/obo/alternate#abcdef"));
+		// todo - test this
+		//System.out.println("== "+oboId);
 		
 		iri= obo2owl.oboIdToIRI("part_of");
 		assertTrue("http://purl.obolibrary.org/obo/test#part_of".equals(iri.toString()));
