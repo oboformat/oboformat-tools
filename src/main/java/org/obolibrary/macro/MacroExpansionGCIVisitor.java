@@ -164,6 +164,13 @@ public class MacroExpansionGCIVisitor {
 			return result;
 		}
 	}
+	
+	/**
+	 * Call this method to clear internal references.
+	 */
+	public void dispose() {
+		manchesterSyntaxTool.dispose();
+	}
 }
 
 

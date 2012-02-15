@@ -48,10 +48,13 @@ public class ManchesterSyntaxTool {
 	private static final Logger log = Logger.getLogger(ManchesterSyntaxTool.class);
 	private static final boolean DEBUG = log.isDebugEnabled();
 	
-	private final IRIShortFormProvider iriShortFormProvider;
-	private final OWLDataFactory dataFactory;
-	private final OWLEntityChecker entityChecker;
+	private IRIShortFormProvider iriShortFormProvider;
+	private OWLDataFactory dataFactory;
+	private OWLEntityChecker entityChecker;
 	private ShortFormProvider shortFormProvider;
+	private BidirectionalShortFormProviderAdapter bidirectionalShortFormProvider;
+	private volatile boolean disposed = false; 
+	private Object disposedLock = new Object();
 
 	/**
 	 * Create a new parser instance for the given ontology. By 
@@ -111,11 +114,10 @@ public class ManchesterSyntaxTool {
 			}
 		};
 		
+		bidirectionalShortFormProvider = new BidirectionalShortFormProviderAdapter(manager,
+		        ontologies, shortFormProvider);
 		final ShortFormEntityChecker defaultInstance = new ShortFormEntityChecker(
-                new BidirectionalShortFormProviderAdapter(
-                        manager,
-                        ontologies,
-                        shortFormProvider));
+                bidirectionalShortFormProvider);
 		if (resolveEntities) {
 			entityChecker = new AdvancedEntityChecker(defaultInstance, ontologies);
 		}
@@ -154,6 +156,11 @@ public class ManchesterSyntaxTool {
 	
 	
 	private ManchesterOWLSyntaxEditorParser createParser(String expression) {
+		synchronized (disposedLock) {
+			if (disposed) {
+				throw new RuntimeException("Illegal State: Trying to use an disposed instance.");
+			}
+		}
 		ManchesterOWLSyntaxEditorParser parser = 
 			new ManchesterOWLSyntaxEditorParser(dataFactory, expression);
 	
@@ -171,6 +178,11 @@ public class ManchesterSyntaxTool {
 	 * @return short form
 	 */
 	public String getId(IRI iri){
+		synchronized (disposedLock) {
+			if (disposed) {
+				throw new RuntimeException("Illegal State: Trying to use an disposed instance.");
+			}
+		}
 		return iriShortFormProvider.getShortForm(iri);
 		
 	}
@@ -183,6 +195,11 @@ public class ManchesterSyntaxTool {
 	 * @return short form
 	 */
 	public String getId(OWLEntity entity) {
+		synchronized (disposedLock) {
+			if (disposed) {
+				throw new RuntimeException("Illegal State: Trying to use an disposed instance.");
+			}
+		}
 		return shortFormProvider.getShortForm(entity);
 	}
 	
@@ -356,6 +373,25 @@ public class ManchesterSyntaxTool {
 				}
 			}
 			return null;
+		}
+	}
+	
+	/**
+	 * Call this method to dispose the internal data structures. 
+	 * This will remove also the listeners registered with the ontology manager.
+	 */
+	public void dispose() {
+		synchronized (disposedLock) {
+			if (!disposed) {
+				disposed = true;
+				iriShortFormProvider = null;
+				dataFactory = null;
+				entityChecker = null;
+				shortFormProvider.dispose();
+				shortFormProvider = null;
+				bidirectionalShortFormProvider.dispose();
+				bidirectionalShortFormProvider = null;
+			}
 		}
 	}
 }
