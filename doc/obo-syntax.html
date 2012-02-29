@@ -513,7 +513,7 @@ tag-value qualifiers.
 
 <p class="grammar" style="white-space: pre;">
 
-<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefNoComma</span> } ] ']'
+<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefNoComma</span> } ] { <span class="nonterminal">ws</span> } ']'
 <span class="nonterminal">XrefNoComma</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
 <span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
 
@@ -797,14 +797,17 @@ clauses into the ontology document. If the pre-condition is satisfied
 (middle column) and the header contains the specified macro (first
 column), then clauses are added to the ontology such that the
 post-condition is satisfied (right hand column). Note that the
-original xref tags are <i>not</i> replaced in the ontology.
+original xref tags are <i>not</i> removed from the source ontology.
 </p>
 
 <p>
 These clauses are expanded into a fresh ontology, which can be
 optionally imported.
 </p>
-
+<p>
+In addition, any Typedef frames for relations used in a header macro
+are also copied into the corresponding bridge ontology
+</p>
 
 
 <table border="1" cellspacing="0">
@@ -1811,7 +1814,7 @@ The following qualifiers are not translated to annotations:
 
 <tr>
 <td valign="top" style="white-space: pre;">subset</td>
-<td valign="top" style="white-space: pre; color:red">oboInOwl:subset</td>
+<td valign="top" style="white-space: pre; color:red">oboInOwl:inSubset</td>
 </tr>
 
 <tr>
@@ -1956,7 +1959,7 @@ in ontologies. These have also proven useful for NLP purposes.
                   </ul>
                 </p>
                 <p>
-                  A side effect of this substitution is the generation of an annotatoion assertion that preserves the original shorthand relation:
+                  A side effect of this substitution is the generation of an annotation assertion that preserves the original shorthand relation:
                   <span valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(shorthand) <span class="name">T</span>(Formal-ID) "Original-ID"^^xsd:string)</span>
                 </p>
                 <p>
@@ -2125,6 +2128,8 @@ We can define 3 sub-characteristics:
 
 <h3><a name="6.1.3"></a>6.1.3 Unidirectional</h3>
 
+<!-- TODO: define in terms of unfoldability -->
+
 <p>
 An ontology is said to be multidirectional if it contains a class
 assertion involving property P and a class assertion involving
@@ -2141,6 +2146,8 @@ according to the definition above, but this need not hold.
 </p>
 
 <h3><a name="6.1.4"></a>6.1.4 Fully asserted</h3>
+
+<!-- TODO: simplify -->
 
 <p>
 An ontology is fully asserted if the graph formed by is_a and
