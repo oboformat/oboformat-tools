@@ -774,6 +774,9 @@ public class Owl2Obo {
 		for(OWLAnnotation ann: qualifiers){
 			String prop = owlObjectToTag(ann.getProperty());
 
+			if (prop == null) {
+				prop = ann.getProperty().getIRI().toString();
+			}
 
 			if (prop.equals("gci_relation") ||
 					prop.equals("gci_filler") ||
