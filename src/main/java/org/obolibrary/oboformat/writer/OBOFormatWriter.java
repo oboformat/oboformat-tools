@@ -132,6 +132,10 @@ public class OBOFormatWriter {
 		List<Frame> typeDefFrames = new ArrayList<Frame>();
 		typeDefFrames.addAll(doc.getTypedefFrames());
 		Collections.sort(typeDefFrames, FramesComparator.instance);
+		
+		List<Frame> instanceFrames = new ArrayList<Frame>();
+		typeDefFrames.addAll(doc.getInstanceFrames());
+		Collections.sort(instanceFrames, FramesComparator.instance);
 
 
 		for(Frame f: termFrames){
@@ -139,6 +143,9 @@ public class OBOFormatWriter {
 		}
 
 		for(Frame f: typeDefFrames){
+			write(f, writer, nameProvider);
+		}
+		for(Frame f: instanceFrames){
 			write(f, writer, nameProvider);
 		}
 	}
@@ -201,15 +208,18 @@ public class OBOFormatWriter {
 	}
 
 	public void write(Frame frame, BufferedWriter writer, NameProvider nameProvider) throws IOException{
-
 		Comparator<String> comparator = null;
-
+		
+		
 		if(frame.getType() == FrameType.TERM){
 			writeLine("[Term]", writer);
 
 			comparator = TermsTagsComparator.instance;
 		}else if (frame.getType() == FrameType.TYPEDEF){
 			writeLine("[Typedef]", writer);
+			comparator = TypeDefTagsComparator.instance;
+		} else if (frame.getType() == FrameType.INSTANCE){
+			writeLine("[Instance]", writer);
 			comparator = TypeDefTagsComparator.instance;
 		}
 
@@ -218,6 +228,7 @@ public class OBOFormatWriter {
 		}
 
 		List<String> tags = duplicateTags(frame.getTags());
+		
 		Collections.sort(tags, comparator);
 		String defaultOboNamespace = null;
 		if (nameProvider != null) {
@@ -228,6 +239,7 @@ public class OBOFormatWriter {
 			Collections.sort(clauses, ClauseComparator.instance);
 			for( Clause clause : clauses){
 				final String clauseTag = clause.getTag();
+				
 				if(OboFormatTag.TAG_ID.getTag().equals(clauseTag))
 					continue;
 				else if(OboFormatTag.TAG_DEF.getTag().equals(clauseTag))
@@ -238,9 +250,10 @@ public class OBOFormatWriter {
 					writePropertyValue(clause, writer);
 				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clauseTag) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clauseTag))
 					writeClauseWithQuotedString(clause, writer);
-				else if (OboFormatTag.TAG_XREF.getTag().equals(clauseTag))
+				else if (OboFormatTag.TAG_XREF.getTag().equals(clauseTag)){
+					
 					writeXRefClause(clause, writer);
-				else if (OboFormatTag.TAG_NAMESPACE.getTag().equals(clauseTag)) {
+				}else if (OboFormatTag.TAG_NAMESPACE.getTag().equals(clauseTag)) {
 					// only write OBO namespace,
 					// if it is different from the default OBO namespace
 					if (defaultOboNamespace == null || 
@@ -258,6 +271,7 @@ public class OBOFormatWriter {
 
 	private void writeXRefClause(Clause clause, BufferedWriter writer) throws IOException {
 		Xref xref = clause.getValue(Xref.class);
+		//System.out.println("girdi:"+xref);
 		if (xref != null) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(clause.getTag());
@@ -366,7 +380,7 @@ public class OBOFormatWriter {
 	}
 
 	public void writePropertyValue(Clause clause, BufferedWriter writer) throws IOException{
-
+		
 		Collection<?> cols = clause.getValues();
 
 		if(cols.size()<2){
@@ -377,7 +391,6 @@ public class OBOFormatWriter {
 		StringBuilder sb = new StringBuilder();
 		sb.append(clause.getTag());
 		sb.append(": ");
-
 		for(Iterator<?> it = cols.iterator(); it.hasNext(); ) {
 			String val = it.next().toString(); // TODO replace toString() method
 			if(val.contains(" ") || !val.contains(":")) {
