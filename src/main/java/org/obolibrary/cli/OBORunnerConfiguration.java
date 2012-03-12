@@ -160,6 +160,15 @@ public class OBORunnerConfiguration {
 			return true;
 		}
 	};
+	
+	public final Variable<Boolean> writeLabelOWL = new ParamterVariable<Boolean>("Write additional owl file in functional syntax file with labels", false, "--write-label-owl"){
+
+		@Override
+		public boolean setValue(String value) {
+			this.value = true;
+			return true;
+		}
+	};
 
 	public final Variable<Set<String>> ontsToDownload = new StringSetParamterVariable("Ontologies to download",
 			"--download");

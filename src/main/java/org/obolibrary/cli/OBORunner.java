@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,6 +28,8 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.obolibrary.owl.LabelFunctionalFormat;
+import org.obolibrary.owl.LabelFunctionalSyntaxOntologyStorer;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
@@ -141,6 +142,14 @@ public class OBORunner {
 				OWLOntologyFormat format = config.format.getValue();
 				logger.info("saving to "+ ontologyId + "," +outputStream+" via "+format);
 				manager.saveOntology(ontology, format, outputStream);
+				
+				if (config.writeLabelOWL.getValue()) {
+					manager.addOntologyStorer(new LabelFunctionalSyntaxOntologyStorer());
+					OWLOntologyFormat labelFormat = new LabelFunctionalFormat();
+				    IRI labelFile = IRI.create(new File(config.outputdir.getValue(), ontologyId+ ".ofn").getCanonicalFile());
+				    logger.info("saving "+ ontologyId + " additional OWL to " +outputStream);
+					manager.saveOntology(ontology, labelFormat, labelFile );
+				}
 			}
 			else {
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
@@ -285,8 +294,9 @@ public class OBORunner {
 	 * makes OWL from all selected ontologies.
 	 * These are downloaded from the OBO metadata file
 	 * 
-	 * 
 	 * @param dir
+	 * @param config
+	 * @param logger 
 	 * @throws IOException
 	 */
 	protected static void buildAllOboOwlFiles(String dir, OBORunnerConfiguration config, Logger logger) throws IOException {
