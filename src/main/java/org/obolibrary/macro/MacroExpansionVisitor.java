@@ -23,13 +23,13 @@ public class MacroExpansionVisitor {
 	private OWLOntologyManager outputManager;
 	private OWLOntology outputOntology;
 
-	private Visitor vistor;
+	private Visitor visitor;
 	private ManchesterSyntaxTool manchesterSyntaxTool;
 	
 	public MacroExpansionVisitor(OWLOntology inputOntology) {
 		super();
 		this.inputOntology = inputOntology;
-		this.vistor = new Visitor(inputOntology);
+		this.visitor = new Visitor(inputOntology);
 		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 		
 		outputManager = OWLManager.createOWLOntologyManager();
@@ -61,10 +61,10 @@ public class MacroExpansionVisitor {
 			
 			OWLAxiom exAx = ax;
 			if (ax instanceof OWLSubClassOfAxiom) {
-				exAx = vistor.visit((OWLSubClassOfAxiom)ax);
+				exAx = visitor.visit((OWLSubClassOfAxiom)ax);
 			}
 			else if (ax instanceof OWLEquivalentClassesAxiom) {
-				exAx = vistor.visit((OWLEquivalentClassesAxiom)ax);
+				exAx = visitor.visit((OWLEquivalentClassesAxiom)ax);
 			}else if(ax instanceof OWLAnnotationAssertionAxiom){
 			 	for(OWLAxiom expandedAx: expand((OWLAnnotationAssertionAxiom)ax)){
 			 		output(expandedAx);
@@ -83,15 +83,31 @@ public class MacroExpansionVisitor {
 		
 		OWLAnnotationProperty prop = ax.getProperty();
 		
-		String expandTo = vistor.expandAssertionToMap.get(prop.getIRI());
+		String expandTo = visitor.expandAssertionToMap.get(prop.getIRI());
 		HashSet<OWLAxiom> setAx = new HashSet<OWLAxiom>();
 		
 		if(expandTo != null){
+			
+			// when expanding assertions, the axiom is an annotation assertion,
+			// and the value may be not be explicitly declared. If it is not,
+			// we assume it is a class
+			IRI axValIRI = (IRI) ax.getValue();
+			OWLClass axValClass = visitor.dataFactory.getOWLClass(axValIRI);
+			if (inputOntology.getDeclarationAxioms(axValClass).size() == 0) {
+				OWLDeclarationAxiom newAx = visitor.dataFactory.getOWLDeclarationAxiom(axValClass);
+				outputManager.addAxiom(inputOntology, newAx);
+				// we need to sync the MST entity checker with the new ontology plus declarations;
+				// we do this by creating a new MST - this is not particularly efficient, a better
+				// way might be to first scan the ontology for all annotation axioms that will be expanded,
+				// then add the declarations at this point
+				this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
+			}
+			
 			if(DEBUG)
 				log.debug("Template to Expand" + expandTo);
 			
 			expandTo = expandTo.replaceAll("\\?X", manchesterSyntaxTool.getId((IRI)ax.getSubject()));
-			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId((IRI)ax.getValue()));
+			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId(axValIRI));
 
 			if(DEBUG)
 				log.debug("Expanding " + expandTo);
