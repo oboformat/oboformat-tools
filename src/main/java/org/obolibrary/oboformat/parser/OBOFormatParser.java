@@ -430,7 +430,7 @@ public class OBOFormatParser {
 	private String checkRelation(String relId, String tag, String frameId, OBODoc doc){
 		if(doc.getTypedefFrame(relId, followImport) == null){
 			return "The relation '" + relId+ "' reference in" +
-					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not delclared";
+					" the tag '" + tag +" ' in the frame of id '" + frameId +"' is not declared";
 		}
 		
 		return null;
@@ -440,7 +440,7 @@ public class OBOFormatParser {
 	{
 		if(doc.getTermFrame(classId, followImport) == null){
 			 return "The class '" + classId+ "' reference in" +
-					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not delclared";
+					" the tag '" + tag +" ' in the frame of id '" +  frameId +"'is not declared";
 		}
 		
 		return null;
