@@ -107,4 +107,23 @@ public class OBOFormatWriterTest extends OboFormatTestBasics {
 		assertEquals("GO always had an empty newline at the end.",2, newLineCount);
 	}
 	
+	@Test
+	public void testWriteOpaqueIdsAsComments() throws Exception {
+		OBODoc oboDoc = parseOBOFile("opaque_ids_test.obo");
+		String oboString = renderOboToString(oboDoc);
+		
+		String[] lines = oboString.split("\n");
+		boolean ok = false;
+		for (String line : lines) {
+			System.out.println("LINE: "+line);	
+			if (line.startsWith("relationship:")) {
+				if (line.contains("named relation y1"))
+					ok = true;
+			}
+		}
+		
+		assertTrue(ok);
+	}
+
+	
 }

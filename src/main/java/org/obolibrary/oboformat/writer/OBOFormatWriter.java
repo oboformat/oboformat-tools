@@ -227,7 +227,20 @@ public class OBOFormatWriter {
 		}
 
 		if(frame.getId() != null){
-			writeLine(OboFormatTag.TAG_ID.getTag()+": " + frame.getId(), writer);
+			Object label = frame.getTagValue(OboFormatTag.TAG_NAME);
+			String extra = "";
+			if (label == null) {
+				// the name clause may not be present in this OBODoc - however,
+				// the name provide may be able to provide one, in which case, we 
+				// write it as a parser-invisible comment, thus preserving the
+				// document structure but providing useful information for any
+				// person that inspects the obo file
+				label = nameProvider.getName(frame.getId());
+				if (label != null) {
+					extra = " ! "+label;
+				}
+			}
+			writeLine(OboFormatTag.TAG_ID.getTag()+": " + frame.getId() + extra, writer);
 		}
 
 		List<String> tags = duplicateTags(frame.getTags());
@@ -444,7 +457,7 @@ public class OBOFormatWriter {
 
 		while (valuesIterator.hasNext()) {
 			String value = valuesIterator.next().toString();
-			if(idsLabel != null){
+			if (idsLabel != null){
 				if (nameProvider != null) {
 					String label = nameProvider.getName(value);
 					if (label != null && (isOpaqueIdentifier(value) || !valuesIterator.hasNext())) {
@@ -498,13 +511,13 @@ public class OBOFormatWriter {
 		if (value != null && value.length() > 0) {
 			// check for colon
 			int colonPos = value.indexOf(':');
-			if (colonPos > 1) {
+			if (colonPos > 0) {
 				// check that the suffix after the colon contains only digits
 				if (value.length() > (colonPos + 1)) {
 					result = true;
 					for (int i = colonPos; i < value.length(); i++) {
 						char c = value.charAt(i);
-						if (!Character.isDigit(c)) {
+						if (!Character.isDigit(c) && c != ':') {
 							result = false;
 							break;
 						}
