@@ -113,15 +113,18 @@ public class OBOFormatWriter {
 		write(doc,bw);
 		bw.close();
 	}
-
-
+	
 	public void write(OBODoc doc, BufferedWriter writer) throws IOException{
+		NameProvider nameProvider = new OBODocNameProvider(doc);
+		write(doc, writer, nameProvider);
+	}
+
+	public void write(OBODoc doc, BufferedWriter writer, NameProvider nameProvider) throws IOException{
 
 		if (isCheckStructure) {
 			doc.check();
 		}
 		Frame headerFrame = doc.getHeaderFrame();
-		NameProvider nameProvider = new OBODocNameProvider(doc);
 
 		writeHeader(headerFrame, writer, nameProvider);
 
