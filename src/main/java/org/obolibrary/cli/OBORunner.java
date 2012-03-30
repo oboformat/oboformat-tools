@@ -102,7 +102,7 @@ public class OBORunner {
 
 				List<String> errors= p.checkDanglingReferences(obodoc);
 				for(String error: errors){
-					logger.error("Dangliing Reference Error: " + error);
+					logger.error("Dangling Reference Error: " + error);
 				}
 				
 				if(!config.allowDangling.getValue() && !errors.isEmpty()){
