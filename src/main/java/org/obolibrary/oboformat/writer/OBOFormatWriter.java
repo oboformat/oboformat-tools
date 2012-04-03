@@ -229,7 +229,7 @@ public class OBOFormatWriter {
 		if(frame.getId() != null){
 			Object label = frame.getTagValue(OboFormatTag.TAG_NAME);
 			String extra = "";
-			if (label == null) {
+			if (label == null && nameProvider != null) {
 				// the name clause may not be present in this OBODoc - however,
 				// the name provide may be able to provide one, in which case, we 
 				// write it as a parser-invisible comment, thus preserving the
