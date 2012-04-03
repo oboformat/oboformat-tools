@@ -638,7 +638,6 @@ public class Owl2Obo {
 			else {
 				clause.addValue(value);
 			}
-			frame.addClause(clause);
 			Set<OWLAnnotation> unprocessedQualifiers = new HashSet<OWLAnnotation>(qualifiers);
 
 			if(tag == OboFormatTag.TAG_DEF){
@@ -699,11 +698,35 @@ public class Owl2Obo {
 				}
 			}
 			addQualifiers(clause, unprocessedQualifiers);
+			
+			// before adding the clause check for redundant clauses
+			boolean redundant = false;
+			for(Clause frameClause : frame.getClauses()) {
+				if (clause.equals(frameClause)) {
+					redundant = handleDuplicateClause(frame, frameClause);
+				}
+			}
+			if (!redundant) {
+				frame.addClause(clause);
+			}
 		}else{
 			return false;
 		}
 		return true;
 
+	}
+	
+	/**
+	 * Handle a duplicate clause in a frame during translation.
+	 * 
+	 * @param frame
+	 * @param clause
+	 * @return true if the clause is to be marked as redundant and will not be added to the
+	 */
+	protected boolean handleDuplicateClause(Frame frame, Clause clause) {
+		// default is to report it via the logger and remove it.
+		LOG.warn("Duplicate clause '"+clause+"' generated in frame: "+frame.getId());
+		return true;
 	}
 
 	private boolean trGenericPropertyValue(OWLAnnotationProperty prop,

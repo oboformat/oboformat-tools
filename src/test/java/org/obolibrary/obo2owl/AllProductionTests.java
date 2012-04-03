@@ -52,6 +52,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	UnionOfTest.class,
 	UnmappableExpressionsTest.class,
 	XPBridgeFileTest.class,
+	DuplicateTagsTest.class,
 	
 	// oboformat tests
 	CAROTest.class,

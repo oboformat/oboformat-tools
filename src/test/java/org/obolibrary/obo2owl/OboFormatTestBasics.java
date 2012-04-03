@@ -4,6 +4,7 @@ import static junit.framework.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -163,6 +164,14 @@ public class OboFormatTestBasics {
 	protected static void renderOWL(OWLOntology owlOntology) throws OWLOntologyStorageException {
 		OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
 		manager.saveOntology(owlOntology, new OWLXMLOntologyFormat(), System.out);
+	}
+	
+	protected static String renderOWL(OWLOntology owlOntology, OWLOntologyFormat ontologyFormat) throws OWLOntologyStorageException, IOException {
+		OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		manager.saveOntology(owlOntology, ontologyFormat, out);
+		out.close();
+		return out.toString();
 	}
 	
 	protected IRI getIriByLabel(OWLOntology ontology, String label) {
