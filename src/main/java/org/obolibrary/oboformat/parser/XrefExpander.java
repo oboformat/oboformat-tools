@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.FrameMergeException;
@@ -15,6 +16,9 @@ import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class XrefExpander {
+
+	private static Logger LOG = Logger.getLogger(XrefExpander.class);
+
 	OBODoc sourceOBODoc;
 	OBODoc targetOBODoc;
 	String targetBase;
@@ -56,7 +60,12 @@ public class XrefExpander {
 	
 		for (Clause c : sourceOBODoc.getHeaderFrame().getClauses()) {
 			String [] parts;
-			parts = c.getValue(String.class).split("\\s");
+			String v = c.getValue(String.class);
+			if (v == null) {
+				LOG.error("problem with header clause in xref expansion: "+c);
+				continue;
+			}
+			parts = v.split("\\s");
 			String relation = null;
 			String idSpace = parts[0];
 			if (c.getTag().equals(OboFormatTag.TAG_TREAT_XREFS_AS_EQUIVALENT.getTag())) {
