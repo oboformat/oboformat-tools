@@ -426,6 +426,11 @@ public class OBOFormatWriter {
 
 
 	public void writeSynonym(Clause clause, BufferedWriter writer) throws IOException{
+		Collection<Xref> xrefs = clause.getXrefs();
+		// xrefs in synonyms must never be null, otherwise this will generate invalid obo
+		if (xrefs == null) {
+			clause.setXrefs(new ArrayList<Xref>(0));
+		}
 		writeClauseWithQuotedString(clause, writer);
 	}
 
