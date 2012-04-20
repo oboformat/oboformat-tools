@@ -195,6 +195,18 @@ public class Frame {
 	}
 	
 	public void check() throws FrameStructureException {
+		if (!FrameType.HEADER.equals(getType())) {
+			if (getClauses(OboFormatTag.TAG_ID).size() != 1) {
+				throw new FrameStructureException(this, "cardinality of id field must be 1");
+			}
+			if (this.getClause(OboFormatTag.TAG_ID).getValue() == null) {
+				throw new FrameStructureException(this, "id field must not be null");
+			}
+			if (this.getId() == null) {
+				throw new FrameStructureException(this, "id field must be set");
+			}
+		}
+		
 		Collection<Clause> iClauses = getClauses(OboFormatTag.TAG_INTERSECTION_OF);
 		if (iClauses.size() == 1) {
 			throw new FrameStructureException(this, "single intersection_of tags are not allowed");
