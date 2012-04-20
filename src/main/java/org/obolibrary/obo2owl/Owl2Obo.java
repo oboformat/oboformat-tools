@@ -1130,10 +1130,6 @@ public class Owl2Obo {
 	 */
 	public static String getIdentifier(IRI iriId) {
 		String id = _getIdentifier(iriId);
-		if(id != null && id.startsWith("Error")){
-			id = null;
-		}
-
 		return id;
 	}	
 
