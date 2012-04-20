@@ -245,7 +245,7 @@ public class Owl2Obo {
 					}
 					else if (x instanceof OWLObjectSomeValuesFrom) {
 						OWLObjectProperty p = (OWLObjectProperty) ((OWLObjectSomeValuesFrom) x).getProperty();
-						if (this.getIdentifier(p) != viewRel) {
+						if (this.getIdentifier(p).equals(viewRel) == false) {
 							LOG.error("Expected: "+viewRel+" got: "+p+" in "+eca);
 						}
 						xs.add(((OWLObjectSomeValuesFrom)x).getFiller());

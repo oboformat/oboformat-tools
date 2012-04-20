@@ -584,7 +584,7 @@ public class Obo2Owl {
 			String id = typedefFrame.getId();
 
 			String xid = translateShorthandIdToExpandedId(id);
-			if (xid != id) {
+			if (xid.equals(id) == false) {
 				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
 						trTagToAnnotationProp("shorthand"),
 						p.getIRI(), 
@@ -1005,11 +1005,13 @@ public class Obo2Owl {
 				// TODO: Throw Exceptions
 				LOG.warn("Cannot translate: "+clause);
 			}
-			ax = fac.getOWLAnnotationAssertionAxiom(
-					trTagToAnnotationProp(tag),
-					sub, 
-					trAnnotationProp(v.toString()).getIRI(), 
-					annotations);
+			else{
+				ax = fac.getOWLAnnotationAssertionAxiom(
+						trTagToAnnotationProp(tag),
+						sub, 
+						trAnnotationProp(v.toString()).getIRI(), 
+						annotations);
+			}
 		}
 		else if (_tag == OboFormatTag.TAG_PROPERTY_VALUE) {
 			Collection<Object> values = clause.getValues();
