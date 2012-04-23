@@ -34,7 +34,7 @@ public class OBOFormatParser {
 	static final Logger LOG = Logger.getLogger(OBOFormatParser.class); 
 	
 	// TODO use this to validate date strings for OboFormatTag.TAG_CREATION_DATE
-    SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+    SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	private boolean followImport;
 	
