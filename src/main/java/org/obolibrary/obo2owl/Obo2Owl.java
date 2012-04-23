@@ -1324,15 +1324,16 @@ public class Obo2Owl {
 		return fac.getOWLObjectProperty(iri);	
 	}
 
-
+	
 
 	protected OWLAnnotationValue trLiteral(Object value) {
 		if (value instanceof Xref) {
 			value = ((Xref)value).getIdref();
 		}
 		else if (value instanceof Date) {
-			// TODO replace toString() with defined date mapping
-			value = ((Date)value).toString();
+			// use proper OWL2 data type, write lexical value as ISO 8601 date string 
+			String lexicalValue = Obo2OWLConstants.OWL2_DATE_LITERAL_FORMAT.get().format((Date)value);
+			return fac.getOWLLiteral(lexicalValue, OWL2Datatype.XSD_DATE_TIME);
 		}
 		else if (value instanceof Boolean) {
 			return fac.getOWLLiteral((Boolean)value);

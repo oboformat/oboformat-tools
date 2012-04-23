@@ -1,6 +1,7 @@
 package org.obolibrary.obo2owl;
 
-import java.util.HashSet;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Hashtable;
 
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
@@ -15,6 +16,15 @@ public class Obo2OWLConstants {
 
 	public static final String DEFAULT_IRI_PREFIX = "http://purl.obolibrary.org/obo/";
 	public static final String OIOVOCAB_IRI_PREFIX = "http://www.geneontology.org/formats/oboInOwl#";
+	
+	// use a thread local variable as date formats are generally not synchronized  
+	public static final ThreadLocal<DateFormat> OWL2_DATE_LITERAL_FORMAT = new ThreadLocal<DateFormat>(){
+
+		@Override
+		protected DateFormat initialValue() {
+			return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		}
+	}; 
 	
 	public enum Obo2OWLVocabulary{
 		
