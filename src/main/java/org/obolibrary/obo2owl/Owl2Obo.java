@@ -895,11 +895,13 @@ public class Owl2Obo {
 
 		OWLClassExpression ce1 = list.get(0);
 		OWLClassExpression ce2 = list.get(1);
-
-		String cls2 = this.getIdentifier(ce2);
+		if (ce1 instanceof OWLEntity == false) {
+			// this might happen for some GCI axioms, which are not expressible in OBO
+			error(ax);
+			return;
+		}
 
 		Frame f = getTermFrame((OWLEntity) ce1);
-
 		if (f == null) {
 			error(ax);
 			return;
@@ -908,7 +910,7 @@ public class Owl2Obo {
 		boolean isUntranslateable = false;
 		List<Clause> equivalenceAxiomClauses = new ArrayList<Clause>();
 
-
+		String cls2 = this.getIdentifier(ce2);
 		if (cls2 != null) {
 			Clause c = new Clause();
 			c.setTag(OboFormatTag.TAG_EQUIVALENT_TO.getTag());
@@ -929,10 +931,8 @@ public class Owl2Obo {
 					error(ax);
 					return;
 				}
-				else{
-					c.setValue(id);
-					equivalenceAxiomClauses.add(c);
-				}
+				c.setValue(id);
+				equivalenceAxiomClauses.add(c);
 			}
 
 
