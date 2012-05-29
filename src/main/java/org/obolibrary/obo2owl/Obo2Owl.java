@@ -363,7 +363,7 @@ public class Obo2Owl {
 			OWLObjectProperty vp = fac.getOWLObjectProperty(pIRI);
 			Set<OWLAxiom> rmAxioms = new HashSet<OWLAxiom>();
 			Set<OWLAxiom> newAxioms = new HashSet<OWLAxiom>();
-			
+
 			for (OWLEquivalentClassesAxiom eca : owlOntology.getAxioms(AxiomType.EQUIVALENT_CLASSES)) {
 				int numNamed = 0;
 				Set<OWLClassExpression> xs = new HashSet<OWLClassExpression>();
@@ -548,9 +548,22 @@ public class Obo2Owl {
 			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
 			add(fac.getOWLDeclarationAxiom(p));
 			for (String tag : typedefFrame.getTags()) {
-				for (Clause clause : typedefFrame.getClauses(tag)) {
-					//System.out.println(p+" p "+tag+" t "+clause);
-					add(trGenericClause(p, tag, clause));					
+				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
+
+				if (_tag == OboFormatTag.TAG_IS_A) {
+					// todo - subAnnotationProperty
+					/*
+					OWLAxiom ax = fac.getOWLSubAnnotationPropertyOfAxiom(
+							p,
+							trObjectProp((String)typedefFrame.getC), 
+							annotations);
+							*/
+				}
+				else {
+					for (Clause clause : typedefFrame.getClauses(tag)) {
+						//System.out.println(p+" p "+tag+" t "+clause);
+						add(trGenericClause(p, tag, clause));					
+					}
 				}
 			}
 			return p;
@@ -565,6 +578,7 @@ public class Obo2Owl {
 		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG) != null &&
 				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG)) {
 
+			// already handled
 			return null;
 			/*OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
 			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
@@ -1022,6 +1036,7 @@ public class Obo2Owl {
 				LOG.warn("Cannot translate: "+clause);
 			} 
 			else if (values.size() == 2) {
+				// property_value(Rel-ID Entity-ID Qualifiers)
 				ax = fac.getOWLAnnotationAssertionAxiom(
 						trAnnotationProp((String)v),
 						sub, 
@@ -1029,6 +1044,7 @@ public class Obo2Owl {
 						annotations);
 			} 
 			else if (values.size() == 3) {
+				// property_value(Rel-ID Value XSD-Type Qualifiers)
 				Iterator<Object> it = clause.getValues().iterator();
 				it.next();
 				it.next();

@@ -1,7 +1,11 @@
 package org.obolibrary.oboformat.diff;
 
+import java.io.IOException;
+import java.util.Vector;
+
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.Frame.FrameType;
 
 public class Diff {
 
@@ -70,9 +74,37 @@ public class Diff {
 		return type + " " + frameType +
 		" Frame1="+(frame1 == null ? "-" : frame1.getId()) +
 		" Frame2="+(frame2 == null ? "-" : frame2.getId()) +
-		" Clause="+(clause1 == null ? "-" : clause1)+
+		" Clause1="+(clause1 == null ? "-" : clause1)+
+		" Clause2="+(clause2 == null ? "-" : clause2)+
 		" In=Frame"+frameNum;
-		
+
 	}
+
+	/*
+	public String toOboDelta() throws IOException {
+		Vector<String> lines = new Vector();
+		String line1 = null;
+		if(frame1.getType() != frame2.getType()) {
+			throw new IOException("Frames must be of same type: "+frame1+" -vs- "+frame2);
+		}
+		if(frame1.getType() == FrameType.TERM)
+			line1 = "[Term]";
+		else	if(frame1.getType() == FrameType.TYPEDEF)
+			line1 = "[Typedef]";
+		else	if(frame1.getType() == FrameType.INSTANCE)
+			line1 = "[Instance]";
+		lines.add(line1);
+		lines.add("id: "+frame1.getId());
+		
+		if (clause1 == null) {
+		}
+		else {
+			lines.add("-");			
+		}
+
+		return line1 + "\n" + line2 + "\n";
+
+	}
+	*/
 
 }

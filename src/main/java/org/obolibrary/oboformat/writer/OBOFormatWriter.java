@@ -231,7 +231,7 @@ public class OBOFormatWriter {
 			String extra = "";
 			if (label == null && nameProvider != null) {
 				// the name clause may not be present in this OBODoc - however,
-				// the name provide may be able to provide one, in which case, we 
+				// the name provider may be able to provide one, in which case, we 
 				// write it as a parser-invisible comment, thus preserving the
 				// document structure but providing useful information for any
 				// person that inspects the obo file

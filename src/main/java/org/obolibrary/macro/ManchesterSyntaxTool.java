@@ -234,6 +234,9 @@ public class ManchesterSyntaxTool {
 				IRI iri = getIRI(name);
 				if (iri != null) {
 					owlClass = getOWLClass(iri);
+					if (owlClass == null) {
+						
+					}
 				}
 			}
 			return owlClass;
@@ -275,7 +278,12 @@ public class ManchesterSyntaxTool {
 
 		IRI getIRI(String name) {
 			if (isQuoted(name)) {
+				// anything in '....' quotes is a label
 				return getIRIByLabel(name.substring(1, name.length() - 1));
+			}
+			if (name.length() > 2 && name.charAt(0) == '<' && name.charAt(name.length() -1 ) == '>') {
+				// anything between <...> brackets is a complete IRI
+				return IRI.create(name.substring(1, name.length() - 1));
 			}
 			return getIRIByIdentifier(name);
 		}
@@ -331,6 +339,9 @@ public class ManchesterSyntaxTool {
 			for(OWLOntology o : ontologies) {
 				OWLClass c = o.getOWLOntologyManager().getOWLDataFactory().getOWLClass(iri);
 				if (o.getDeclarationAxioms(c).size() > 0) {
+					return c;
+				}
+				if (o.getOWLOntologyManager().getOWLDataFactory().getOWLNothing().equals(c)) {
 					return c;
 				}
 			}
