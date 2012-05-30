@@ -408,6 +408,16 @@ Documents in the obo-format consist of sequences of Unicode characters
 
 <h3><a name="2.2"></a>2.2 Characters</h3>
 
+<h4><a name="2.2.0"></a>2.2.0 Basic Characters</h4>
+
+<p class="grammar" style="white-space: pre;">
+
+<span class="nonterminal">Alpha-Char</span> ::=  <span class="nonterminal">a</span> |<span class="nonterminal">b</span> |<span class="nonterminal">c</span> |<span class="nonterminal">d</span> |<span class="nonterminal">e</span> |<span class="nonterminal">f</span> |<span class="nonterminal">g</span> |<span class="nonterminal">h</span> |<span class="nonterminal">i</span> |<span class="nonterminal">j</span> |<span class="nonterminal">k</span> |<span class="nonterminal">l</span> |<span class="nonterminal">m</span> |<span class="nonterminal">n</span> |<span class="nonterminal">o</span> |<span class="nonterminal">p</span> |<span class="nonterminal">q</span> |<span class="nonterminal">r</span> |<span class="nonterminal">s</span> |<span class="nonterminal">t</span> |<span class="nonterminal">u</span> |<span class="nonterminal">v</span> |<span class="nonterminal">w</span> |<span class="nonterminal">x</span> |<span class="nonterminal">y</span> |<span class="nonterminal">z</span> | <span class="nonterminal">A</span> |<span class="nonterminal">B</span> |<span class="nonterminal">C</span> |<span class="nonterminal">D</span> |<span class="nonterminal">E</span> |<span class="nonterminal">F</span> |<span class="nonterminal">G</span> |<span class="nonterminal">H</span> |<span class="nonterminal">I</span> |<span class="nonterminal">J</span> |<span class="nonterminal">K</span> |<span class="nonterminal">L</span> |<span class="nonterminal">M</span> |<span class="nonterminal">N</span> |<span class="nonterminal">O</span> |<span class="nonterminal">P</span> |<span class="nonterminal">Q</span> |<span class="nonterminal">R</span> |<span class="nonterminal">S</span> |<span class="nonterminal">T</span> |<span class="nonterminal">U</span> |<span class="nonterminal">V</span> |<span class="nonterminal">W</span> |<span class="nonterminal">X</span> |<span class="nonterminal">Y</span> |<span class="nonterminal">Z</span>
+<span class="nonterminal">Digit</span> ::= <span class="nonterminal">0</span> |<span class="nonterminal">1</span> |<span class="nonterminal">2</span> |<span class="nonterminal">3</span> |<span class="nonterminal">4</span> |<span class="nonterminal">5</span> |<span class="nonterminal">6</span> |<span class="nonterminal">7</span> |<span class="nonterminal">8</span> |<span class="nonterminal">9</span> 
+
+</p>
+
+
 <h4><a name="2.2.1"></a>2.2.1 Spacing Characters</h4>
 
 <p class="grammar" style="white-space: pre;">
@@ -435,6 +445,7 @@ in different contexts.
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">UniCodeChar</span> ::= <i>any Unicode character</i>
 <span class="nonterminal">OBOChar</span> ::= '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
+<span class="nonterminal">NonWsChar</span> ::=  ( <span class="nonterminal">OBOChar</span> - <span class="nonterminal">WhiteSpaceChar</span> ) 
 </p>
 
 
@@ -442,20 +453,29 @@ in different contexts.
 
 <p>
 Each tag-value clause in OBOF is line separated. The line can
-optionally be ended by a comment, indicated by the ! character - this
-is ignored by the parser. Each clause can also have zero or more
-tag-value qualifiers.
+optionally be ended by a HiddenComment, indicated by the '!' character
+- this is semantically silent can be ignored by the parser. Each
+clause can also have zero or more comma-separated
+tag-value <i>trailing qualifiers</i> between a '{' and a '}' - this is
+called a QualifierBlock.
 </p>
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">EOL</span> ::=  {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">QualifierBlock</span> ] {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">HiddenComment</span> ] {<span class="nonterminal">WhiteSpaceChar</span>} <span class="nonterminal">NewLineChar</span>
-<span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> '}' 
 <span class="nonterminal">HiddenComment</span> ::= '!' { ( <span class="nonterminal">UniCodeChar</span> - <span class="nonterminal">NewlineChar</span> ) } 
-<span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' <span class="nonterminal">ws</span> <span class="terminal">Qualifier</span> }
+<span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> '}' 
+<span class="nonterminal">QualifierList</span>  ::= <span class="nonterminal">Qualifier</span> {',' <span class="nonterminal">ws</span> <span class="nonterminal">Qualifier</span> }
 <span class="nonterminal">Qualifier</span> ::= <span class="nonterminal">Rel-ID</span> '=' <span class="nonterminal">QuotedString</span> 
 </p>
 
-<h3><a name="2.4"></a>2.4 Tokens</h3>
+<h3><a name="2.4"></a>2.4 Clause Values</h3>
+
+<p>
+Depending on the tag, the values for clauses may be written as
+UnquotedStrings (in which case the entire line after the tag and
+before any qualifier block is used as the clause value), or as a
+QuotedString, in which case it is enclosed within double quotes.
+</p>
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">QuotedString</span> ::=  <span class="nonterminal">DblQuote</span> { ( <span class="nonterminal">OBOChar</span> - <span class="nonterminal">DblQuote</span> ) } <span class="nonterminal">DblQuote</span>
@@ -464,33 +484,40 @@ tag-value qualifiers.
 
 <h3><a name="2.5"></a>2.5 Identifiers</h3>
 
+<p>
+We introduce 3 rules for class IDs, relation IDs and instance IDs -
+these all have the same structure.
+</p>
+
+<p>
+IDs fall into one of 3 categories: unprefixed, prefixed or URLs. The
+prefixed category is divided into two: canonical and non-canonical
+prefixed IDs. Whilst canonical prefixed IDs are preferred, many OBO
+documents make use of non-canonical prefixed IDs or unprefixed IDs in
+a variety of contexts - relation, subsetdef and synonymtypedef IDs
+have traditionally been unprefixed; xrefs frequently do not conform to
+the canonical prefixed ID pattern.
+</p>
+
 <p class="grammar" style="white-space: pre;">
-<span class="nonterminal">NonWsChar</span> ::=  ( <span class="nonterminal">OBOChar</span> - <span class="nonterminal">WhiteSpaceChar</span> ) 
 <span class="nonterminal">Class-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Rel-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Instance-ID</span> ::=  <span class="nonterminal">ID</span>
 <!-- TODO: URLs -->
 <span class="nonterminal">ID</span> ::=  <span class="nonterminal">Prefixed-ID</span> | <span class="nonterminal">Unprefixed-ID</span> | <span class="nonterminal">URL-as-ID</span>
 
-<span class="nonterminal">URL-as-ID</span> ::=   ( <span class="terminal">http:</span> | <span class="terminal">https:</span> ) { <span class="nonterminal">NonWsChar</span> }
+<span class="nonterminal">URL-as-ID</span> ::=   ( <span class="terminal">'http:'</span> | <span class="terminal">'https:'</span> ) { <span class="nonterminal">NonWsChar</span> }
 <span class="nonterminal">Unprefixed-ID</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="terminal">':'</span> ) }
 <span class="nonterminal">Prefixed-ID</span> ::=  <span class="nonterminal">Canonical-Prefixed-ID</span> | <span class="nonterminal">NonCanonical-Prefixed-ID</span> 
 </p>
 
 <p class="grammar" style="white-space: pre;">
 
-<span class="nonterminal">Canonical-Prefixed-ID</span> ::=  <span class="nonterminal">Canonical-IDPrefix</span> ':' <span class="nonterminal">Canonical-LocalID</span> 
-<span class="nonterminal">Alpha-Char</span> ::=  <span class="nonterminal">a</span> |<span class="nonterminal">b</span> |<span class="nonterminal">c</span> |<span class="nonterminal">d</span> |<span class="nonterminal">e</span> |<span class="nonterminal">f</span> |<span class="nonterminal">g</span> |<span class="nonterminal">h</span> |<span class="nonterminal">i</span> |<span class="nonterminal">j</span> |<span class="nonterminal">k</span> |<span class="nonterminal">l</span> |<span class="nonterminal">m</span> |<span class="nonterminal">n</span> |<span class="nonterminal">o</span> |<span class="nonterminal">p</span> |<span class="nonterminal">q</span> |<span class="nonterminal">r</span> |<span class="nonterminal">s</span> |<span class="nonterminal">t</span> |<span class="nonterminal">u</span> |<span class="nonterminal">v</span> |<span class="nonterminal">w</span> |<span class="nonterminal">x</span> |<span class="nonterminal">y</span> |<span class="nonterminal">z</span> | <span class="nonterminal">A</span> |<span class="nonterminal">B</span> |<span class="nonterminal">C</span> |<span class="nonterminal">D</span> |<span class="nonterminal">E</span> |<span class="nonterminal">F</span> |<span class="nonterminal">G</span> |<span class="nonterminal">H</span> |<span class="nonterminal">I</span> |<span class="nonterminal">J</span> |<span class="nonterminal">K</span> |<span class="nonterminal">L</span> |<span class="nonterminal">M</span> |<span class="nonterminal">N</span> |<span class="nonterminal">O</span> |<span class="nonterminal">P</span> |<span class="nonterminal">Q</span> |<span class="nonterminal">R</span> |<span class="nonterminal">S</span> |<span class="nonterminal">T</span> |<span class="nonterminal">U</span> |<span class="nonterminal">V</span> |<span class="nonterminal">W</span> |<span class="nonterminal">X</span> |<span class="nonterminal">Y</span> |<span class="nonterminal">Z</span>
-<span class="nonterminal">Digit</span> ::= <span class="nonterminal">0</span> |<span class="nonterminal">1</span> |<span class="nonterminal">2</span> |<span class="nonterminal">3</span> |<span class="nonterminal">4</span> |<span class="nonterminal">5</span> |<span class="nonterminal">6</span> |<span class="nonterminal">7</span> |<span class="nonterminal">8</span> |<span class="nonterminal">9</span> 
 <span class="nonterminal">Canonical-IDPrefix</span> ::=  <span class="nonterminal">Alpha-Char</span> { ( '_' | <span class="nonterminal">Alpha-Char</span> ) }
 <span class="nonterminal">Canonical-LocalID</span> ::=  { <span class="nonterminal">Digit</span> }
-
-</p>
-
-<p class="grammar" style="white-space: pre;">
-
+<span class="nonterminal">Canonical-Prefixed-ID</span> ::=  <span class="nonterminal">Canonical-IDPrefix</span> ':' <span class="nonterminal">Canonical-LocalID</span> 
 <span class="nonterminal">NonCanonical-Prefixed-ID</span> ::=  ( <span class="nonterminal">Any-IDPrefix</span> ':' <span class="nonterminal">Any-LocalID</span> ) - <span class="nonterminal">Canonical-Prefixed-ID</span>
-<span class="nonterminal">Any-IDPrefix</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="nonterminal">':'</span> ) } ':' 
+<span class="nonterminal">Any-IDPrefix</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="nonterminal">':'</span> ) }
 <span class="nonterminal">Any-LocalID</span> ::=  { <span class="nonterminal">NonWsChar</span> }
 
 </p>
@@ -562,6 +589,7 @@ order to be more consistent with Manchester Syntax.</p>
         | <span class="nonterminal">treat-xrefs-as-is_a-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">treat-xrefs-as-has-subclass-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">remark-TVP</span>
+        | <span class="nonterminal">owl-axioms-TVP</span>
         | <span class="nonterminal">UnreservedToken</span> ':'  [  <span class="nonterminal">ws</span> ] <span class="nonterminal">UnquotedString</span>
 <span class="nonterminal">entity-frame</span> ::= <span class="nonterminal">term-frame</span> | <span class="nonterminal">typedef-frame</span> | <span class="nonterminal">instance-frame</span> 
 </p>
@@ -949,6 +977,8 @@ but it will eventually "ground out" in (a fragment of) OWL DL.</p>
   generated by extracting the value of the "ontology" tag in the header frame
 </p>
 
+<h3><a name="5.0.1"></a>5.0.1 Ontology Documents</h3>
+
 <table border="1" cellspacing="0">
 <caption><a id="decl" name="decl" />
 	Mapping of Ontology Document</caption>
@@ -971,9 +1001,32 @@ but it will eventually "ground out" in (a fragment of) OWL DL.</p>
 </tbody>
 </table>
 
-<p></p>
+
+<h3><a name="5.0.2"></a>5.0.2 Ontology IRIs</h3>
+
+<p>
+An OBO ontology ID can be either an entire IRI or an abbreviated form
+such as 'go'. The abbreviated form is translated by prefixing the
+standard obolibrary PURL scheme and affixing with ".owl"
+</p>
+
+<p>
+<span class="name">T<sup>OntID</sup></span>(IRI) = IRI
+</p>
+<p>
+<span class="name">T<sup>OntID</sup></span>(abbreviated-ID) =
+'http://purl.obolibrary.org/obo/' abbreviated-ID '.owl'
+</p>
+
+<p>
+An ontology is in abbreviated form if it contains only alphanumeric
+characters, plus '_', '-' and '.'
+</p>
+
+<h3><a name="5.0.3"></a>5.0.3 Ontology Headers</h3>
 
 <p></p>
+
 
 <table border="1" cellspacing="0">
 <caption><a id="decl" name="decl" />
@@ -1036,6 +1089,113 @@ AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span
 
 </tbody>
 </table>
+
+<span style="color: red;">
+
+<h3><a name="5.0.4"></a>5.0.4 Untranslatable OWL axioms</h3>
+
+<p>
+An ontology can contain any number of arbitrary OWL axioms encoded in
+OWL functional syntax in the ontology header using the owl-axioms
+tag. The values of all owl-axioms clauses are concatenated together
+(with newline characters appended) in
+order of appearance in the document and interpreted as if they were
+enclosed within an "Ontology( ... )" production in functional
+syntax. This allows any OWL ontology to be roundtripped through
+OBO-format, albeit in such a way that expressive OWL axioms are opaque
+to many OBO-format applications. 
+</p>
+
+
+
+<h4>Prefixes</h4>
+
+<p>
+The following prefixes are assumed to be pre-declared - other prefixes
+cannot be declared and thus full IRIs must be used
+
+<span style="white-space: pre;">
+Prefix: xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
+Prefix: owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+Prefix: : &lt;http://purl.obolibrary.org/obo/&gt;
+Prefix: oboInOwl: &lt;http://www.geneontology.org/formats/oboInOwl#&gt;
+Prefix: xml: &lt;http://www.w3.org/XML/1998/namespace&gt;
+Prefix: rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+Prefix: dc: &lt;http://purl.org/dc/elements/1.1/&gt;
+Prefix: rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+</span>
+
+</p>
+
+<h4>Example</h4>
+
+<p>
+
+<span style="white-space: pre;">
+format-version: 1.2
+ontology: go
+date: 17:04:2012 15:38
+...
+remark: this is an example of what a header in the GO might look like
+remark: We have two axioms, the first declares that nothing is part of
+remark: both a nucleus and a cytoplasm, the second declares that
+remark: nothing is part of both a cytoplasm and a plasma membrane.
+remark: (Note we could have chosen to use a single axiom with 3
+remark: arguments, which is better as it also gives us the spatial
+remark: disjointness between nucleus and PM)
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634))
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
+
+[Term]
+...
+</span>
+
+</p>
+
+<h4>Behavior for OBO-writers (normative)</h4>
+
+<p>
+When translating an OWL ontology to an OBO-document, any axiom that is
+not translated according to the standard obo2owl rules must be added
+as an owl-axioms clause
+</p>
+
+<h4>Recommendations for OBO-writers (informative)</h4>
+
+<p>
+Note that individual axioms may be broken over multiple lines;
+alternatively, multiple axioms may be concatenated as one line. It is
+recommended that writers write each axiom on its own line/clause.
+
+<h5>Recommended</h5>
+<span style="white-space: pre;">
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634))
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
+</span>
+
+<h5>Allowed</h5>
+<span style="white-space: pre;">
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) 
+owl-axioms:                 ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634))
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) 
+owl-axioms:                 ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
+</span>
+
+<h5>Allowed</h5>
+<span style="white-space: pre;">
+owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634)) DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
+</span>
+
+</p>
+
+
+
+<p>
+It is strongly recommended that writers only generate owl-axioms
+clauses for axioms that fall outside of the OBO-subset of
+OWL2-DL. Remember that most applications that consume obo-format will
+ignore the owl-axioms headers.
+</p>
 
 
 
