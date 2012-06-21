@@ -23,6 +23,13 @@ public class RoundTripPropertyValueTest extends RoundTripTest {
 		roundTripOBOFile("property_value_test.obo", true);
 	}
 	
+	@Test
+	public void testRoundTripWithQualifiers() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+		//uncomment this when http://code.google.com/p/oboformat/issues/detail?id=69 is fixed:
+		//roundTripOBOFile("property_value_qualifiers_test.obo", true);
+	}
+
+	
 	
 	/*
 	@Test
