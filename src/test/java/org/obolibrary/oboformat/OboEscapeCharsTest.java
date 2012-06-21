@@ -2,7 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,6 +18,8 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class OboEscapeCharsTest extends OboFormatTestBasics {
 
+	static boolean useSystemOut = false;
+	
 	@Test
 	public void testEscapeChars() throws IOException {
 		OBODoc obodoc = parseOBOFile("escape_chars_test.obo");
@@ -44,9 +45,11 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 	public void testRoundTripEscapeChars() throws IOException {
 		OBODoc oboDoc = parseOBOFile("escape_chars_test.obo");
 		
-		File file = this.writeOBO(oboDoc, "escape_chars_test2.obo");
-		System.out.println("Writen test ontology to file: "+file.getAbsolutePath());
-		OBODoc oboDoc2 = parseOBOFile(file);
+		String oboToString = renderOboToString(oboDoc);
+		if (useSystemOut) {
+			System.out.println(oboToString);
+		}
+		OBODoc oboDoc2 = parseOboToString(oboToString);
 		assertNotNull("There was an error during parsing of the obodoc", oboDoc2);
 		OBODocDiffer differ = new OBODocDiffer();
 		List<Diff> diffs = differ.getDiffs(oboDoc, oboDoc2);

@@ -17,7 +17,6 @@ public class GOTest extends OboFormatTestBasics {
 		System.out.println("term frames:"+obodoc.getTermFrames().size());
 		System.out.println("typedef frames:"+obodoc.getTypedefFrames().size());
 		assertTrue(obodoc.getTermFrames().size() > 3000);
-		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
 	
 }

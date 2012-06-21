@@ -19,6 +19,8 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class PropertyValueTest extends OboFormatTestBasics {
 
+	static boolean useSystemOut = false;
+	
 	@Test
 	public void testExpand() throws IOException, URISyntaxException, InvalidXrefMapException {
 		OBODoc obodoc = parseOBOFile("property_value_test.obo");
@@ -31,7 +33,9 @@ public class PropertyValueTest extends OboFormatTestBasics {
 	public void testWriteReadValues() throws Exception {
 		OBODoc doc = createPVDoc();
 		String oboString = renderOboToString(doc);
-		System.out.println(oboString);
+		if (useSystemOut) {
+			System.out.println(oboString);
+		}
 		OBODoc doc2 = parseOboToString(oboString);
 		OBODocDiffer dd = new OBODocDiffer();
 		List<Diff> diffs = dd.getDiffs(doc, doc2);

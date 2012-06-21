@@ -15,19 +15,27 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class CAROTest extends OboFormatTestBasics {
 	
+	static boolean useSystemOut = false;
+	
 	@Test
 	public void testParseCARO() throws IOException {
 		OBODoc obodoc = parseOBOFile("caro.obo");
-		System.out.println("F:"+obodoc);
+		if (useSystemOut) {
+			System.out.println("F:" + obodoc);
+		}
 		assertTrue(obodoc.getTermFrames().size() > 2);
 		Frame cc = obodoc.getTermFrame("CARO:0000014");
 		assertEquals("cell component", cc.getTagValue(OboFormatTag.TAG_NAME));
 		assertEquals("Anatomical structure that is a direct part of the cell.", cc.getTagValue(OboFormatTag.TAG_DEF));
 		
 		Clause dc = cc.getClause(OboFormatTag.TAG_DEF);
-		System.out.println("dc="+dc);
+		if (useSystemOut) {
+			System.out.println("dc=" + dc);
+		}
 		Collection<Xref> dcxs = dc.getXrefs();
-		System.out.println("dcxs="+dcxs);
+		if (useSystemOut) {
+			System.out.println("dcxs=" + dcxs);
+		}
 		assertEquals("CARO:MAH", dcxs.iterator().next().getIdref());
 		/*
 		Collection<Xref> defxrefs = cc.getTagXrefs("def");

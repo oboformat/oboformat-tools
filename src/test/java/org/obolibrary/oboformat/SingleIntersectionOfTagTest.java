@@ -13,17 +13,19 @@ import org.obolibrary.oboformat.model.OBODoc;
 
 public class SingleIntersectionOfTagTest extends OboFormatTestBasics {
 	
+	static boolean useSystemOut = false;
+	
 	@Test(expected=FrameStructureException.class)
 	public void testParseOBOFile() throws IOException, URISyntaxException {
 		OBODoc obodoc = parseOBOFile("single_intersection_of_tag_test.obo");
-		System.out.println("F:"+obodoc);
+		if (useSystemOut) {
+			System.out.println("F:" + obodoc);
+		}
 		assertTrue(obodoc.getTermFrames().size() == 2);
 		Frame frame = obodoc.getTermFrames().iterator().next();
 		assertNotNull(frame);
 		
-		writeOBO(obodoc, "test.obo"); // throws FrameStructureException
-		
-		//assertTrue(frame.getClause("name").getValue().equals("x1"));
+		renderOboToString(obodoc); // throws FrameStructureException
 	}
 
 }
