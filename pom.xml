@@ -114,19 +114,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.11</version>
 				<configuration>
+					<argLine>-Xmx1024M</argLine>
 					<excludes>
 						<exclude>**/CHEBITest.java</exclude>
 						<exclude>**/RoundTripFlyAnatomyTest.java</exclude>
 						<exclude>**/RoundTripPROTest.java</exclude>
 					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.11</version>
-				<configuration>
-					<argLine>-Xmx1024M</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
