@@ -118,6 +118,8 @@ public class OBORunnerConfiguration {
 		}
 	};
 	
+	public final Variable<String> untranslatableAxiomsFile = new StringParamterVariable("Untranslatable Axioms Output File", null, "--untranslatableAxiomsFile");
+	
 	protected final Variable<Boolean> showHelp = new ParamterVariable<Boolean>("show help",false,"-h","--help"){
 
 		@Override

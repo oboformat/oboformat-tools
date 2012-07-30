@@ -11,7 +11,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +33,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.obolibrary.owl.LabelFunctionalFormat;
 import org.obolibrary.owl.LabelFunctionalSyntaxOntologyStorer;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
@@ -184,8 +187,28 @@ public class OBORunner {
 				oboWriter.write(doc, writer);
 				
 				writer.close();
+				
+				final String untranslatableAxiomsFile = config.untranslatableAxiomsFile.getValue();
+				Collection<OWLAxiom> untranslatableAxioms = bridge.getUntranslatableAxioms();
+				if (untranslatableAxiomsFile != null && untranslatableAxioms != null && !untranslatableAxioms.isEmpty()) {
+					writeUntranslatableAxioms(untranslatableAxiomsFile, untranslatableAxioms);
+				}
 			}
 		}
+	}
+
+	private static void writeUntranslatableAxioms(final String path, Collection<OWLAxiom> untranslatableAxioms) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+		// create temporary ontology with untranslatable axioms
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = manager.createOntology();
+		Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(untranslatableAxioms);
+		manager.addAxioms(ontology, axioms);
+		
+		// write temporary ontology to file
+		final FileOutputStream outputStream = new FileOutputStream(new File(path));
+		OWLOntologyFormat format = new RDFXMLOntologyFormat(); // TODO make this configurable
+		manager.saveOntology(ontology, format, outputStream);
+		outputStream.close();
 	}
 
 	private static OWLOntology handleMacroExpansion(OBORunnerConfiguration config, OWLOntology ontology, 
