@@ -61,7 +61,7 @@ public class OboFormatTestBasics {
 		return obodoc;
 	}
 
-	private InputStream getInputStream(String fn) {
+	protected InputStream getInputStream(String fn) {
 		InputStream inputStream = getClass().getResourceAsStream(fn);
 		if (inputStream == null) {
 			inputStream = ClassLoader.getSystemResourceAsStream(fn);

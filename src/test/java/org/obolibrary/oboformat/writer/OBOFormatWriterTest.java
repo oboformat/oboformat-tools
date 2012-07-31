@@ -2,7 +2,9 @@ package org.obolibrary.oboformat.writer;
 
 import static org.junit.Assert.*;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +117,7 @@ public class OBOFormatWriterTest extends OboFormatTestBasics {
 		String[] lines = oboString.split("\n");
 		boolean ok = false;
 		for (String line : lines) {
-			System.out.println("LINE: "+line);	
+//			System.out.println("LINE: "+line);	
 			if (line.startsWith("relationship:")) {
 				if (line.contains("named relation y1"))
 					ok = true;
@@ -125,5 +127,20 @@ public class OBOFormatWriterTest extends OboFormatTestBasics {
 		assertTrue(ok);
 	}
 
-	
+	@Test
+	public void testPropertyValueOrder() throws Exception {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(getInputStream("tag_order_test.obo")));
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+			sb.append('\n');
+		}
+		reader.close();
+		final String input = sb.toString();
+		OBODoc obodoc = parseOboToString(input);
+		
+		String written = renderOboToString(obodoc);
+		assertEquals(input, written);
+	}
 }

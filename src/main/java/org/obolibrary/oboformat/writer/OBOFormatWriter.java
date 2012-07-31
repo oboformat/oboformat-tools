@@ -407,7 +407,14 @@ public class OBOFormatWriter {
 		StringBuilder sb = new StringBuilder();
 		sb.append(clause.getTag());
 		sb.append(": ");
-		for(Iterator<?> it = cols.iterator(); it.hasNext(); ) {
+		Iterator<?> it = cols.iterator();
+		// write property
+		String property = it.next().toString(); // TODO replace toString() method
+		sb.append(escapeOboString(property, EscapeMode.simple));
+		
+		// write value and optional type
+		while(it.hasNext()) {
+			sb.append(' ');
 			String val = it.next().toString(); // TODO replace toString() method
 			if(val.contains(" ") || !val.contains(":")) {
 				sb.append('"');
@@ -416,9 +423,6 @@ public class OBOFormatWriter {
 			}
 			else {
 				sb.append(escapeOboString(val, EscapeMode.simple));
-			}
-			if (it.hasNext()) {
-				sb.append(' ');
 			}
 		}
 		writeLine(sb, writer);
