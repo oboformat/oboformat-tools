@@ -673,13 +673,13 @@ public class OBOFormatWriter {
 			table.put(OboFormatTag.TAG_SYNONYM.getTag(),45);
 			table.put(OboFormatTag.TAG_XREF.getTag(),50);
 			table.put(OboFormatTag.TAG_BUILTIN.getTag(),55);
-			table.put(OboFormatTag.TAG_PROPERTY_VALUE.getTag(),60); 
 			table.put(OboFormatTag.TAG_IS_A.getTag(),65);
 			table.put(OboFormatTag.TAG_INTERSECTION_OF.getTag(),70); 
 			table.put(OboFormatTag.TAG_UNION_OF.getTag(),80);
 			table.put(OboFormatTag.TAG_EQUIVALENT_TO.getTag(),85);
 			table.put(OboFormatTag.TAG_DISJOINT_FROM.getTag(),90);
 			table.put(OboFormatTag.TAG_RELATIONSHIP.getTag(),95);
+			table.put(OboFormatTag.TAG_PROPERTY_VALUE.getTag(),98); 
 			table.put(OboFormatTag.TAG_CREATED_BY.getTag(),100);
 			table.put(OboFormatTag.TAG_CREATION_DATE.getTag(),105);
 			table.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),110);
@@ -772,9 +772,9 @@ public class OBOFormatWriter {
 			table.put(OboFormatTag.TAG_EQUIVALENT_TO_CHAIN.getTag(),155);
 			table.put(OboFormatTag.TAG_DISJOINT_OVER.getTag(),160); 
 			table.put(OboFormatTag.TAG_RELATIONSHIP.getTag(),165); 
+			table.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),169);
 			table.put(OboFormatTag.TAG_CREATED_BY.getTag(),170); 
 			table.put(OboFormatTag.TAG_CREATION_DATE.getTag(),175); 
-			table.put(OboFormatTag.TAG_IS_OBSELETE.getTag(),180);
 			table.put(OboFormatTag.TAG_REPLACED_BY.getTag(),185); 
 			table.put(OboFormatTag.TAG_CONSIDER.getTag(),190);
 			table.put(OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag(),195); 
