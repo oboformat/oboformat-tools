@@ -149,7 +149,7 @@ OBO Flat File Format 1.4 Syntax and Semantics [WORKING DRAFT]</h1>
           <p>Comments should be sent to <a href="mailto:obo-format@lists.sourceforge.net">obo-format@lists.sourceforge.net</a> (<a href="http://sourceforge.net/mailarchive/forum.php?forum=obo-format">archive</a>)
             to ensure wide visibility. </p>
           <p>
-            Most of this document can be regarded as stable. The parts that are likely to be unstable <span style="color:red">are marked red</a>. 
+            Most of this document can be regarded as stable. The parts that are likely to be unstable <span style="color:red">are marked red</span>. 
           </p>
           <p>
             There is a working reference implementation available from <a href="http://oboformat.googlecode.com/">http://oboformat.googlecode.com/</a>.
@@ -570,7 +570,6 @@ order to be more consistent with Manchester Syntax.</p>
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">header-frame</span> ::= { <span class="nonterminal">header-clause</span> <span class="nonterminal">nl*</span> }
 <span class="nonterminal">header-clause</span> ::= <span class="nonterminal">format-version-TVP</span>
-        | <span class="nonterminal">ontology-TVP</span>
         | <span class="nonterminal">data-version-TVP</span>
         | <span class="nonterminal">date-Tag</span>  <span class="nonterminal">DD:MM:YYYY</span> <span class="nonterminal">sp</span> <span class="nonterminal">hh:mm</span>
         | <span class="nonterminal">saved-by-TVP</span>
@@ -589,6 +588,7 @@ order to be more consistent with Manchester Syntax.</p>
         | <span class="nonterminal">treat-xrefs-as-is_a-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">treat-xrefs-as-has-subclass-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">remark-TVP</span>
+        | <span class="nonterminal">ontology-TVP</span>
         | <span class="nonterminal">owl-axioms-TVP</span>
         | <span class="nonterminal">UnreservedToken</span> ':'  [  <span class="nonterminal">ws</span> ] <span class="nonterminal">UnquotedString</span>
 <span class="nonterminal">entity-frame</span> ::= <span class="nonterminal">term-frame</span> | <span class="nonterminal">typedef-frame</span> | <span class="nonterminal">instance-frame</span> 
@@ -675,10 +675,10 @@ classes).</p >
         | <span class="nonterminal">holds_over_chain-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Relation-ID</span>
         | <span class="nonterminal">equivalent_to_chain-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Relation-ID</span>
         | <span class="nonterminal">disjoint_over-Tag</span> <span class="nonterminal">Rel-ID</span> 
-        | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">Rel-ID</span> 
+        | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">Rel-ID</span>
+        | <span class="nonterminal">is-obsolete-BT</span>   
         | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
-        | <span class="nonterminal">is-obsolete-BT</span>
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
         | <span class="nonterminal">expand_assertion_to-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
@@ -709,9 +709,9 @@ classes).</p >
         | <span class="nonterminal">subset-Tag</span> <span class="nonterminal">Subset-ID</span> 
         | <span class="nonterminal">synonym-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">SynonymScope</span> [ <span class="nonterminal">ws</span> <span class="nonterminal">SynonymType-ID</span> ] <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">xref-Tag</span> <span class="nonterminal">ID</span> 
-        | <span class="nonterminal">property_value-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">ID</span> 
+        | <span class="nonterminal" style="color:red">property_value-Tag</span> <span class="nonterminal" style="color:red">Relation-ID</span> <span class="nonterminal" style="color:red">ID</span> 
         | <span class="nonterminal">instance_of-Tag</span> <span class="nonterminal">Class-ID</span> 
-        | <span class="nonterminal">PropertyValueTagValue</span> 
+        | <span class="nonterminal" style="color:red">PropertyValueTagValue</span> 
         | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">ID</span> 
         | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
@@ -803,7 +803,7 @@ Document - the result of parsing a physical OBO document file.</p>
 
 <h4><a name="4.4.1"></a>4.4.1 Implicit Header Macros</h4>
 
-<p>
+<div>
   Every OBO-Doc is automatically populated with two header clauses:
 <ul>
                   <li>treat-xrefs-as-equivalent(RO)</li>
@@ -812,7 +812,7 @@ Document - the result of parsing a physical OBO document file.</p>
                 It is illegal to override these. These declarations
                 are taken as implicit, and an OBO format generator
                 need not export these
-</p>
+</div>
 
 <h4><a name="4.4.2"></a>4.4.2 Header Macro Translation</h4>
 
@@ -836,7 +836,7 @@ are also copied into the corresponding bridge ontology
 
 
 <table border="1" cellspacing="0">
-<caption><a id="header-macros" name="header-macros" />
+<caption><a id="header-macros" name="header-macros" ></a>
 	Header Macros</caption>
 
 <thead>
@@ -902,7 +902,7 @@ intersection_of(Rel-ID Class-ID) &isin; Frame[B]</td>
 <p>Any tag not mentioned has free cardinality (zero, one or many).</p>
 
 <table border="1" cellspacing="0">
-<caption><a id="cardinality" name="cardinality" />
+<caption><a id="cardinality" name="cardinality" ></a>
 	Cardinality Constraints</caption>
 
 <thead>
@@ -915,7 +915,7 @@ intersection_of(Rel-ID Class-ID) &isin; Frame[B]</td>
 
 <tbody>
 
-  <tr><td>ontology</td><td>Header</td><td>zero or one</td><td>-</td>recommended for all docs</tr>
+  <tr><td>ontology</td><td>Header</td><td>zero or one</td><td>recommended for all docs</td></tr>
   <tr><td>format_version</td><td>Header</td><td>zero or one</td><td>-</td></tr>
   <tr><td>date</td><td>Header</td><td>zero or one</td><td>-</td></tr>
   <tr><td>default-namespace</td><td>Header</td><td>zero or one</td><td>-</td></tr>
@@ -926,8 +926,8 @@ intersection_of(Rel-ID Class-ID) &isin; Frame[B]</td>
   <tr><td>namespace</td><td>*</td><td>one</td><td>-</td></tr>
   <tr><td>def</td><td>*</td><td>zero or one</td><td>-</td></tr>
   <tr><td>comment</td><td>*</td><td>zero or one</td><td>-</td></tr>
-  <tr><td>domain</td><td>Typedef</td></td><td>zero or one</td><td>use union constructs in place of multiple values</td></tr>
-  <tr><td>range</td><td>Typedef</td></td><td>zero or one</td><td>use union constructs in place of multiple values</td></tr>
+  <tr><td>domain</td><td>Typedef</td><td>zero or one</td><td>use union constructs in place of multiple values</td></tr>
+  <tr><td>range</td><td>Typedef</td><td>zero or one</td><td>use union constructs in place of multiple values</td></tr>
   <tr><td>is_anti_symmetric</td><td>*</td><td>zero or one</td><td>-</td></tr>
   <tr><td>is_cyclic</td><td>*</td><td>zero or one</td><td>-</td></tr>
   <tr><td>is_reflexive</td><td>*</td><td>zero or one</td><td>-</td></tr>
@@ -948,13 +948,11 @@ intersection_of(Rel-ID Class-ID) &isin; Frame[B]</td>
 </tbody>
 </table>
 
-<p>
-  <ul>
-    <li>
-      If a frame with an intersection_of clause has exactly one intersection_of(Class-ID) clause, then the frame is said to have a <i>genus-differentia definition</i>
-    </li>
-  </ul>
-</p>
+<ul>
+  <li>
+    If a frame with an intersection_of clause has exactly one intersection_of(Class-ID) clause, then the frame is said to have a <i>genus-differentia definition</i>
+  </li>
+</ul>
 
 <h2><a name="5"></a>5 OBO Semantics : Mapping to OWL2-DL</h2>
 
@@ -980,7 +978,7 @@ but it will eventually "ground out" in (a fragment of) OWL DL.</p>
 <h3><a name="5.0.1"></a>5.0.1 Ontology Documents</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="decl" name="decl" />
+<caption><a id="decl" name="decl" ></a>
 	Mapping of Ontology Document</caption>
 
 <thead>
@@ -1029,7 +1027,7 @@ characters, plus '_', '-' and '.'
 
 
 <table border="1" cellspacing="0">
-<caption><a id="decl" name="decl" />
+<caption><a id="decl" name="decl" ></a>
   Mapping of Ontology Headers</caption>
 
 <thead>
@@ -1050,14 +1048,12 @@ characters, plus '_', '-' and '.'
 <td valign="top" style="white-space: pre;">import(IRI)
 </td>
 <td valign="top" style="white-space: pre;">Import(IRI)</td>
-</td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">remark(String)
 </td>
 <td valign="top" style="white-space: pre;">Annotation(<span class="name">T</span>(remark) <span class="name">T</span>(String))</td>
-</td>
 </tr>
 
 <tr>
@@ -1067,7 +1063,6 @@ characters, plus '_', '-' and '.'
 SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</span>(subsetdef) )
 AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) ID)
 AnnotationAssertion(<span class="name">T</span>(comment) <span class="name">T</span>(ID) String)
-</td>
 </td>
 </tr>
 
@@ -1079,7 +1074,6 @@ SubAnnotationPropertyOf( <span class="name">T</span>(ID) <span class="name">T</s
 AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span>(ID) <span class="name">T</span>(String))
 [AnnotationAssertion(<span class="name">T</span>(hasScope) <span class="name">T</span>(ID) <span class="name">T</span>(Scope))]
 </td>
-</td>
 </tr>
 
 <tr>
@@ -1090,11 +1084,9 @@ AnnotationAssertion(<span class="name">T</span>(name) <span class="name">T</span
 </tbody>
 </table>
 
-<span style="color: red;">
-
 <h3><a name="5.0.4"></a>5.0.4 Untranslatable OWL axioms</h3>
 
-<p>
+<p style="color: red;">
 An ontology can contain any number of arbitrary OWL axioms encoded in
 OWL functional syntax in the ontology header using the owl-axioms
 tag. The values of all owl-axioms clauses are concatenated together
@@ -1108,13 +1100,13 @@ to many OBO-format applications.
 
 
 
-<h4>Prefixes</h4>
+<h4 style="color: red;">Prefixes</h4>
 
-<p>
+<p style="color: red;">
 The following prefixes are assumed to be pre-declared - other prefixes
 cannot be declared and thus full IRIs must be used
 
-<span style="white-space: pre;">
+<span style="white-space: pre; color: red;">
 Prefix: xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt;
 Prefix: owl: &lt;http://www.w3.org/2002/07/owl#&gt;
 Prefix: : &lt;http://purl.obolibrary.org/obo/&gt;
@@ -1127,11 +1119,9 @@ Prefix: rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 
 </p>
 
-<h4>Example</h4>
+<h4 style="color: red;">Example</h4>
 
-<p>
-
-<span style="white-space: pre;">
+<p style="white-space: pre; color: red;">
 format-version: 1.2
 ontology: go
 date: 17:04:2012 15:38
@@ -1148,49 +1138,47 @@ owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) Objec
 
 [Term]
 ...
-</span>
-
 </p>
 
-<h4>Behavior for OBO-writers (normative)</h4>
+<h4 style="color: red;">Behavior for OBO-writers (normative)</h4>
 
-<p>
+<p style="color: red;">
 When translating an OWL ontology to an OBO-document, any axiom that is
 not translated according to the standard obo2owl rules must be added
 as an owl-axioms clause
 </p>
 
-<h4>Recommendations for OBO-writers (informative)</h4>
+<h4 style="color: red;">Recommendations for OBO-writers (informative)</h4>
 
-<p>
+<div style="color: red;">
 Note that individual axioms may be broken over multiple lines;
 alternatively, multiple axioms may be concatenated as one line. It is
 recommended that writers write each axiom on its own line/clause.
 
-<h5>Recommended</h5>
-<span style="white-space: pre;">
+<h5 style="color: red;">Recommended</h5>
+<span style="white-space: pre; color: red;">
 owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634))
 owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
 </span>
 
-<h5>Allowed</h5>
-<span style="white-space: pre;">
+<h5 style="color: red;">Allowed</h5>
+<span style="white-space: pre; color: red;">
 owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) 
 owl-axioms:                 ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634))
 owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) 
 owl-axioms:                 ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
 </span>
 
-<h5>Allowed</h5>
-<span style="white-space: pre;">
+<h5 style="color: red;">Allowed</h5>
+<span style="white-space: pre; color: red;">
 owl-axioms: DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005634)) DisjointClasses(ObjectSomeValuesFrom(:BFO_0000050 :GO_0005737) ObjectSomeValuesFrom(:BFO_0000050 :GO_0005886))
 </span>
 
-</p>
+</div>
 
 
 
-<p>
+<p style="color: red;">
 It is strongly recommended that writers only generate owl-axioms
 clauses for axioms that fall outside of the OBO-subset of
 OWL2-DL. Remember that most applications that consume obo-format will
@@ -1202,7 +1190,7 @@ ignore the owl-axioms headers.
 <h3><a name="5.1"></a>5.1 Declarations</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="decl" name="decl" />
+<caption><a id="decl" name="decl" ></a>
 	Mapping of frames/stanzas to OWL</caption>
 
 <thead>
@@ -1264,7 +1252,7 @@ ignore the owl-axioms headers.
 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation" name="translationDL" />
+<caption><a id="translation" name="translationDL" /></a>
 	Translation of Term frames to OWL</caption>
 
 <thead>
@@ -1397,7 +1385,7 @@ The resulting axiom would be (in Manchester-like syntax, informative):
 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation" name="translationDL" />
+<caption><a id="translation" name="translationDL" ></a>
 	Translation of class expressions to OWL</caption>
 
 <thead>
@@ -1499,7 +1487,7 @@ all_some(true) &isin; Qualifiers
 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation" name="translationDL" />
+<caption><a id="translation" name="translationDL" ></a>
 	Translation of Typedef frames to OWL</caption>
 
 <thead>
@@ -1659,7 +1647,7 @@ AnnotationAssertion(<span class="name">T</span>(Qualifiers) <span class="name">T
               </p>
               
 <table border="1" cellspacing="0">
-<caption><a id="translation-i" name="translationI" />
+<caption><a id="translation-i" name="translationI" ></a>
 	Additional axioms generated by equivalent_to_chain clauses</caption>
 
 <thead>
@@ -1681,7 +1669,7 @@ is_transitive(Rel1-ID)</td>
 <h3><a name="5.5"></a>5.5 Individual Axioms</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-i" name="translationI" />
+<caption><a id="translation-i" name="translationI" ></a>
 	Translation of Instance frames to OWL</caption>
 
 <thead>
@@ -1708,7 +1696,7 @@ is_transitive(Rel1-ID)</td>
 <h3><a name="5.6"></a>5.6 Common Elements to Annotation Properties</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-ap" name="translationAP" />
+<caption><a id="translation-ap" name="translationAP" ></a>
 	Translation of common frame elements</caption>
 
 <thead>
@@ -1784,7 +1772,7 @@ is_transitive(Rel1-ID)</td>
 <h3><a name="5.7"></a>5.7 Translation of OBO Qualifiers to Annotations</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-q" name="translationQ" />
+<caption><a id="translation-q" name="translationQ" ></a>
 	Translation of qualifier expressions</caption>
 
 <thead>
@@ -1825,10 +1813,7 @@ is_transitive(Rel1-ID)</td>
 
 </table>
 
-</tbody>
-</table>
-
-<p>
+<div>
 The following qualifiers are not translated to annotations:
 <ul>
  <li>cardinality</li>
@@ -1837,11 +1822,11 @@ The following qualifiers are not translated to annotations:
  <li>gci_relation</li>
  <li>gci_filler</li>
 </ul>
-</p>
+</div>
 
 <h3><a name="5.8"></a>5.8 Translation of Annotation Vocabulary</h3>
 
-<p>
+<div>
  Annotation properties are drawn from the followling vocabularies:
                 <ul>
                   <li>
@@ -1858,11 +1843,11 @@ The following qualifiers are not translated to annotations:
                   </li>
 
                 </ul>
-</p>
+</div>
 
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-q" name="translationQ" />
+<caption><a id="translation-q" name="translationQ" ></a>
 	Translation of identifiers - hardcoded values</caption>
 
 <thead>
@@ -1991,7 +1976,7 @@ The following qualifiers are not translated to annotations:
 Note we have no cognate of IAO:definition_source - we would have a generic xref annotation on the definition annotation assertion
 </p>
 
-<h4><a name="5.8.1"></a>5.8.1 Semantics of synonyms</h3>
+<h4><a name="5.8.1"></a>5.8.1 Semantics of synonyms</h4>
 
 <p>
   Mapping of OBO Format synonym clauses is described
@@ -2039,20 +2024,20 @@ in ontologies. These have also proven useful for NLP purposes.
 <h3><a name="5.9"></a>5.9 Translation of Identifiers</h3>
 
 <h4><a name="5.9.1"></a>5.9.1. Pre-processing</h4>
-<p>Every OBO-Document is automatically populated with two clauses:
+<div>Every OBO-Document is automatically populated with two clauses:
  <ul>
    <li>idspace(RO "http://purl.obolibrary.org/obo/RO_")</li>
    <li>idspace(BFO "http://purl.obolibrary.org/obo/BFO_")</li>
  </ul>
 (see <a href="#4.4.1">4.4.1</a>)
-</p>
+</div>
 
 <h4><a name="5.9.2"></a>5.9.2. Translation of identifiers</h4>
 
 <p>The following table is used when translating an OBO identifier to an IRI</p>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-id" name="translationID" />
+<caption><a id="translation-id" name="translationID" ></a>
 	Translation of identifiers</caption>
 
 <thead>
@@ -2087,7 +2072,7 @@ in ontologies. These have also proven useful for NLP purposes.
 
 <h4><a name="5.9.3"></a>5.9.3. Special Rules for Relations</h4>
 
-                <p>
+                <div>
                   An exception is made to 5.9.2 for translating relation IDs:
                   <ul>
                     <li>If an Unprefixed-ID is declared in a Typedef
@@ -2114,10 +2099,10 @@ in ontologies. These have also proven useful for NLP purposes.
                       source document is invalid.
                     </li>
                   </ul>
-                </p>
+                </div>
                 <p>
                   A side effect of this substitution is the generation of an annotation assertion that preserves the original shorthand relation:
-                  <span valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(shorthand) <span class="name">T</span>(Formal-ID) "Original-ID"^^xsd:string)</span>
+                  <span style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(shorthand) <span class="name">T</span>(Formal-ID) "Original-ID"^^xsd:string)</span>
                 </p>
                 <p>
                   These rules are normative. An informative summary is provided in section <a href="#8.2.2">8.2.2</a>.
@@ -2142,7 +2127,7 @@ in ontologies. These have also proven useful for NLP purposes.
 <h3><a name="5.10"></a>5.10 Post-Processing OWL DL</h3>
 
 <table border="1" cellspacing="0">
-<caption><a id="postProcessing" name="postProcessing" />
+<caption><a id="postProcessing" name="postProcessing" ></a>
   Post-processing OWL2 DL
 </caption>  
 <thead>
@@ -2154,7 +2139,7 @@ in ontologies. These have also proven useful for NLP purposes.
 <tbody>
   <tr>
     <td>
-      ObjectExactCardinality(n P CE), n>0
+      ObjectExactCardinality(n P CE), n&gt;0
     </td>
     <td>
       TransitiveProperty(P)
@@ -2165,7 +2150,7 @@ in ontologies. These have also proven useful for NLP purposes.
   </tr>
   <tr>
     <td>
-      ObjectMinCardinality(n P CE), n>0
+      ObjectMinCardinality(n P CE), n&gt;0
     </td>
     <td>
       TransitiveProperty(P)
@@ -2201,13 +2186,13 @@ in ontologies. These have also proven useful for NLP purposes.
                   would violate OBO document structure constraints
                   (see section <a href="#4.4">4.4</a>).
                 </p>
-                <p>
+                <div>
                   <ul>
                     <li>If a Frame has more than one name after translation, an arbitrary one is selected, and a warning is fired</li>
                     <li>If a Frame has more than one comment after translation, the set of distinct comments for that frame is concatenated using the \n escape character</li>
                     <li>If an expression cannot be translated, it is dropped OR converted into an OWL Macro, see below</li>
                   </ul>
-                </p>
+                </div>
 <p>
   Note that all classes in an OBO Document are assumed to
   satisfiable. Any axioms refering to owl:Thing should be removed. An
@@ -2236,7 +2221,7 @@ At this time, only one sublanguage is specified - OBO basic. To
 <h3><a name="6.1"></a>6.1 OBO Sublanguage Characteristics</h3>
 <h3><a name="6.1.1"></a>6.1.1 DAG</h3>
 
-<p>
+<div>
 An ontology is a DAG if the graph formed by its logical relationships
 does not contain any cycles. Formally: let V be a set of nodes
 corresponding to all Term frames in the ontology (OWL Classes). Let E
@@ -2246,7 +2231,7 @@ be a set of edge pairs A,B where both A and B are in V and either
 <li> relationship: R B (i.e. SubClassOf(A ObjectSomeValuesFrom(R B)))</li>
 </ul>
 Note that the relationship type (i.e. ObjectProperty) is irrelevant here.                    
-</p>
+</div>
 <p>
 The ontology is a DAG if the transitive closure of E contains no cycles.
 </p>
@@ -2267,7 +2252,7 @@ the ontology document. Here declaration means there exists a frame
 with the corresponding identifier.
 </p>
 
-<p>
+<div>
 We can define 3 sub-characteristics:
 <ul>
  <li>
@@ -2281,7 +2266,7 @@ We can define 3 sub-characteristics:
  </li>
 </ul>
 
-</p>
+</div>
 
 <h3><a name="6.1.3"></a>6.1.3 Unidirectional</h3>
 
@@ -2389,7 +2374,7 @@ ignoring relationship types using a naive algorithm will not lead to
 cycles (i.e. the ontology is a DAG); every referenced term is declared
 in the ontology (i.e. there are no dangling clauses).
 </p>
-<p>
+<div>
 An ontology is OBO Basic if and only if it has the following characteristics:                  
 
                 <ul>
@@ -2412,7 +2397,7 @@ An ontology is OBO Basic if and only if it has the following characteristics:
                     No equivalence axioms
                   </li>
                 </ul>
-                </p>
+</div>
 
 
 <h3><a name="6.3"></a>6.3 Conversion to sub-languages</h3>
@@ -2459,7 +2444,7 @@ Two IRIs are used to specify the two different types of macro expansion.
 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="translation-q" name="translationQ" />
+<caption><a id="translation-q" name="translationQ" ></a>
 	Macros</caption>
 
 <thead>
@@ -2495,7 +2480,7 @@ Two IRIs are used to specify the two different types of macro expansion.
 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="postProcessing" name="postProcessing" />
+<caption><a id="postProcessing" name="postProcessing" ></a>
   OWL Macro Expansion Rules
 </caption>  
 <thead>
@@ -2558,7 +2543,7 @@ Two IRIs are used to specify the two different types of macro expansion.
                 </p>
 
 <table border="1" cellspacing="0">
-<caption><a id="postProcessing" name="postProcessing" />
+<caption><a id="postProcessing" name="postProcessing" ></a>
   GCI Addition Rules
 </caption>  
 <thead>
@@ -2616,7 +2601,7 @@ Two IRIs are used to specify the two different types of macro expansion.
   decision of whether to place generated axioms in a new ontology or
   the source ontology.
                 </p>
-                <p>
+                <div>
                   The <i>recommended behavior</i> is:
                   <ul>
                     <li>
@@ -2634,7 +2619,7 @@ Two IRIs are used to specify the two different types of macro expansion.
                       id-policy document.
                     </li>
                   </ul>
-</p>
+</div>
 
 <h2><a name="8"></a>8 Recommendations (informative)</h2>
 
@@ -2804,7 +2789,7 @@ and Mapping to OWL Web Ontology Language</a></cite>. Ian Horrocks, March 2007. h
   </dd>
 
   <dt> <span id="obo-owl-swat4ls">[OBO OWL SWAT4LS]</span>
-  </dt><dd> <cite><a class="external text" href="http://userweb.cs.utexas.edu/~hamid/oboowl.html" title="http://userweb.cs.utexas.edu/~hamid/oboowl.html">OBO & OWL: Roundtrip Ontology Transformations.</a></cite>. Syed Hamid Tirmizi, Stuart Aitken, Dilvan Moreira, Chris Mungall, Juan Sequeda, Nigam H. Shah and Daniel P. Miranker. In: Proceedings of Semantic Web Applications and Tools for Life Sciences Workshop, Amsterdam, The Netherlands,
+  </dt><dd> <cite><a class="external text" href="http://userweb.cs.utexas.edu/~hamid/oboowl.html" title="http://userweb.cs.utexas.edu/~hamid/oboowl.html">OBO &amp; OWL: Roundtrip Ontology Transformations.</a></cite>. Syed Hamid Tirmizi, Stuart Aitken, Dilvan Moreira, Chris Mungall, Juan Sequeda, Nigam H. Shah and Daniel P. Miranker. In: Proceedings of Semantic Web Applications and Tools for Life Sciences Workshop, Amsterdam, The Netherlands,
   </dd>
 
   <dt> <span id="obo-1-4">[OBO Format 1.4 Guide]</span>
