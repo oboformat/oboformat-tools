@@ -891,14 +891,34 @@ public class Owl2Obo {
 
 	private void tr(OWLEquivalentClassesAxiom ax) {
 
-		List<OWLClassExpression> list = ax.getClassExpressionsAsList();
-
-		OWLClassExpression ce1 = list.get(0);
-		OWLClassExpression ce2 = list.get(1);
-		if (ce1 instanceof OWLEntity == false) {
-			// this might happen for some GCI axioms, which are not expressible in OBO
+		/*
+		 *  Assumption: the underlying data structure is a set
+		 *  The order is not guaranteed to be preserved. 
+		 */
+		Set<OWLClassExpression> expressions = ax.getClassExpressions();
+		
+		// handle expression list with size other than two elements as error
+		if (expressions.size() != 2) {
 			error(ax);
 			return;
+		}
+
+		Iterator<OWLClassExpression> it = expressions.iterator();
+		OWLClassExpression ce1 = it.next();
+		OWLClassExpression ce2 = it.next();
+		if (ce1 instanceof OWLEntity == false) {
+			// check whether ce2 is the actual OWLEntity
+			if (ce2 instanceof OWLEntity) {
+				// three way exchange
+				OWLClassExpression temp = ce2;
+				ce2 = ce1;
+				ce1 = temp;
+			}
+			else{
+				// this might happen for some GCI axioms, which are not expressible in OBO
+				error(ax);
+				return;
+			}
 		}
 
 		Frame f = getTermFrame((OWLEntity) ce1);
