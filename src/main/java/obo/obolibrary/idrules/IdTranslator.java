@@ -47,7 +47,7 @@ public class IdTranslator {
 	 * Does not check if it actually conforms to URI syntax.
 	 * 
 	 * @param id
-	 * @return
+	 * @return boolean
 	 */
 	public boolean isURI(String id) {
 		if (id.startsWith("http:") ||
@@ -64,7 +64,7 @@ public class IdTranslator {
 	 * By default a prefix XX maps to http://purl.obolibrary.org/obo/XX_
 	 * 
 	 * @param prefix
-	 * @return
+	 * @return expanded prefix
 	 */
 	public String expandPrefix(String prefix) {
 		if (idspaceMap.containsKey(prefix)) {

@@ -457,6 +457,9 @@ public class OBOFormatParser {
 
 	/**
 	 * header-clause ::= format-version-TVP | ... | ...
+	 * 
+	 * @param h header frame 
+	 * @return true if parse was successful
 	 */
 	protected boolean parseHeaderClauseNl(Frame h) {
 		parseZeroOrMoreWsOptCmtNl();
@@ -514,7 +517,10 @@ public class OBOFormatParser {
 
 
 	/**
-	 * term-frame ::= nl*  '[Term]' nl  id-Tag Class-ID EOL  { term-frame-clause EOL } 
+	 * term-frame ::= nl*  '[Term]' nl  id-Tag Class-ID EOL  { term-frame-clause EOL }
+	 * 
+	 * @param obodoc 
+	 * @return true if parse was successful
 	 */
 	public boolean parseTermFrame(OBODoc obodoc)  {
 		Frame f = new Frame(FrameType.TERM);
@@ -538,7 +544,8 @@ public class OBOFormatParser {
 	}
 
 	/**
-	 * 
+	 * @param f 
+	 * @return true if parse was successful
 	 */
 	protected boolean parseTermFrameClauseEOL(Frame f) {
 		// comment line:
@@ -659,8 +666,10 @@ public class OBOFormatParser {
 
 
 	/**
-	 * Typedef-frame ::= nl*  '[Typedef]' nl  id-Tag Class-ID EOL  { Typedef-frame-clause EOL } 
-	 * @throws FrameMergeException 
+	 * Typedef-frame ::= nl*  '[Typedef]' nl  id-Tag Class-ID EOL  { Typedef-frame-clause EOL }
+	 *  
+	 * @param obodoc 
+	 * @return true if parse was successful
 	 */
 	public boolean parseTypedefFrame(OBODoc obodoc)  {
 		Frame f = new Frame(FrameType.TYPEDEF);
@@ -684,7 +693,8 @@ public class OBOFormatParser {
 	}
 
 	/**
-	 * 
+	 * @param f 
+	 * @return true if parse was successful
 	 */
 	protected boolean parseTypedefFrameClauseEOL(Frame f) {
 		// comment line:
@@ -1000,7 +1010,10 @@ public class OBOFormatParser {
 	}
 
 	/**
-	 * intersection_of-Tag Class-ID | intersection_of-Tag Relation-ID Class-ID 
+	 * intersection_of-Tag Class-ID | intersection_of-Tag Relation-ID Class-ID
+	 *  
+	 * @param cl 
+	 * @return true if parse was successful
 	 */
 	private boolean parseTermIntersectionOf(Clause cl) {
 		if (parseIdRef(cl)) {

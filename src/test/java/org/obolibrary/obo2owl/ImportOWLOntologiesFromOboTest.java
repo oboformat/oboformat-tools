@@ -14,14 +14,11 @@ import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
-import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
@@ -34,6 +31,8 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
  *
  */
 public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
+	
+	private static final boolean useSystemOut = false;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -51,7 +50,9 @@ public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
 					IRI.create(new File("src/test/resources/import_test_imported.owl")));
 
 		Obo2Owl bridge = new Obo2Owl();
-		System.out.println("M="+bridge.getManager());
+		if (useSystemOut) {
+			System.out.println("M=" + bridge.getManager());
+		}
 		bridge.getManager().addIRIMapper(iriMapper);
 		
 		Collection<Clause> importClauses = obodoc.getHeaderFrame().getClauses(OboFormatTag.TAG_IMPORT);
@@ -63,8 +64,10 @@ public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
 
 		assertEquals(1, ontology.getImportsDeclarations().size());
 		
-		for (OWLSubClassOfAxiom a : ontology.getAxioms(AxiomType.SUBCLASS_OF, true)) {
-			System.out.println("A="+a);
+		if (useSystemOut) {
+			for (OWLSubClassOfAxiom a : ontology.getAxioms(AxiomType.SUBCLASS_OF, true)) {
+				System.out.println("A="+a);
+			}
 		}
 		assertEquals(2, ontology.getAxioms(AxiomType.SUBCLASS_OF, true).size());
 

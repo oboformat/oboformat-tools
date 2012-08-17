@@ -108,6 +108,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
 	 * Layout and events for the build dir
 	 * 
 	 * @param pos
+	 * @param defaultFolder
 	 */
 	private void createDownloadDirPanel(GBHelper pos, String defaultFolder) {
 		final SelectDialog dialog = SelectDialog.getFolderSelector(frame, defaultFolder, "Work directory choose dialog"); 

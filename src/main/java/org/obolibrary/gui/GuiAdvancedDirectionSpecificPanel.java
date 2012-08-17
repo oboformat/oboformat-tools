@@ -51,7 +51,9 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
 	 * @param allowDanglingDefault
 	 * @param expandMacrosDefault
 	 * @param followImports
+	 * @param defaultOntologyConfigValue
 	 * @param isObo2Owl
+	 * @param strictConversion 
 	 */
 	public GuiAdvancedDirectionSpecificPanel(
 			boolean allowDanglingDefault, 

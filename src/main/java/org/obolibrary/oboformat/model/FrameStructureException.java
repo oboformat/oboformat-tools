@@ -1,7 +1,10 @@
 package org.obolibrary.oboformat.model;
 
 public class FrameStructureException extends DocumentStructureException {
-	Frame frame;
+	
+	// generated
+	private static final long serialVersionUID = -461365284401308633L;
+	
 	public FrameStructureException(String msg) {
 		super(msg);
 	}

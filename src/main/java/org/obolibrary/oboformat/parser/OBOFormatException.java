@@ -2,19 +2,22 @@ package org.obolibrary.oboformat.parser;
 
 public class OBOFormatException extends Exception {
 
+	// generated
+	private static final long serialVersionUID = 6785258968276915779L;
+
 	public OBOFormatException() {
 	}
 
-	public OBOFormatException(String arg0) {
-		super(arg0);
+	public OBOFormatException(String message) {
+		super(message);
 	}
 
-	public OBOFormatException(Throwable arg0) {
-		super(arg0);
+	public OBOFormatException(Throwable e) {
+		super(e);
 	}
 
-	public OBOFormatException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	public OBOFormatException(String message, Throwable e) {
+		super(message, e);
 	}
 
 }

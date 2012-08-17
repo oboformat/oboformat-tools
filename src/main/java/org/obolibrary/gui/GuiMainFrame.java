@@ -138,6 +138,7 @@ public class GuiMainFrame extends JFrame {
 	 * Update the config values by reading the fields and states from the GUI.
 	 * 
 	 * @param config 
+	 * @return true, if config update was successful
 	 */
 	private boolean updateConfigurationFromGUI(OBORunnerConfiguration config) {
 		// config from main panel

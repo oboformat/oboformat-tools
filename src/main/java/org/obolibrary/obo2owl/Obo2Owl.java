@@ -142,7 +142,7 @@ public class Obo2Owl {
 	}
 
 	/**
-	 * See {@link convertURL(String iri, String outFile)}
+	 * See {@link #convertURL(String iri, String outFile)}
 	 * 
 	 * @param iri
 	 * @param outFile
@@ -234,7 +234,7 @@ public class Obo2Owl {
 	 * the convert method
 	 * 
 	 * @param oboFile
-	 * @return
+	 * @return ontology
 	 * @throws OWLOntologyCreationException
 	 */
 	public OWLOntology convert(String oboFile) throws OWLOntologyCreationException {
@@ -254,7 +254,7 @@ public class Obo2Owl {
 	/**
 	 * @param obodoc
 	 * @param useFreshManager
-	 * @return
+	 * @return ontology
 	 * @throws OWLOntologyCreationException
 	 */
 	public OWLOntology convert(OBODoc obodoc, boolean useFreshManager) throws OWLOntologyCreationException {
@@ -271,7 +271,7 @@ public class Obo2Owl {
 	 * Converts an OBO document to an OWL ontology 
 	 * 
 	 * @param obodoc
-	 * @return
+	 * @return ontology
 	 * @throws OWLOntologyCreationException
 	 */
 	public OWLOntology convert(OBODoc obodoc) throws OWLOntologyCreationException {
@@ -662,13 +662,13 @@ public class Obo2Owl {
 	}
 
 
-	private OWLAxiom trRelationUnionOf(OWLProperty p, Collection<Clause> clauses) {
+	private OWLAxiom trRelationUnionOf(OWLProperty<?,?> p, Collection<Clause> clauses) {
 		// TODO Auto-generated method stub
 		// not expressible in OWL - use APs. SWRL?
 		return null;
 	}
 
-	private OWLAxiom trRelationIntersectionOf(OWLProperty p,
+	private OWLAxiom trRelationIntersectionOf(OWLProperty<?,?> p,
 			Collection<Clause> clauses) {
 		// TODO Auto-generated method stub
 		// not expressible in OWL - use APs. SWRL?
