@@ -380,7 +380,15 @@ public class OBOFormatWriter {
 
 		Iterator<Xref> xrefsIterator = sortedXrefs.iterator();
 		while (xrefsIterator.hasNext()) {
-			sb.append(escapeOboString(xrefsIterator.next().getIdref(), EscapeMode.xrefList));
+			final Xref current = xrefsIterator.next();
+			sb.append(escapeOboString(current.getIdref(), EscapeMode.xrefList));
+			String annotation = current.getAnnotation();
+			if (annotation != null) {
+				sb.append(' ');
+				sb.append('"');
+				sb.append(escapeOboString(annotation, EscapeMode.quotes));
+				sb.append('"');
+			}
 			if (xrefsIterator.hasNext()) {
 				sb.append(", ");
 			}
