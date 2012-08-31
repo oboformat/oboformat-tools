@@ -625,11 +625,11 @@ classes).</p >
         | <span class="nonterminal">equivalent_to-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">disjoint_from-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Class-ID</span> 
-        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
-        | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">is_obsolete-BT</span>
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
+        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
+        | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
 </p >
 
 
@@ -658,6 +658,7 @@ classes).</p >
         | <span class="nonterminal">domain-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">range-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">builtin-BT</span>
+        | <span class="nonterminal">holds_over_chain-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Relation-ID</span>
         | <span class="nonterminal">is_anti_symmetric-BT</span>
         | <span class="nonterminal">is_cyclic-BT</span>
         | <span class="nonterminal">is_reflexive-BT</span>
@@ -672,15 +673,14 @@ classes).</p >
         | <span class="nonterminal">disjoint_from-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">inverse_of-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">transitive_over-Tag</span> <span class="nonterminal">Relation-ID</span>
-        | <span class="nonterminal">holds_over_chain-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Relation-ID</span>
         | <span class="nonterminal">equivalent_to_chain-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">Relation-ID</span>
         | <span class="nonterminal">disjoint_over-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">Rel-ID</span>
         | <span class="nonterminal">is-obsolete-BT</span>   
-        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
-        | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
+        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
+        | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">expand_assertion_to-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">expand_expression_to-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">is_metadata_tag-BT</span>
