@@ -60,7 +60,11 @@ public class MacroExpansionGCIVisitor {
 			}
 			else if (ax instanceof OWLEquivalentClassesAxiom) {
 				visitor.visit((OWLEquivalentClassesAxiom)ax);
-			}else if(ax instanceof OWLAnnotationAssertionAxiom){
+			}
+			else if (ax instanceof OWLClassAssertionAxiom) {
+				visitor.visit((OWLClassAssertionAxiom)ax);
+			}
+			else if(ax instanceof OWLAnnotationAssertionAxiom){
 				expand((OWLAnnotationAssertionAxiom)ax);
 			}
 		}

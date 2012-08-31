@@ -68,5 +68,14 @@ public class XrefExpanderTest extends OboFormatTestBasics {
 		assertTrue(n == 3);
 		//assertTrue(frame.getClause("name").getValue().equals("x1"));
 	}
+	
+	/*
+	@Test
+	public void testUberonHeader() throws IOException, URISyntaxException, InvalidXrefMapException {
+		OBODoc obodoc = parseOBOFile("uberon_header_test.obo");
+		XrefExpander x = new XrefExpander(obodoc, "bridge");
+		x.expandXrefs();
+	}
+	*/
 
 }

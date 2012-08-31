@@ -20,9 +20,8 @@ public class MacroExpansionVisitor {
 	private static final boolean DEBUG = log.isDebugEnabled();
 	
 	private OWLOntology inputOntology;
-	private OWLOntologyManager outputManager;
-	private OWLOntology outputOntology;
-
+	private OWLOntologyManager manager;
+	
 	private Visitor visitor;
 	private ManchesterSyntaxTool manchesterSyntaxTool;
 	
@@ -31,32 +30,13 @@ public class MacroExpansionVisitor {
 		this.inputOntology = inputOntology;
 		this.visitor = new Visitor(inputOntology);
 		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
-		
-		outputManager = OWLManager.createOWLOntologyManager();
-		
-		try{
-			outputOntology = outputManager.createOntology(inputOntology.getOntologyID());
-		}catch(Exception ex){
-			log.error(ex.getMessage(), ex);
-		}
-	}
-
-	private void output(OWLAxiom axiom){
-		if (axiom == null) {
-			log.error("no axiom");
-			return;
-		}
-		//System.out.println("adding:"+axiom);
-		AddAxiom addAx = new AddAxiom(outputOntology, axiom);
-		try {
-			outputManager.applyChange(addAx);
-		}
-		catch (Exception e) {			
-			log.error("COULD NOT TRANSLATE AXIOM", e);
-		}
+		manager = inputOntology.getOWLOntologyManager();
 	}
 
 	public OWLOntology expandAll() {
+		Set<OWLAxiom> newAxioms = new HashSet<OWLAxiom>();
+		Set<OWLAxiom> rmAxioms = new HashSet<OWLAxiom>();
+		
 		for (OWLAxiom ax : inputOntology.getAxioms()) {
 			
 			OWLAxiom exAx = ax;
@@ -65,18 +45,32 @@ public class MacroExpansionVisitor {
 			}
 			else if (ax instanceof OWLEquivalentClassesAxiom) {
 				exAx = visitor.visit((OWLEquivalentClassesAxiom)ax);
-			}else if(ax instanceof OWLAnnotationAssertionAxiom){
+			}
+			else if (ax instanceof OWLClassAssertionAxiom) {
+				exAx = visitor.visit((OWLClassAssertionAxiom)ax);
+			}
+			else if(ax instanceof OWLAnnotationAssertionAxiom){
 			 	for(OWLAxiom expandedAx: expand((OWLAnnotationAssertionAxiom)ax)){
-			 		output(expandedAx);
+			 		//output(expandedAx);
+					if (!ax.equals(expandedAx)) {
+						newAxioms.add(expandedAx);
+						rmAxioms.add(ax);
+					}
 			 	}
 			}
 			/*else if(ax instanceof OWLDeclarationAxiom) {
 				exAx = vistor.visit((OWLDeclarationAxiom) ax);
 			}*/
 			
-			output(exAx);
+			//output(exAx);
+			if (!ax.equals(exAx)) {
+				newAxioms.add(exAx);
+				rmAxioms.add(ax);
+			}
 		}
-		return outputOntology;
+		manager.addAxioms(inputOntology, newAxioms);
+		manager.removeAxioms(inputOntology, rmAxioms);
+		return inputOntology;
 	}
 	
 	private Set<OWLAxiom> expand(OWLAnnotationAssertionAxiom ax){
@@ -95,7 +89,7 @@ public class MacroExpansionVisitor {
 			OWLClass axValClass = visitor.dataFactory.getOWLClass(axValIRI);
 			if (inputOntology.getDeclarationAxioms(axValClass).size() == 0) {
 				OWLDeclarationAxiom newAx = visitor.dataFactory.getOWLDeclarationAxiom(axValClass);
-				outputManager.addAxiom(inputOntology, newAx);
+				manager.addAxiom(inputOntology, newAx);
 				// we need to sync the MST entity checker with the new ontology plus declarations;
 				// we do this by creating a new MST - this is not particularly efficient, a better
 				// way might be to first scan the ontology for all annotation axioms that will be expanded,
