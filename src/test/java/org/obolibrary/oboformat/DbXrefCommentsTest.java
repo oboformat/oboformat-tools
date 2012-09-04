@@ -2,10 +2,6 @@ package org.obolibrary.oboformat;
 
 import static org.junit.Assert.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -44,21 +40,5 @@ public class DbXrefCommentsTest extends OboFormatTestBasics {
 		String renderedOboString = renderOboToString(obodoc);
 		assertEquals(original, renderedOboString);
 	}
-	
-	private String readResource(String resource) throws IOException {
-		InputStream inputStream = getInputStream(resource);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-		
-		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			sb.append(line);
-			sb.append('\n');
-		}
-		
-		reader.close();
-		inputStream.close();
-		
-		return sb.toString();
-	}
+
 }

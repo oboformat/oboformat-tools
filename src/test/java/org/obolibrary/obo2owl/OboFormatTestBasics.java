@@ -189,4 +189,21 @@ public class OboFormatTestBasics {
 		}
 		return null;
 	}
+	
+	protected String readResource(String resource) throws IOException {
+		InputStream inputStream = getInputStream(resource);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+			sb.append('\n');
+		}
+		
+		reader.close();
+		inputStream.close();
+		
+		return sb.toString();
+	}
 }
