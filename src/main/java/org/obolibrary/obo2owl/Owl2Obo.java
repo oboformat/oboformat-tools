@@ -1547,7 +1547,7 @@ public class Owl2Obo {
 	 * @param clauses
 	 * @return normalized list of {@link Clause}
 	 */
-	private List<Clause> normalizeRelationshipClauses(List<Clause> clauses) {
+	public static List<Clause> normalizeRelationshipClauses(List<Clause> clauses) {
 		final List<Clause> normalized = new ArrayList<Clause>();
 		while (!clauses.isEmpty()) {
 			final Clause target = clauses.remove(0);
@@ -1558,7 +1558,7 @@ public class Owl2Obo {
 		return normalized;
 	}
 
-	private List<Clause> findSimilarClauses(List<Clause> clauses, final Clause target) {
+	static List<Clause> findSimilarClauses(List<Clause> clauses, final Clause target) {
 		final String targetTag = target.getTag();
 		final Object targetValue = target.getValue();
 		final Object targetValue2 = target.getValue2();
@@ -1584,7 +1584,7 @@ public class Owl2Obo {
 		return similar;
 	}
 
-	private void mergeSimilarIntoTarget(final Clause target, List<Clause> similar) {
+	static void mergeSimilarIntoTarget(final Clause target, List<Clause> similar) {
 		if (similar.isEmpty()) {
 			return;
 		}
@@ -1610,7 +1610,7 @@ public class Owl2Obo {
 		}
 	}
 
-	private QualifierValue findMatchingQualifierValue(QualifierValue query, Collection<QualifierValue> list) {
+	static QualifierValue findMatchingQualifierValue(QualifierValue query, Collection<QualifierValue> list) {
 		String queryQualifier = query.getQualifier();
 		for (QualifierValue qv : list) {
 			if (queryQualifier.equals(qv.getQualifier())) {
@@ -1620,7 +1620,7 @@ public class Owl2Obo {
 		return null;
 	}
 
-	private void mergeQualifierValues(QualifierValue target, QualifierValue newQV) {
+	static void mergeQualifierValues(QualifierValue target, QualifierValue newQV) {
 		// do nothing, if they are equal
 		if (!target.getValue().equals(newQV.getValue())) {
 			if("minCardinality".equals(target.getQualifier())) {
