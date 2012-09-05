@@ -1289,7 +1289,7 @@ public class OBOFormatParser {
 	// ----------------------------------------
 
 	
-	private boolean parseEOL(Clause cl) {
+	public boolean parseEOL(Clause cl) {
 		while (parseWs()) {
 			
 		}
