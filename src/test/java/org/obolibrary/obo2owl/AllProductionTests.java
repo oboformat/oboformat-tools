@@ -9,6 +9,7 @@ import org.obolibrary.macro.ManchesterSyntaxToolTest;
 import org.obolibrary.oboformat.CAROTest;
 import org.obolibrary.oboformat.ChebiXRefTest;
 import org.obolibrary.oboformat.EmptyLinesTest;
+import org.obolibrary.oboformat.MultipleCommentsTest;
 import org.obolibrary.oboformat.OboEscapeCharsTest;
 import org.obolibrary.oboformat.PropertyValueTest;
 import org.obolibrary.oboformat.SimpleGOTest;
@@ -65,6 +66,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	EmptyLinesTest.class,
 	PropertyValueTest.class,
 	OBOFormatWriterTest.class,
+	MultipleCommentsTest.class,
 	
 	// macro expansion
 	ExpandSynapsedToTest.class,

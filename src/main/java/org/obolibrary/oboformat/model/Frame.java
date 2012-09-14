@@ -214,7 +214,9 @@ public class Frame {
 		if (getClauses(OboFormatTag.TAG_DEF).size() > 1) {
 			throw new FrameStructureException(this, "multiple def tags not allowed");	
 		}
-		
+		if (getClauses(OboFormatTag.TAG_COMMENT).size() > 1) {
+			throw new FrameStructureException(this, "multiple comment tags not allowed");	
+		}
 	}
 
 
