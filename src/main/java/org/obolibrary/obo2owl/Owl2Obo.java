@@ -609,10 +609,8 @@ public class Owl2Obo {
 		if(tag == null){
 			Clause clause = new Clause(OboFormatTag.TAG_PROPERTY_VALUE);
 			String propId = this.getIdentifier(prop);
-			if (propId.equals("shorthand")) {
-				addQualifiers(clause, qualifiers);
-			}
-			else {
+			addQualifiers(clause, qualifiers);
+			if (propId.equals("shorthand") == false) {
 				clause.addValue(propId);
 				clause.addValue(value);
 				frame.addClause(clause);
@@ -738,10 +736,8 @@ public class Owl2Obo {
 
 		clause.setTag(OboFormatTag.TAG_PROPERTY_VALUE.getTag());
 		String propId = this.getIdentifier(prop);
-		if (propId.equals("shorthand")) {
-			addQualifiers(clause, qualifiers);
-		}
-		else {
+		addQualifiers(clause, qualifiers);
+		if (propId.equals("shorthand") == false) {
 			clause.addValue(propId);
 
 			if(annVal instanceof OWLLiteral){
@@ -1117,9 +1113,10 @@ public class Owl2Obo {
 	 */
 	public static String getIdentifierFromObject(OWLObject obj, OWLOntology ont) throws UntranslatableAxiomException {
 
-		if(obj instanceof OWLObjectProperty){
-			OWLObjectProperty prop = (OWLObjectProperty) obj;
-			for(OWLAnnotationAssertionAxiom ax: prop.getAnnotationAssertionAxioms(ont)){
+		if(obj instanceof OWLObjectProperty || obj instanceof OWLAnnotationProperty){
+			OWLEntity entity = (OWLEntity) obj;
+			final Set<OWLAnnotationAssertionAxiom> axioms = entity.getAnnotationAssertionAxioms(ont);
+			for(OWLAnnotationAssertionAxiom ax: axioms){
 				String propId = getIdentifierFromObject(ax.getProperty(), ont);
 
 				// see BFOROXrefTest

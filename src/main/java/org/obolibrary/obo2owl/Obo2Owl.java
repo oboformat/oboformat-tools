@@ -544,9 +544,24 @@ public class Obo2Owl {
 		if (typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG) != null &&
 				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG)) {
 
-			OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
-			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
+			final String id = typedefFrame.getId();
+			OWLAnnotationProperty p = trAnnotationProp(id);
 			add(fac.getOWLDeclarationAxiom(p));
+			
+			// handle xrefs also for meta data tags
+			final String xid = translateShorthandIdToExpandedId(id);
+			if (id.equals(xid) == false) {
+				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(
+						trTagToAnnotationProp("shorthand"),
+						p.getIRI(), 
+						trLiteral(id), 
+						new HashSet<OWLAnnotation>());
+
+				add(ax);				
+			}
+			
+			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
+			
 			for (String tag : typedefFrame.getTags()) {
 				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 
@@ -579,17 +594,8 @@ public class Obo2Owl {
 				(Boolean)typedefFrame.getTagValue(OboFormatTag.TAG_IS_METADATA_TAG)) {
 
 			// already handled
+			// see: trTypedefToAnnotationProperty(Frame typedefFrame)
 			return null;
-			/*OWLAnnotationProperty p = trAnnotationProp(typedefFrame.getId());
-			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
-			add(fac.getOWLDeclarationAxiom(p));
-			for (String tag : typedefFrame.getTags()) {
-				for (Clause clause : typedefFrame.getClauses(tag)) {
-					//System.out.println(p+" p "+tag+" t "+clause);
-					add(trGenericClause(p, tag, clause));					
-				}
-			}
-			return p;*/
 		}
 		else {
 			OWLObjectProperty p = trObjectProp(typedefFrame.getId());

@@ -433,6 +433,7 @@ public class OBOFormatWriter {
 				sb.append(escapeOboString(val, EscapeMode.simple));
 			}
 		}
+		appendQualifiers(sb, clause);
 		writeLine(sb, writer);
 	}
 
