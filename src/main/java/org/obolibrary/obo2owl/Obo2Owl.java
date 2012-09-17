@@ -485,7 +485,8 @@ public class Obo2Owl {
 					// TODO: Throw Exceptions
 					LOG.warn("Cannot translate: "+clause);
 				}
-
+			} else if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
+				addPropertyValueHeaders(headerFrame.getClauses(OboFormatTag.TAG_PROPERTY_VALUE));
 			}/*else if (tag == OboFormatTag.TAG_DATA_VERSION) {
 				//fac.getOWLVersionInfo();
 				Clause clause = headerFrame.getClause(t);
@@ -508,6 +509,49 @@ public class Obo2Owl {
 		}		
 	}
 
+	private void addPropertyValueHeaders(Collection<Clause> clauses) {
+		for (Clause clause : clauses) {
+			final Set<OWLAnnotation> annotations = trAnnotations(clause);
+			Collection<Object> values = clause.getValues();
+			Object v = clause.getValue();
+			Object v2 = clause.getValue2();
+			if (v == null) {
+				// TODO: Throw Exceptions
+				LOG.warn("Cannot translate: "+clause);
+			} 
+			else if (values.size() == 2) {
+				// property_value(Rel-ID Entity-ID Qualifiers)
+				OWLAnnotationProperty prop = trAnnotationProp((String)v);
+				OWLAnnotationValue value = trAnnotationProp(v2.toString()).getIRI();
+				OWLAnnotation ontAnn = fac.getOWLAnnotation(prop, value, annotations);
+				AddOntologyAnnotation addAnn = new AddOntologyAnnotation(owlOntology, ontAnn);
+				apply(addAnn);
+			} 
+			else if (values.size() == 3) {
+				// property_value(Rel-ID Value XSD-Type Qualifiers)
+				Iterator<Object> it = clause.getValues().iterator();
+				it.next();
+				it.next();
+				String v3String = (String) it.next();
+				IRI valueIRI;
+				if (v3String.startsWith("xsd:")) {
+					valueIRI = IRI.create(Namespaces.XSD + v3String.substring(4));
+				} else {
+					valueIRI = IRI.create(v3String);
+				}
+				OWLAnnotationValue value = fac.getOWLLiteral((String) v2, OWL2Datatype.getDatatype(valueIRI));
+				OWLAnnotationProperty prop = trAnnotationProp((String)v);
+				OWLAnnotation ontAnn = fac.getOWLAnnotation(prop, value, annotations);
+				AddOntologyAnnotation addAnn = new AddOntologyAnnotation(owlOntology, ontAnn);
+				apply(addAnn);
+			}
+			else {
+				LOG.warn("Cannot translate: "+clause);
+				// TODO 
+			}
+		}
+	}
+	
 	protected void addOntologyAnnotation(OWLAnnotationProperty ap, OWLAnnotationValue v) {
 		OWLAnnotation ontAnn = fac.getOWLAnnotation(ap, v);
 		AddOntologyAnnotation addAnn = new AddOntologyAnnotation(owlOntology, ontAnn);

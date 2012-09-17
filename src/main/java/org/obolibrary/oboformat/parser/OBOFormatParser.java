@@ -501,7 +501,16 @@ public class OBOFormatParser {
 			return parseHeaderDate(cl);
 		}
 		if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
-			return parsePropertyValue(cl);
+			boolean success = parsePropertyValue(cl);
+			if (!success) {
+				return false;
+			}
+			while (parseWs()) {
+				
+			}
+			parseQualifierBlock(cl);
+			parseHiddenComment();
+			return true;
 		}
 		// default
 		return parseUnquotedString(cl);

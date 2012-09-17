@@ -1,4 +1,5 @@
 ontology: test
+property_value: FOO:0000001 http://purl.obolibrary.org/obo/go.owl
 
 [Term]
 id: UBERON:0004657

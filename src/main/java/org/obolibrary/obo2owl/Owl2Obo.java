@@ -880,7 +880,7 @@ public class Owl2Obo {
 		f.addClause(c);
 
 		for(OWLAnnotation ann: ontology.getAnnotations()){
-			tr(ann.getProperty(), ann.getValue(), new HashSet<OWLAnnotation>(), f);
+			tr(ann.getProperty(), ann.getValue(), ann.getAnnotations(), f);
 		}
 
 	}
