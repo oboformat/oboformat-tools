@@ -512,6 +512,9 @@ public class OBOFormatParser {
 			parseHiddenComment();
 			return true;
 		}
+		if (tag == OboFormatTag.TAG_IMPORT) {
+			return parseImport(cl);
+		}
 		// default
 		return parseUnquotedString(cl);
 	}
@@ -978,6 +981,23 @@ public class OBOFormatParser {
 	}
 	
 
+	private boolean parseImport(Clause cl) {
+		parseZeroOrMoreWs();
+		String v = getParseUntil("!{");
+
+		v = removeTrailingWS(v);
+		
+		cl.setValue(v);
+		
+		// parse and ignore annotations for import statements
+		parseZeroOrMoreWs();
+		if (s.peekCharIs('{')) {
+			getParseUntilAdv("}");
+		}
+		return true;
+		
+	}
+	
 	private boolean parseRelationship(Clause cl) {
 		return parseIdRef(cl) && parseOneOrMoreWs() && parseIdRef(cl);
 	}
