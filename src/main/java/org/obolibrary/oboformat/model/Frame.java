@@ -226,7 +226,7 @@ public class Frame {
 		}
 		checkMaxOneCardinality(OboFormatTag.TAG_IS_ANONYMOUS,
 				OboFormatTag.TAG_NAME,
-				OboFormatTag.TAG_NAMESPACE,
+//				OboFormatTag.TAG_NAMESPACE,
 				OboFormatTag.TAG_DEF,
 				OboFormatTag.TAG_COMMENT,
 				OboFormatTag.TAG_IS_ANTI_SYMMETRIC,
