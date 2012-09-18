@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.obolibrary.obo2owl.OboInOwlCardinalityTools;
 import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
@@ -219,6 +220,13 @@ public class OBODoc {
 		}
 	}
 	
+	/**
+	 * Check this document for violations, i.e. cardinality constraint violations.
+	 * 
+	 * @throws FrameStructureException
+	 * 
+	 * @see OboInOwlCardinalityTools for equivalent checks in OWL 
+	 */
 	public void check() throws FrameStructureException {
 		getHeaderFrame().check();
 		for (Frame f : getTermFrames())

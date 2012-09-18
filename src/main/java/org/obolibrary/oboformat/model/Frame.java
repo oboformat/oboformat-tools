@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import org.obolibrary.obo2owl.OboInOwlCardinalityTools;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class Frame {
@@ -194,6 +195,13 @@ public class Frame {
 		// note we do not perform a document structure check at this point
 	}
 	
+	/**
+	 * Check this frame for violations, i.e. cardinality constraint violations.
+	 * 
+	 * @throws FrameStructureException
+	 * 
+	 * @see OboInOwlCardinalityTools for equivalent checks in OWL 
+	 */
 	public void check() throws FrameStructureException {
 		if (FrameType.HEADER.equals(type)) {
 			checkMaxOneCardinality(OboFormatTag.TAG_ONTOLOGY, 
