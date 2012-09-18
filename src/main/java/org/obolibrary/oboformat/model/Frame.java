@@ -195,6 +195,20 @@ public class Frame {
 	}
 	
 	public void check() throws FrameStructureException {
+		if (FrameType.HEADER.equals(type)) {
+			checkMaxOneCardinality(OboFormatTag.TAG_ONTOLOGY, 
+					OboFormatTag.TAG_FORMAT_VERSION,
+					OboFormatTag.TAG_DATE, 
+					OboFormatTag.TAG_DEFAULT_NAMESPACE,
+					OboFormatTag.TAG_SAVED_BY,
+					OboFormatTag.TAG_AUTO_GENERATED_BY);
+		}
+		if (FrameType.TYPEDEF.equals(type)) {
+			checkMaxOneCardinality(OboFormatTag.TAG_DOMAIN,
+					OboFormatTag.TAG_RANGE,
+					OboFormatTag.TAG_IS_METADATA_TAG,
+					OboFormatTag.TAG_IS_CLASS_LEVEL_TAG);
+		}
 		if (!FrameType.HEADER.equals(getType())) {
 			if (getClauses(OboFormatTag.TAG_ID).size() != 1) {
 				throw new FrameStructureException(this, "cardinality of id field must be 1");
@@ -206,16 +220,32 @@ public class Frame {
 				throw new FrameStructureException(this, "id field must be set");
 			}
 		}
-		
 		Collection<Clause> iClauses = getClauses(OboFormatTag.TAG_INTERSECTION_OF);
 		if (iClauses.size() == 1) {
 			throw new FrameStructureException(this, "single intersection_of tags are not allowed");
 		}
-		if (getClauses(OboFormatTag.TAG_DEF).size() > 1) {
-			throw new FrameStructureException(this, "multiple def tags not allowed");	
-		}
-		if (getClauses(OboFormatTag.TAG_COMMENT).size() > 1) {
-			throw new FrameStructureException(this, "multiple comment tags not allowed");	
+		checkMaxOneCardinality(OboFormatTag.TAG_IS_ANONYMOUS,
+				OboFormatTag.TAG_NAME,
+				OboFormatTag.TAG_NAMESPACE,
+				OboFormatTag.TAG_DEF,
+				OboFormatTag.TAG_COMMENT,
+				OboFormatTag.TAG_IS_ANTI_SYMMETRIC,
+				OboFormatTag.TAG_IS_CYCLIC,
+				OboFormatTag.TAG_IS_REFLEXIVE,
+				OboFormatTag.TAG_IS_SYMMETRIC,
+				OboFormatTag.TAG_IS_TRANSITIVE,
+				OboFormatTag.TAG_IS_FUNCTIONAL,
+				OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL,
+				OboFormatTag.TAG_IS_OBSELETE,
+				OboFormatTag.TAG_CREATED_BY,
+				OboFormatTag.TAG_CREATION_DATE);		
+	}
+	
+	private void checkMaxOneCardinality(OboFormatTag...tags) throws FrameStructureException {
+		for (OboFormatTag tag : tags) {
+			if (getClauses(tag).size() > 1) {
+				throw new FrameStructureException(this, "multiple "+tag.getTag()+" tags not allowed.");
+			}
 		}
 	}
 
