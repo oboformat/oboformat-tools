@@ -4,3 +4,73 @@ PATH_TO_ME=`which $0`;
 PATH_TO_ME=`echo $PATH_TO_ME | sed -e "s/\(.*\)\/.*/\1/g"`
 
 bash $PATH_TO_ME/obolib-basic --owl2obo "$@"
+
+
+#!/bin/bash
+
+# To set a specific default Java path, set the JAVAPATH variable below.
+# This value can be overridden with the -Jvm= option.
+# If JAVAPATH is not set, the script will use whatever version of Java is on the
+# path. If there is no copy of Java on the path, the JAVA_HOME environment
+# variable will be used. If that fails, we just use "java" in the hopes that the
+# failure message will make a little more sense.
+# JAVAPATH="java"
+
+PATH_SEP=":"
+
+JAVAARGS=" "
+CMDARGS=" "
+
+PATH_TO_ME=`which $0`;
+
+
+SCRIPTNAME=`echo $PATH_TO_ME | sed -e "s/.*\/\(.*\)/\1/g"`
+
+#Remove the name of this script from the end of the path
+PATH_TO_ME=`echo $PATH_TO_ME | sed -e "s/\(.*\)\/.*/\1/g"`
+
+if [ -e "$PATH_TO_ME/$SCRIPTNAME.vmoptions" ]
+then
+	VMOPTIONS=`cat $PATH_TO_ME/$SCRIPTNAME.vmoptions`
+	for OPTION in "$VMOPTIONS"
+	do
+		JAVAARGS="$JAVAARGS '${OPTION}'"
+	done
+fi
+
+for ARG in "$@"
+do
+	if [ "${ARG:0:5}" == "-Jvm=" ]
+	then
+		JAVAPATH=${ARG:5};
+	else
+		if [ "${ARG:0:2}" == "-J" ]
+		then
+			JAVAARGS="$JAVAARGS '${ARG:2}'"
+		else
+			CMDARGS="$CMDARGS $ARG"
+		fi
+	fi
+	shift;
+	
+done
+
+if [ -z "$JAVAPATH" ]
+then
+	JAVAPATH=`which java`
+	if [ -z "$JAVAPATH" ]
+	then
+		if [ -n "$JAVA_HOME" && -e "$JAVA_HOME" ]
+		then
+			JAVAPATH=$JAVA_HOME/bin/java
+		else
+			JAVAPATH="java"
+		fi
+	fi
+fi
+
+echo CMDARGS=$CMDARGS
+
+CMD="$JAVAPATH -d64 -Xmx2048M -Xms2048M -DentityExpansionLimit=512000 -DlauncherDir=$PATH_TO_ME -jar $PATH_TO_ME/oboformat-all.jar  $JAVAARGS  --owl2obo $CMDARGS"
+echo $CMD
+sh -c "$CMD"
