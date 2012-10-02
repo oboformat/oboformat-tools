@@ -17,5 +17,10 @@ public class RoundTripPropertyValueTest extends RoundTripTest {
 	public void testRoundTripWithQualifiers() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
 		roundTripOBOFile("property_value_qualifier_test.obo", true);
 	}
-	
+
+	@Test
+	public void testRoundTripHeader() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+		roundTripOBOFile("dc_header_test.obo", true);
+	}
+
 }
