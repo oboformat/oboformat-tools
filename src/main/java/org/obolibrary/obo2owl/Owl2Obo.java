@@ -223,7 +223,7 @@ public class Owl2Obo {
 					viewRel = ((OWLLiteral)v).getLiteral();
 				}
 				else {
-					viewRel = this.getIdentifier((IRI)v);
+					viewRel = this.getIdentifierUsingBaseOntology((IRI)v);
 				}
 				break;
 			}
@@ -542,9 +542,16 @@ public class Owl2Obo {
 			clause.addValue(this.getIdentifier(sub));
 			clause.addValue(name);
 			clause.addValue(scope);
-			hf.addClause(clause);
-
 			addQualifiers(clause, ax.getAnnotations());
+
+			if (!hf.getClauses().contains(clause)) {
+				hf.addClause(clause);				
+			}
+			else {
+				LOG.warn("duplicate clause: "+clause+" in header");
+			}
+			
+
 			return;
 		}
 		else if (OboFormatTag.TAG_SUBSETDEF.getTag().equals(_tag)) {
@@ -562,7 +569,12 @@ public class Owl2Obo {
 			Clause clause = new Clause(OboFormatTag.TAG_SUBSETDEF);
 			clause.addValue(this.getIdentifier(sub));
 			clause.addValue(comment);
-			hf.addClause(clause);
+			if (!hf.getClauses().contains(clause)) {
+				hf.addClause(clause);				
+			}
+			else {
+				LOG.warn("duplicate clause: "+clause+" in header");
+			}
 			addQualifiers(clause, ax.getAnnotations());
 
 			return;
@@ -759,7 +771,7 @@ public class Owl2Obo {
 				}
 
 			}else if(annVal instanceof IRI){
-				clause.addValue(getIdentifier((IRI)annVal));
+				clause.addValue(getIdentifierUsingBaseOntology((IRI)annVal));
 			}
 			frame.addClause(clause);
 		}
@@ -771,7 +783,7 @@ public class Owl2Obo {
 		if(annVal instanceof OWLLiteral){
 			value = ((OWLLiteral) annVal).getLiteral();
 		}else if(annVal instanceof IRI){
-			value = getIdentifier((IRI)annVal);
+			value = getIdentifierUsingBaseOntology((IRI)annVal);
 		}
 
 		if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(tag)){
@@ -810,7 +822,7 @@ public class Owl2Obo {
 			if(ann.getValue() instanceof OWLLiteral){
 				value = ((OWLLiteral) ann.getValue()).getLiteral();
 			}else if(ann.getValue() instanceof IRI){
-				value = getIdentifier((IRI)ann.getValue()); //getIdentifier((IRI)aanAx.getValue());
+				value = getIdentifierUsingBaseOntology((IRI)ann.getValue()); //getIdentifier((IRI)aanAx.getValue());
 			}
 
 			QualifierValue qv = new QualifierValue(prop, value);
@@ -1132,9 +1144,9 @@ public class Owl2Obo {
 		}
 
 		if(obj instanceof OWLEntity)
-			return getIdentifier(((OWLEntity)obj).getIRI());
+			return getIdentifier(((OWLEntity)obj).getIRI(), ont);
 		if(obj instanceof IRI)
-			return getIdentifier((IRI)obj);
+			return getIdentifier((IRI)obj, ont);
 
 		return null;
 	}
@@ -1146,11 +1158,14 @@ public class Owl2Obo {
 	 * @return obo identifier or null
 	 */
 	public static String getIdentifier(IRI iriId) {
-		String id = _getIdentifier(iriId);
-		return id;
-	}	
-
-	private static String _getIdentifier(IRI iriId) {
+		return getIdentifier(iriId, null);
+	}
+	
+	private String getIdentifierUsingBaseOntology(IRI iriId) {
+		return getIdentifier(iriId, this.owlOntology);
+	}
+	
+	public static String getIdentifier(IRI iriId, OWLOntology baseOntology) {
 
 		if(iriId == null)
 			return null;
@@ -1194,6 +1209,18 @@ public class Owl2Obo {
 			if("owl".equals(s[0]) || "rdf".equals(s[0]) || "rdfs".equals(s[0])){
 				prefix = s[0] + ":";
 			}
+			// TODO: the following implements behavior in current spec, but this leads to undesirable results
+			/*
+			else if (baseOntology != null) {
+				String oid = getOntologyId(baseOntology); // OBO-style ID
+				if (oid.equals(s[0]))
+					prefix = "";
+				else {
+					return iri;
+				}
+				//prefix = s[0];
+			}
+			*/
 
 			return prefix + s[1];
 		}
@@ -1272,7 +1299,7 @@ public class Owl2Obo {
 	}
 
 	private Frame getTermFrame(OWLEntity entity) {
-		String id = getIdentifier(entity.getIRI());
+		String id = getIdentifierUsingBaseOntology(entity.getIRI());
 		Frame f = this.obodoc.getTermFrame(id);
 		if (f == null) {
 			f = new Frame(FrameType.TERM);

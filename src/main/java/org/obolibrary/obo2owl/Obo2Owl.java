@@ -1450,21 +1450,21 @@ public class Obo2Owl {
 			db = idParts[0];
 			localId = idParts[1];
 			if(localId.contains("_")){
-				db += "#_";
+				db += "#_"; // NonCanonical-Prefixed-ID
 			}else
 				db += "_";
 		}
 		else if (idParts.length == 0) {
-			db = getDefaultIDSpace()+"#";
+			db = getDefaultIDSpace()+"#"; 
 			localId = id;
 		}
-		else { // ==1
+		else { // == 1
 			// todo use owlOntology IRI
 			db = getDefaultIDSpace()+"#";
 			//	if(id.contains("_"))
 			//	db += "_";
 
-			localId = idParts[0];
+			localId = idParts[0]; // Unprefixed-ID
 		}
 
 
