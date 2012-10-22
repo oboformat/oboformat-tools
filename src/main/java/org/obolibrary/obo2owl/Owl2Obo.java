@@ -868,6 +868,18 @@ public class Owl2Obo {
 		 */
 		return id;
 	}
+	
+	public static String getDataVersion(OWLOntology ontology) {
+		String oid = getOntologyId(ontology);
+		IRI v = ontology.getOntologyID().getVersionIRI();
+		if (v != null) {
+			String vs = v.toString().replace("http://purl.obolibrary.org/obo/", "");
+			vs = vs.replaceFirst(oid+"/", "");
+			vs = vs.replace("/"+oid+".owl", "");
+			return vs;
+		}
+		return null;
+	}
 
 	private void tr(OWLOntology ontology) {
 		Frame f = new Frame(FrameType.HEADER);
@@ -890,6 +902,15 @@ public class Owl2Obo {
 		c.setTag(OboFormatTag.TAG_ONTOLOGY.getTag());
 		c.setValue(id);
 		f.addClause(c);
+		
+		String vid = getDataVersion(this.owlOntology);
+		if (vid != null) {
+			Clause c2 = new Clause();
+			c2.setTag(OboFormatTag.TAG_DATA_VERSION.getTag());
+			c2.setValue(vid);
+			f.addClause(c2);
+			
+		}
 
 		for(OWLAnnotation ann: ontology.getAnnotations()){
 			tr(ann.getProperty(), ann.getValue(), ann.getAnnotations(), f);

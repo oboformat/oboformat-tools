@@ -47,6 +47,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLProperty;
@@ -297,7 +298,18 @@ public class Obo2Owl {
 				ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+ontOboId+".owl");
 			}
 
-			owlOntology = manager.createOntology(ontIRI);
+			Clause dvclause = hf.getClause(OboFormatTag.TAG_DATA_VERSION);
+			if (dvclause != null) {
+				String dv = dvclause.getValue().toString();
+
+				IRI vIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+ontOboId+"/"+dv+"/"+ontOboId+".owl");
+				OWLOntologyID oid = new OWLOntologyID(ontIRI, vIRI);
+				owlOntology = manager.createOntology(oid);
+			}
+			else {
+
+				owlOntology = manager.createOntology(ontIRI);
+			}
 		}
 		else {
 			defaultIDSpace = "TEMP";
@@ -402,7 +414,6 @@ public class Obo2Owl {
 		IRI ontIRI = owlOntology.getOntologyID().getOntologyIRI();
 
 		for (String t: headerFrame.getTags()) {
-
 			OboFormatTag tag = OBOFormatConstants.getTag(t);
 
 			if (tag == OboFormatTag.TAG_ONTOLOGY) {
@@ -487,19 +498,18 @@ public class Obo2Owl {
 				}
 			} else if (tag == OboFormatTag.TAG_PROPERTY_VALUE) {
 				addPropertyValueHeaders(headerFrame.getClauses(OboFormatTag.TAG_PROPERTY_VALUE));
-			}/*else if (tag == OboFormatTag.TAG_DATA_VERSION) {
-				//fac.getOWLVersionInfo();
-				Clause clause = headerFrame.getClause(t);
+			} else if (tag == OboFormatTag.TAG_DATA_VERSION) {
+				/*
+				Clause clause = headerFrame.getClause(tag);
+				String dv = clause.getValue().toString();
 
-				OWLAnnotationProperty ap = trAnnotationProp(OboFormatTag.TAG_REMARK.getTag());
-				OWLAnnotation ann = fac.getOWLAnnotation(ap, trLiteral(clause.getValue()));
+				String ontOboId = headerFrame.getClause(OboFormatTag.TAG_ONTOLOGY).getValue().toString();
+				IRI vIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX+ontOboId+"/"+dv+"/"+ontOboId+".owl");
+				System.out.println("Adding versionIRI "+vIRI);
+				addOntologyAnnotation(fac.getOWLVersionInfo(), fac.getOWLLiteral(vIRI.toString(), OWL2Datatype.XSD_ANY_URI));
+				 */
 
-				OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontIRI, ann);
-
-				manager.applyChange(new AddAxiom(owlOntology, ax));
-
-				// TODO
-			}*/else{
+			} else{
 				Collection<Clause> clauses = headerFrame.getClauses(t);
 
 				for(Clause clause: clauses){
@@ -551,7 +561,7 @@ public class Obo2Owl {
 			}
 		}
 	}
-	
+
 	protected void addOntologyAnnotation(OWLAnnotationProperty ap, OWLAnnotationValue v) {
 		OWLAnnotation ontAnn = fac.getOWLAnnotation(ap, v);
 		AddOntologyAnnotation addAnn = new AddOntologyAnnotation(owlOntology, ontAnn);
@@ -591,7 +601,7 @@ public class Obo2Owl {
 			final String id = typedefFrame.getId();
 			OWLAnnotationProperty p = trAnnotationProp(id);
 			add(fac.getOWLDeclarationAxiom(p));
-			
+
 			// handle xrefs also for meta data tags
 			final String xid = translateShorthandIdToExpandedId(id);
 			if (id.equals(xid) == false) {
@@ -603,9 +613,9 @@ public class Obo2Owl {
 
 				add(ax);				
 			}
-			
+
 			typedefToAnnotationProperty.put(p.getIRI().toString(), p);
-			
+
 			for (String tag : typedefFrame.getTags()) {
 				OboFormatTag _tag = OBOFormatConstants.getTag(tag);
 
@@ -616,7 +626,7 @@ public class Obo2Owl {
 							p,
 							trObjectProp((String)typedefFrame.getC), 
 							annotations);
-							*/
+					 */
 				}
 				else {
 					for (Clause clause : typedefFrame.getClauses(tag)) {
@@ -1390,7 +1400,7 @@ public class Obo2Owl {
 		return fac.getOWLObjectProperty(iri);	
 	}
 
-	
+
 
 	protected OWLAnnotationValue trLiteral(Object value) {
 		if (value instanceof Xref) {
