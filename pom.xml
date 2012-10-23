@@ -119,6 +119,8 @@
 						<exclude>**/CHEBITest.java</exclude>
 						<exclude>**/RoundTripFlyAnatomyTest.java</exclude>
 						<exclude>**/RoundTripPROTest.java</exclude>
+						<exclude>**/RoundTripCLTest.java</exclude>
+						<exclude>**/FlyXPTest.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -169,7 +171,7 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
-			<version>3.4</version>
+			<version>3.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
