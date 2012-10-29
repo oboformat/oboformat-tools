@@ -128,6 +128,7 @@ OBO Flat File Format 1.4 Syntax and Semantics [WORKING DRAFT]</h1>
   <dd>Melanie Courtot,  British Columbia Cancer Research Center</dd>
   <dd>Heiko Dietze, Lawrence Berkeley National Laboratory</dd>
   <dd>John Day-Richter, Google</dd>
+  <dd>Mathew Horridge, University of Manchester</dd>
   <dd>Amelia Ireland, The Jackson Laboratory</dd>
   <dd>Suzanna Lewis, Lawrence Berkeley National Laboratory</dd>
   <dd>Shahid Manzoor, Lawrence Berkeley National Laboratory</dd>
@@ -587,6 +588,7 @@ order to be more consistent with Manchester Syntax.</p>
         | <span class="nonterminal">treat-xrefs-as-relationship-Tag</span> <span class="nonterminal">IDPrefix</span> <span class="nonterminal">Rel-ID</span>
         | <span class="nonterminal">treat-xrefs-as-is_a-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">treat-xrefs-as-has-subclass-Tag</span> <span class="nonterminal">IDPrefix</span>
+        | <span style="color:red"><span class="nonterminal">property_value-Tag</span> <span class="nonterminal">Relation-ID</span> ( <span class="nonterminal">QuotedString</span> <span class="nonterminal">XSD-Type</span> | <span class="nonterminal">ID</span> ) {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">QualifierBlock</span> ] {<span class="nonterminal">WhiteSpaceChar</span>} [ <span class="nonterminal">HiddenComment</span> ]</span>
         | <span class="nonterminal">remark-TVP</span>
         | <span class="nonterminal">ontology-TVP</span>
         | <span class="nonterminal">owl-axioms-TVP</span>
@@ -941,7 +943,6 @@ intersection_of(Rel-ID Class-ID) &isin; Frame[B]</td>
   <tr><td>union_of</td><td>Term or Typedef</td><td>zero or (two or more)</td><td>-</td></tr>
   <tr><td>created_by</td><td>*</td><td>zero or one</td><td>-</td></tr>
   <tr><td>creation_date</td><td>*</td><td>zero or one</td><td>-</td></tr>
-  <tr><td>is_obsolete</td><td>*</td><td>zero or one</td><td>-</td></tr>
   <tr><td>is_metadata_tag</td><td>Typedef</td><td>zero or one</td><td>-</td></tr>
   <tr><td>is_class_level</td><td>Typedef</td><td>zero or one</td><td>-</td></tr>
 
@@ -2358,6 +2359,13 @@ An OBO document has no obo-namespace crossing if there are no is_a,
                   released by the GOC has no obo-namespace crossings.
 </p>
 
+<h3><a name="6.1.10"></a>6.1.10 Singly labeled edges</h3>
+
+<p>
+An OBO document has singly labeled edges if there are no classes A and
+B such that there are two asserted relationships connecting A and B
+</p>
+
 <h3><a name="6.2"></a>6.2 OBO Basic</h3>
 
 <p>
@@ -2395,6 +2403,9 @@ An ontology is OBO Basic if and only if it has the following characteristics:
                   </li>
                   <li>
                     No equivalence axioms
+                  </li>
+                  <li>
+                    Singly labeled edges
                   </li>
                 </ul>
 </div>
