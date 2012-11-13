@@ -26,6 +26,7 @@ public class OBOFormatConstants {
 		TAG_TREAT_XREFS_AS_RELATIONSHIP( "treat-xrefs-as-relationship"),
 		TAG_TREAT_XREFS_AS_IS_A( "treat-xrefs-as-is_a"),
 		TAG_TREAT_XREFS_AS_HAS_SUBCLASS( "treat-xrefs-as-has-subclass"),
+		TAG_OWL_AXIOMS( "owl-axioms"),
 		TAG_REMARK( "remark"),
 		TAG_ID( "id"),
 		TAG_NAME( "name"),
@@ -72,7 +73,7 @@ public class OBOFormatConstants {
 		TAG_NAMESPACE_ID_RULE("namespace-id-rule"),
 		TAG_LOGICAL_DEFINITION_VIEW_RELATION("logical-definition-view-relation"),
 		
-		// these are keywords, bot tags, but we keep them here for convenience
+		// these are keywords, not tags, but we keep them here for convenience
 		TAG_SCOPE("scope"), // implicit, in synonymtypedef
 		TAG_HAS_SYNONYM_TYPE("has_synonym_type"), // implicit, in synonym
 		TAG_BROAD("BROAD"),

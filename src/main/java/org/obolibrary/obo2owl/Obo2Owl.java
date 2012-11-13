@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
+import org.obolibrary.obo2owl.OwlStringTools.OwlStringException;
 import org.obolibrary.oboformat.model.*;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
@@ -410,9 +411,7 @@ public class Obo2Owl {
 
 
 	public void trHeaderFrame(Frame headerFrame) {
-		//	IRI ontIRI = manager.getOntologyDocumentIRI(owlOntology);
-		IRI ontIRI = owlOntology.getOntologyID().getOntologyIRI();
-
+		
 		for (String t: headerFrame.getTags()) {
 			OboFormatTag tag = OBOFormatConstants.getTag(t);
 
@@ -516,6 +515,23 @@ public class Obo2Owl {
 					addOntologyAnnotation(fac.getRDFSComment(), trLiteral(clause.getValue()));
 				}
 				
+			} else if ( tag == OboFormatTag.TAG_OWL_AXIOMS ) {
+				// in theory, there should only be one tag
+				// but we can silently collapse multiple tags
+				Collection<String> axiomStrings = headerFrame.getTagValues(tag, String.class);
+				if (axiomStrings != null) {
+					try {
+						for (String axiomString : axiomStrings) {
+							Set<OWLAxiom> axioms = OwlStringTools.translate(axiomString);
+							if (axioms != null) {
+								manager.addAxioms(owlOntology, axioms);
+							}
+						}
+					} catch (OwlStringException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			
 			} else{
 				Collection<Clause> clauses = headerFrame.getClauses(t);
 

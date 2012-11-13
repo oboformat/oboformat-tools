@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
+import org.obolibrary.obo2owl.OwlStringTools.OwlStringException;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -90,6 +91,7 @@ public class Owl2Obo {
 	private String ontologyId;
 
 	private boolean strictConversion;
+	private boolean discardUntranslatable = false;
 
 	private void init() {
 		idSpaceMap = new HashMap<String, String>();
@@ -121,6 +123,20 @@ public class Owl2Obo {
 
 	public boolean getStrictConversion(){
 		return this.strictConversion;
+	}
+
+	/**
+	 * @return the discardUntranslatable
+	 */
+	public boolean isDiscardUntranslatable() {
+		return discardUntranslatable;
+	}
+
+	/**
+	 * @param discardUntranslatable the discardUntranslatable to set
+	 */
+	public void setDiscardUntranslatable(boolean discardUntranslatable) {
+		this.discardUntranslatable = discardUntranslatable;
 	}
 
 	public OWLOntologyManager getManager() {
@@ -208,6 +224,21 @@ public class Owl2Obo {
 				else {
 					// we presume this has been processed
 				}
+			}
+		}
+		if (untranslatableAxioms.isEmpty() == false && discardUntranslatable == false) {
+			try {
+				String axiomString = OwlStringTools.translate(untranslatableAxioms);
+				if (axiomString != null) {
+					Frame headerFrame = obodoc.getHeaderFrame();
+					if (headerFrame == null) {
+						headerFrame = new Frame(FrameType.HEADER);
+						obodoc.setHeaderFrame(headerFrame);
+					}
+					headerFrame.addClause(new Clause(OboFormatTag.TAG_OWL_AXIOMS, axiomString));
+				}
+			} catch (OwlStringException e) {
+				throw new RuntimeException(e);
 			}
 		}
 		return obodoc;

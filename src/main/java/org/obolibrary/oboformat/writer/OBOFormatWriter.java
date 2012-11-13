@@ -644,6 +644,8 @@ public class OBOFormatWriter {
 			table.put(OboFormatTag.TAG_TREAT_XREFS_AS_IS_A.getTag(),70);
 			table.put(OboFormatTag.TAG_REMARK.getTag(),75);
 			table.put(OboFormatTag.TAG_ONTOLOGY.getTag(),85); // moved from pos 5 to emulate OBO-Edit behavior
+			table.put(OboFormatTag.TAG_PROPERTY_VALUE.getTag(), 100);
+			table.put(OboFormatTag.TAG_OWL_AXIOMS.getTag(), 110);
 
 			return table;
 		}
