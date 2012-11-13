@@ -978,8 +978,6 @@ public class Owl2Obo {
 			OWLAnnotationProperty property = ann.getProperty();
 			String tagString = owlObjectToTag(property);
 			if (OboFormatTag.TAG_COMMENT.getTag().equals(tagString)) {
-				error("Replacing comments with remark tags in header. Comment tags in are not allowed in OBO headers.");
-				// TODO decide if this is the right strategy
 				property = fac.getOWLAnnotationProperty(Obo2Owl.trTagToIRI(OboFormatTag.TAG_REMARK.getTag()));
 			}
 			tr(property, ann.getValue(), ann.getAnnotations(), f);

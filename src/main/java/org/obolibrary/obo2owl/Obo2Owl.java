@@ -509,6 +509,13 @@ public class Obo2Owl {
 				addOntologyAnnotation(fac.getOWLVersionInfo(), fac.getOWLLiteral(vIRI.toString(), OWL2Datatype.XSD_ANY_URI));
 				 */
 
+			} else if ( tag == OboFormatTag.TAG_REMARK) {
+				// translate remark as rdfs:comment
+				Collection<Clause> clauses = headerFrame.getClauses(t);
+				for(Clause clause: clauses){
+					addOntologyAnnotation(fac.getRDFSComment(), trLiteral(clause.getValue()));
+				}
+				
 			} else{
 				Collection<Clause> clauses = headerFrame.getClauses(t);
 
