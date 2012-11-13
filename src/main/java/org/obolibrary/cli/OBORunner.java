@@ -99,32 +99,19 @@ public class OBORunner {
 			iri = getURI(iri);
 			if (config.isOboToOwl.getValue()) {
 				//showMemory();
-				OBOFormatParser p = new OBOFormatParser();
-				p.setFollowImports(config.followImports.getValue());
-				OBODoc obodoc = p.parseURL(iri);
+				OBODoc obodoc = loadObo(config, iri, logger);
 
-				List<String> errors= p.checkDanglingReferences(obodoc);
-				for(String error: errors){
-					logger.error("Dangling Reference Error: " + error);
+				OWLOntology ontology;
+				OWLOntologyManager manager;
+				{
+					Obo2Owl bridge = new Obo2Owl();
+					manager = bridge.getManager();
+					ontology = bridge.convert(obodoc);
+					
+					// discard bridge and obo to reduce memory footprint 
+					obodoc = null;
+					bridge = null;
 				}
-				
-				if(!config.allowDangling.getValue() && !errors.isEmpty()){
-					throw new OBOFormatDanglingReferenceException("Dangling references are found during conversion");
-				}
-
-				String defaultOntology = config.defaultOnt.getValue();
-				
-				if(defaultOntology == null || defaultOntology.trim().length()==0){
-					defaultOntology = iri;
-				}
-				
-				if (defaultOntology != null) {
-					obodoc.addDefaultOntologyHeader(defaultOntology);
-				}
-
-				Obo2Owl bridge = new Obo2Owl();
-				OWLOntologyManager manager = bridge.getManager();
-				OWLOntology ontology = bridge.convert(obodoc);
 				
 				String version = config.version.getValue();
 				if(version != null){
@@ -195,6 +182,34 @@ public class OBORunner {
 				}
 			}
 		}
+	}
+
+	private static OBODoc loadObo(OBORunnerConfiguration config, String iri, Logger logger) 
+			throws IOException, OBOFormatDanglingReferenceException 
+	{
+		OBOFormatParser p = new OBOFormatParser();
+		p.setFollowImports(config.followImports.getValue());
+		OBODoc obodoc = p.parseURL(iri);
+
+		List<String> errors= p.checkDanglingReferences(obodoc);
+		for(String error: errors){
+			logger.error("Dangling Reference Error: " + error);
+		}
+		
+		if(!config.allowDangling.getValue() && !errors.isEmpty()){
+			throw new OBOFormatDanglingReferenceException("Dangling references are found during conversion");
+		}
+
+		String defaultOntology = config.defaultOnt.getValue();
+		
+		if(defaultOntology == null || defaultOntology.trim().length()==0){
+			defaultOntology = iri;
+		}
+		
+		if (defaultOntology != null) {
+			obodoc.addDefaultOntologyHeader(defaultOntology);
+		}
+		return obodoc;
 	}
 
 	private static void writeUntranslatableAxioms(final String path, Collection<OWLAxiom> untranslatableAxioms) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
