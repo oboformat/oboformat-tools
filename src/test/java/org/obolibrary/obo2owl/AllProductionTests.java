@@ -55,6 +55,10 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	UnmappableExpressionsTest.class,
 	XPBridgeFileTest.class,
 	DuplicateTagsTest.class,
+	CommentRemarkConversionTest.class,
+	
+	// owl2obo
+	UntranslatableAxiomsInHeaderTest.class,
 	
 	// oboformat tests
 	CAROTest.class,
