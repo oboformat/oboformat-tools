@@ -2366,6 +2366,41 @@ An OBO document has singly labeled edges if there are no classes A and
 B such that there are two asserted relationships connecting A and B
 </p>
 
+<h3><a name="6.1.11"></a>6.1.11 No disjointness axioms</h3>
+
+<p>
+An ontology contains no disjointness axioms if it has no
+DisjointClasses, DisjointUnion or DisjointObjectProperties axioms. On
+the obo-format level this manifests as no "disjoint_from:" tags.
+</p>
+
+<p>
+Rationale: Some OBO-format based tools do not handle disjointness axioms well
+</p>
+
+<h3><a name="6.1.11"></a>6.1.11 No qualifier lists</h3>
+
+<p>
+An OBO document has no qualifier blocks if the OBO syntax
+concretization has no '{...}'s appearing in the qualifier list
+position. I.e. the following grammar rule (from <a href="#3.2">section 3.2</a>):
+</p>
+
+<p>
+<span class="nonterminal">QualifierBlock</span> ::= '{' <span class="nonterminal">QualifierList</span> '}' 
+</p>
+
+<p>
+Can be replaced by:
+<span class="nonterminal">QualifierBlock</span> ::= 
+</p>
+
+<p>
+On the OWL document level, this is equivalent to an OWL document with
+no Axiom Annotations <i>except</i> those axiom annotations required to
+support OBO metadata constructs, such as definitions and synonyms.
+</p>
+
 <h3><a name="6.2"></a>6.2 OBO Basic</h3>
 
 <p>
@@ -2406,6 +2441,12 @@ An ontology is OBO Basic if and only if it has the following characteristics:
                   </li>
                   <li>
                     Singly labeled edges
+                  </li>
+                  <li>
+                    No qualifier lists
+                  </li>
+                  <li>
+                    No disjointness axioms
                   </li>
                 </ul>
 </div>
