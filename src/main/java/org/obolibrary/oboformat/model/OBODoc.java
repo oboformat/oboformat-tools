@@ -50,29 +50,31 @@ public class OBODoc {
 	}
 
 	public Frame getTermFrame(String id, boolean followImport) {
-		//this set is check for cycles
-		Set<String> set = new HashSet<String>();
-		set.add(this.getHeaderDescriptor());
-		return _getTermFrame(id, followImport, set);
+		if (followImport == false) {
+			return termFrameMap.get(id);
+		}
+		// this set is used to check for cycles
+		Set<String> visited = new HashSet<String>();
+		visited.add(this.getHeaderDescriptor());
+		return _getTermFrame(id, visited);
 	}
 
 	
-	private Frame _getTermFrame(String id, boolean followImport, Set<String> visitedDocs) {
+	private Frame _getTermFrame(String id, Set<String> visitedDocs) {
 		Frame f = termFrameMap.get(id);
 		
 		if(f!= null){
 			return f;
-		}else if(followImport){
-			for(OBODoc doc: importedOBODocs){
-				String headerDescriptor = doc.getHeaderDescriptor();
-				if( !visitedDocs.contains(headerDescriptor)){
-					visitedDocs.add(headerDescriptor);
-					f = doc.getTermFrame(id, followImport);
-				}
-				
-				if(f != null)
-					return f;
+		}
+		for(OBODoc doc: importedOBODocs){
+			String headerDescriptor = doc.getHeaderDescriptor();
+			if( !visitedDocs.contains(headerDescriptor)){
+				visitedDocs.add(headerDescriptor);
+				f = doc.getTermFrame(id, true);
 			}
+
+			if(f != null)
+				return f;
 		}
 		
 		return null;
@@ -84,29 +86,31 @@ public class OBODoc {
 	}
 
 	public Frame getTypedefFrame(String id, boolean followImports) {
-		Set<String> set = new HashSet<String>();
-		set.add(this.getHeaderDescriptor());
-		return _getTypedefFrame(id, followImports, set);
+		if (followImports == false) {
+			return typedefFrameMap.get(id);
+		}
+		// this set is used to check for cycles
+		Set<String> visited = new HashSet<String>();
+		visited.add(this.getHeaderDescriptor());
+		return _getTypedefFrame(id, visited);
 
 	}
 	
-	private Frame _getTypedefFrame(String id, boolean followImports, Set<String> visitedDocs) {
+	private Frame _getTypedefFrame(String id, Set<String> visitedDocs) {
 		Frame f = typedefFrameMap.get(id);
 		
 		if(f!= null){
 			return f;
-		}else if(followImports){
-			for(OBODoc doc: importedOBODocs){
+		}
+		for(OBODoc doc: importedOBODocs){
 				
-				String headerDescriptor = doc.getHeaderDescriptor();
-				if( !visitedDocs.contains(headerDescriptor)){
-					visitedDocs.add(headerDescriptor);
-					f = doc.getTypedefFrame(id, followImports);
-				}
-				
-				if(f != null)
-					return f;
+			String headerDescriptor = doc.getHeaderDescriptor();
+			if( !visitedDocs.contains(headerDescriptor)){
+				visitedDocs.add(headerDescriptor);
+				f = doc.getTypedefFrame(id, true);
 			}
+			if(f != null)
+				return f;
 		}
 		
 		return null;
