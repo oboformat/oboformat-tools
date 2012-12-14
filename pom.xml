@@ -119,6 +119,7 @@
 						<exclude>**/CHEBITest.java</exclude>
 						<exclude>**/RoundTripFlyAnatomyTest.java</exclude>
 						<exclude>**/RoundTripPROTest.java</exclude>
+						<exclude>**/RoundTripUberonTest.java</exclude>
 						<exclude>**/RoundTripCLTest.java</exclude>
 						<exclude>**/FlyXPTest.java</exclude>
 					</excludes>
