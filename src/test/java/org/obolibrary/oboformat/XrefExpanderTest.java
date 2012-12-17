@@ -2,22 +2,18 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.parser.InvalidXrefMapException;
-import org.obolibrary.oboformat.parser.XrefExpander;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.obolibrary.oboformat.parser.XrefExpander;
 
 public class XrefExpanderTest extends OboFormatTestBasics {
 	
 	@Test
-	public void testExpand() throws IOException, URISyntaxException, InvalidXrefMapException {
+	public void testExpand() throws Exception {
 		OBODoc obodoc = parseOBOFile("treat_xrefs_test.obo");
 		XrefExpander x = new XrefExpander(obodoc);
 		x.expandXrefs();
@@ -33,7 +29,7 @@ public class XrefExpanderTest extends OboFormatTestBasics {
 	}
 
 	@Test
-	public void testExpandIntoSeparateBridges() throws IOException, URISyntaxException, InvalidXrefMapException {
+	public void testExpandIntoSeparateBridges() throws Exception {
 		OBODoc obodoc = parseOBOFile("treat_xrefs_test.obo");
 		XrefExpander x = new XrefExpander(obodoc, "bridge");
 		x.expandXrefs();
@@ -71,7 +67,7 @@ public class XrefExpanderTest extends OboFormatTestBasics {
 	
 	/*
 	@Test
-	public void testUberonHeader() throws IOException, URISyntaxException, InvalidXrefMapException {
+	public void testUberonHeader() throws Exception {
 		OBODoc obodoc = parseOBOFile("uberon_header_test.obo");
 		XrefExpander x = new XrefExpander(obodoc, "bridge");
 		x.expandXrefs();

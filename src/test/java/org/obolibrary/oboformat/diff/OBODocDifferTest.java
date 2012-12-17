@@ -2,19 +2,16 @@ package org.obolibrary.oboformat.diff;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
-import org.obolibrary.oboformat.diff.Diff;
-import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.OBODoc;
 
 public class OBODocDifferTest extends OboFormatTestBasics {
 	
 	@Test
-	public void testIdentical() throws IOException {
+	public void testIdentical() throws Exception {
 		OBODoc obodoc1 = parseOBOFile("caro.obo");
 		OBODoc obodoc2 = parseOBOFile("caro.obo");
 		OBODocDiffer dd = new OBODocDiffer();
@@ -26,7 +23,7 @@ public class OBODocDifferTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testDiff() throws IOException {
+	public void testDiff() throws Exception {
 		OBODoc obodoc1 = parseOBOFile("caro.obo");
 		OBODoc obodoc2 = parseOBOFile("caro_modified.obo");
 		OBODocDiffer dd = new OBODocDiffer();

@@ -2,7 +2,6 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +18,6 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubPropertyChainOfAxiom;
 
 /**
@@ -34,7 +31,7 @@ public class TransitiveOverTest extends RoundTripTest  {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 
 		// PARSE TEST FILE, CONVERT TO OWL 
 		OWLOntology ontology = convert(parseOBOFile("relation_shorthand_test.obo"), "x.owl");

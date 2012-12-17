@@ -8,7 +8,9 @@ import org.obolibrary.macro.ExpandSynapsedToTest;
 import org.obolibrary.macro.ManchesterSyntaxToolTest;
 import org.obolibrary.oboformat.CAROTest;
 import org.obolibrary.oboformat.ChebiXRefTest;
+import org.obolibrary.oboformat.CurlyBracesInCommentsTest;
 import org.obolibrary.oboformat.EmptyLinesTest;
+import org.obolibrary.oboformat.IdSpaceTest;
 import org.obolibrary.oboformat.IgnoreImportAnnotationsTest;
 import org.obolibrary.oboformat.MultipleCommentsTest;
 import org.obolibrary.oboformat.OboEscapeCharsTest;
@@ -16,6 +18,7 @@ import org.obolibrary.oboformat.PropertyValueTest;
 import org.obolibrary.oboformat.SimpleGOTest;
 import org.obolibrary.oboformat.SingleIntersectionOfTagTest;
 import org.obolibrary.oboformat.TagTest;
+import org.obolibrary.oboformat.TrailingQualifierTest;
 import org.obolibrary.oboformat.XrefExpanderTest;
 import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 
@@ -47,6 +50,10 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	RoundTripCardinalityTest.class,
 	RoundTripOWLROTest.class,
 	RoundTripNamespaceIdRule.class,
+	RoundTripNonStandardSynonyms.class,
+	RoundTripEquivalentToChain.class,
+	RoundTripTrailingQualifiers.class,
+	RoundTripCardinality.class,
 	RoundTripOBITest.class,
 	//SBOTest.class,
 	SubsetTest.class,
@@ -73,6 +80,9 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	OBOFormatWriterTest.class,
 	MultipleCommentsTest.class,
 	IgnoreImportAnnotationsTest.class,
+	IdSpaceTest.class,
+	TrailingQualifierTest.class,
+	CurlyBracesInCommentsTest.class,
 	
 	// macro expansion
 	ExpandSynapsedToTest.class,

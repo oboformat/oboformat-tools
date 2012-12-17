@@ -19,6 +19,7 @@ import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
@@ -39,21 +40,22 @@ public class OboFormatTestBasics {
 	
 	private final static File systemTempDir = new File(System.getProperty("java.io.tmpdir"));
 
-	protected OBODoc parseOBOURL(String fn) throws IOException {
+	protected OBODoc parseOBOURL(String fn) throws IOException, OBOFormatParserException {
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parseURL(fn);
 		assertTrue(obodoc.getTermFrames().size() > 0);
 		return obodoc;
 	}
 	
-	protected OBODoc parseOBOFile(String fn) throws IOException {
+	protected OBODoc parseOBOFile(String fn) throws IOException, OBOFormatParserException {
 		return parseOBOFile(fn, false);
 	}
 	
-	protected OBODoc parseOBOFile(String fn, boolean allowEmptyFrames) throws IOException {
+	protected OBODoc parseOBOFile(String fn, boolean allowEmptyFrames) throws IOException, OBOFormatParserException {
 		InputStream inputStream = getInputStream(fn);
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parse(new BufferedReader(new InputStreamReader(inputStream)));
+		assertNotNull("The obodoc should not be null", obodoc);
 		
 		if (obodoc.getTermFrames().size() == 0 && !allowEmptyFrames) {
 			fail("Term frames should not be empty.");
@@ -72,7 +74,7 @@ public class OboFormatTestBasics {
 		return inputStream;
 	}
 	
-	protected OBODoc parseOBOFile(File file) throws IOException {
+	protected OBODoc parseOBOFile(File file) throws IOException, OBOFormatParserException {
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parse(file.getCanonicalPath());
 		return obodoc;
@@ -145,7 +147,7 @@ public class OboFormatTestBasics {
 		return out.getBuffer().toString();
 	}
 	
-	protected static OBODoc parseOboToString(String oboString) throws IOException {
+	protected static OBODoc parseOboToString(String oboString) throws IOException, OBOFormatParserException {
 		OBOFormatParser p = new OBOFormatParser();
 		BufferedReader reader = new BufferedReader(new StringReader(oboString));
 		OBODoc parsedOboDoc = p.parse(reader);

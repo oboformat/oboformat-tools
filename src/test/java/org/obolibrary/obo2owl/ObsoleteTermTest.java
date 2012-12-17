@@ -2,7 +2,6 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -19,8 +18,6 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class ObsoleteTermTest extends OboFormatTestBasics {
@@ -31,7 +28,7 @@ public class ObsoleteTermTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 		// PARSE TEST FILE
 		OWLOntology ontology = convert(parseOBOFile("obsolete_term_test.obo"));
 		

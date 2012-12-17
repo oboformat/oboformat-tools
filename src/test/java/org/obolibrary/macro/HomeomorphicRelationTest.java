@@ -2,14 +2,11 @@ package org.obolibrary.macro;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -24,12 +21,12 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testExpand() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testExpand() throws Exception {
 		OWLOntology owlOnt = convertOBOFile("homrel.obo");
 		assertNotNull(owlOnt);
 	}
 	
-	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	private OWLOntology convertOBOFile(String fn) throws Exception {
 		return convert(parseOBOFile(fn), fn);
 	}
 

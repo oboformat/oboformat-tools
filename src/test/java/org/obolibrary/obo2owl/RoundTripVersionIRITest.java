@@ -2,13 +2,9 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class RoundTripVersionIRITest extends RoundTripTest {
 	
@@ -18,14 +14,14 @@ public class RoundTripVersionIRITest extends RoundTripTest {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 		OWLOntology owlOnt = convertOBOFile("version_iri_test.obo");
 		assertNotNull(owlOnt);
 		IRI v = owlOnt.getOntologyID().getVersionIRI();
 		assertEquals("http://purl.obolibrary.org/obo/go/2012-01-01/go.owl", v.toString());
 	}
 	
-	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	private OWLOntology convertOBOFile(String fn) throws Exception {
 		return convert(parseOBOFile(fn), fn);
 	}
 

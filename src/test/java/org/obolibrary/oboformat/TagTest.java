@@ -3,7 +3,6 @@ package org.obolibrary.oboformat;
 import static junit.framework.Assert.*;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 
 import org.junit.Test;
@@ -13,13 +12,14 @@ import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.obolibrary.oboformat.parser.OBOFormatParserException;
 
 public class TagTest extends OboFormatTestBasics {
 	
 	static boolean useSystemOut = false;
 	
 	@Test
-	public void testParseOBOFile() throws IOException {
+	public void testParseOBOFile() throws Exception {
 		OBODoc obodoc = parseOBOFile("tag_test.obo");
 		if (useSystemOut) {
 			System.out.println("F:" + obodoc);
@@ -32,7 +32,7 @@ public class TagTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testParseOBOFile2() throws IOException {
+	public void testParseOBOFile2() throws Exception {
 		OBODoc obodoc = parseOBOFile("testqvs.obo");
 		if (useSystemOut) {
 			System.out.println("F:" + obodoc);
@@ -140,11 +140,14 @@ public class TagTest extends OboFormatTestBasics {
 		BufferedReader br = new BufferedReader(sr);
 		p.setReader(br);
 		
-		Clause cl = new Clause();
-		if (p.parseTermFrameClause(cl)) {
+		try {
+			Clause cl = new Clause();
+			p.parseTermFrameClause(cl);
 			return cl;
+		} catch (OBOFormatParserException e) {
+			fail(e.getMessage());
+			return null;
 		}
-		return null;
 	}
 	
 	private OBODoc parseFrames(String s) {
@@ -153,9 +156,14 @@ public class TagTest extends OboFormatTestBasics {
 		BufferedReader br = new BufferedReader(sr);
 		p.setReader(br);
 		
-		OBODoc obodoc = new OBODoc();
-		p.parseTermFrame(obodoc);
-		return obodoc;
+		try {
+			OBODoc obodoc = new OBODoc();
+			p.parseTermFrame(obodoc);
+			return obodoc;
+		} catch (OBOFormatParserException e) {
+			fail(e.getMessage());
+			return null;
+		}
 	}
 	
 	private OBODoc parseOBODoc(String s) {
@@ -164,8 +172,13 @@ public class TagTest extends OboFormatTestBasics {
 		BufferedReader br = new BufferedReader(sr);
 		p.setReader(br);
 		
-		OBODoc obodoc = new OBODoc();
-		p.parseOBODoc(obodoc);
-		return obodoc;
+		try {
+			OBODoc obodoc = new OBODoc();
+			p.parseOBODoc(obodoc);
+			return obodoc;
+		} catch (OBOFormatParserException e) {
+			fail(e.getMessage());
+			return null;
+		}
 	}
 }

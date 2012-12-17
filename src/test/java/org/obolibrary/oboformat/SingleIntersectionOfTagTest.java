@@ -2,9 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Frame;
@@ -16,7 +13,7 @@ public class SingleIntersectionOfTagTest extends OboFormatTestBasics {
 	static boolean useSystemOut = false;
 	
 	@Test(expected=FrameStructureException.class)
-	public void testParseOBOFile() throws IOException, URISyntaxException {
+	public void testParseOBOFile() throws Exception {
 		OBODoc obodoc = parseOBOFile("single_intersection_of_tag_test.obo");
 		if (useSystemOut) {
 			System.out.println("F:" + obodoc);

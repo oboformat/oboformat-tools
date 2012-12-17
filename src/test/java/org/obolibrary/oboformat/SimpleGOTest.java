@@ -2,8 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Frame;
@@ -13,7 +11,7 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 public class SimpleGOTest extends OboFormatTestBasics {
 	
 	@Test
-	public void testParseOBOFile() throws IOException {
+	public void testParseOBOFile() throws Exception {
 		OBODoc obodoc = parseOBOFile("simplego.obo");
 		assertEquals(3, obodoc.getTermFrames().size());
 		assertEquals(5, obodoc.getTypedefFrames().size());

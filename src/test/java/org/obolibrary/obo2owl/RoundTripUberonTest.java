@@ -1,10 +1,8 @@
 package org.obolibrary.obo2owl;
 
-import java.io.IOException;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class RoundTripUberonTest extends RoundTripTest {
 
@@ -16,14 +14,13 @@ public class RoundTripUberonTest extends RoundTripTest {
 	 * Note also that uberon sometimes 'pushes the boundaries' of what is possible in obo-format, so this test will
 	 * be especially sensitive
 	 * 
-	 * This test should never ben in allproductiontests for this reason
+	 * This test should never be in allproductiontests for this reason
 	 * 
-	 * @throws IOException
-	 * @throws OWLOntologyCreationException
-	 * @throws OWLOntologyStorageException
+	 * @throws Exception
 	 */
 	@Test
-	public void testRoundTripUberonEditVersion() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testRoundTripUberonEditVersion() throws Exception {
+		Logger.getRootLogger().setLevel(Level.WARN);
 		roundTripOBOURL("https://github.com/cmungall/uberon/blob/master/uberon_edit.obo?raw=true", true);		
 	}
 	

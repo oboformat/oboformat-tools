@@ -2,7 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +20,7 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 	static boolean useSystemOut = false;
 	
 	@Test
-	public void testEscapeChars() throws IOException {
+	public void testEscapeChars() throws Exception {
 		OBODoc obodoc = parseOBOFile("escape_chars_test.obo");
 		
 		Collection<Frame> frames = obodoc.getTermFrames();
@@ -42,7 +41,7 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testRoundTripEscapeChars() throws IOException {
+	public void testRoundTripEscapeChars() throws Exception {
 		OBODoc oboDoc = parseOBOFile("escape_chars_test.obo");
 		
 		String oboToString = renderOboToString(oboDoc);

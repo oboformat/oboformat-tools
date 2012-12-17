@@ -1,7 +1,6 @@
 package org.obolibrary.examples;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 
 import org.obolibrary.obo2owl.Obo2Owl;
@@ -12,10 +11,8 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /**
@@ -32,7 +29,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
  */
 public class ExportLabelsAsOWL {
 
-	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public static void main(String[] args) throws Exception {
 		
 		// *** obo to owl ***
 		

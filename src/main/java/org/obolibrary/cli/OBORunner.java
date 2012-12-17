@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +28,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.obolibrary.owl.LabelFunctionalFormat;
 import org.obolibrary.owl.LabelFunctionalSyntaxOntologyStorer;
@@ -59,8 +59,7 @@ public class OBORunner {
 	private static Logger logger = Logger.getLogger(OBORunner.class);
 	
 	
-	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
-		OBOFormatDanglingReferenceException, URISyntaxException{
+	public static void main(String[] args) throws Exception {
 
 		OBORunnerConfiguration config = OBORunnerConfigCLIReader.readConfig(args);
 		if (config.showHelp.getValue()) {
@@ -89,9 +88,7 @@ public class OBORunner {
 		runConversion(config, logger);
 	}
 
-	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws IOException,
-			OBOFormatDanglingReferenceException, OWLOntologyCreationException, OWLOntologyStorageException,
-			URISyntaxException {
+	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws Exception {
 		
 		String outFile = config.outFile.getValue();
 		
@@ -185,7 +182,7 @@ public class OBORunner {
 	}
 
 	private static OBODoc loadObo(OBORunnerConfiguration config, String iri, Logger logger) 
-			throws IOException, OBOFormatDanglingReferenceException 
+			throws IOException, OBOFormatDanglingReferenceException, OBOFormatParserException 
 	{
 		OBOFormatParser p = new OBOFormatParser();
 		p.setFollowImports(config.followImports.getValue());

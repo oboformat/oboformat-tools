@@ -3,7 +3,6 @@ package org.obolibrary.obo2owl;
 import static junit.framework.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 
 import org.junit.Test;
@@ -12,9 +11,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class HeaderLostBugTest extends OboFormatTestBasics {
 
@@ -50,7 +47,7 @@ public class HeaderLostBugTest extends OboFormatTestBasics {
 		
 	}
 	
-	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	private OWLOntology convertOBOFile(String fn) throws Exception {
 		OWLOntology ontology = convert(parseOBOFile(fn));
 		owlFile = writeOWL(ontology, fn);
 		return ontology;

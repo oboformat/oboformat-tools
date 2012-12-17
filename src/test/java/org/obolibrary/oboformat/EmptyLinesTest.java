@@ -2,7 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.junit.Test;
@@ -19,7 +18,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 public class EmptyLinesTest extends OboFormatTestBasics {
 
 	@Test
-	public void testEmptyFirstLine() throws IOException {
+	public void testEmptyFirstLine() throws Exception {
 		OBODoc obodoc = parseOBOFile("empty_lines.obo");
 		
 		Collection<Frame> frames = obodoc.getTermFrames();

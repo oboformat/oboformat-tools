@@ -1,6 +1,5 @@
 package org.obolibrary.oboformat.diff;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -110,7 +109,7 @@ public class OBODocDiffer {
 		return diffs;
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc1 = p.parse(args[0]);
 		OBODoc obodoc2 = p.parse(args[1]);

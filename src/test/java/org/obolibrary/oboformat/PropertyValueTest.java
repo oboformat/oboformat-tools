@@ -2,8 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.junit.Test;
@@ -12,9 +10,8 @@ import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
-import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Frame.FrameType;
-import org.obolibrary.oboformat.parser.InvalidXrefMapException;
+import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class PropertyValueTest extends OboFormatTestBasics {
@@ -22,7 +19,7 @@ public class PropertyValueTest extends OboFormatTestBasics {
 	static boolean useSystemOut = false;
 	
 	@Test
-	public void testExpand() throws IOException, URISyntaxException, InvalidXrefMapException {
+	public void testExpand() throws Exception {
 		OBODoc obodoc = parseOBOFile("property_value_test.obo");
 		Clause propertyValue = obodoc.getTermFrame("UBERON:0004657").getClause(OboFormatTag.TAG_PROPERTY_VALUE);
 		assertEquals("IAO:0000412", propertyValue.getValue());
@@ -54,10 +51,6 @@ public class PropertyValueTest extends OboFormatTestBasics {
 		addPropertyValue(headerFrame, "defaultLanguage", "en", "xsd:string");
 		oboDoc.setHeaderFrame(headerFrame);
 		return oboDoc;
-	}
-	
-	private void addPropertyValue(Frame frame, String v1, String v2) {
-		addPropertyValue(frame, v1, v2, null);
 	}
 	
 	private void addPropertyValue(Frame frame, String v1, String v2, String v3) {

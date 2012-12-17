@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
-import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -37,7 +35,6 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -52,8 +49,7 @@ public class OBODiffRunner {
 	private static Logger logger = Logger.getLogger(OBODiffRunner.class);
 
 
-	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException,
-	OBOFormatDanglingReferenceException, URISyntaxException{
+	public static void main(String[] args) throws Exception {
 
 		OBORunnerConfiguration config = OBORunnerConfigCLIReader.readConfig(args);
 		if (config.showHelp.getValue()) {
@@ -82,9 +78,7 @@ public class OBODiffRunner {
 		runConversion(config, logger);
 	}
 
-	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws IOException,
-	OBOFormatDanglingReferenceException, OWLOntologyCreationException, OWLOntologyStorageException,
-	URISyntaxException {
+	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws Exception {
 
 		String outFile = config.outFile.getValue();
 		List<OBODoc> obodocs = new Vector<OBODoc>();

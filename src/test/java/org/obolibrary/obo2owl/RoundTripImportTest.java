@@ -17,16 +17,14 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 public class RoundTripImportTest extends RoundTripTest {
 
 	@Test
-	public void testRoundTrip() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testRoundTrip() throws Exception {
 		OBODoc obodoc = parseOBOFile("import_test_main.obo", true);
 
 		OWLOntologyIRIMapper iriMapper = 

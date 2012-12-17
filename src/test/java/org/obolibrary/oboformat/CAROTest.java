@@ -2,7 +2,6 @@ package org.obolibrary.oboformat;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.junit.Test;
@@ -18,7 +17,7 @@ public class CAROTest extends OboFormatTestBasics {
 	static boolean useSystemOut = false;
 	
 	@Test
-	public void testParseCARO() throws IOException {
+	public void testParseCARO() throws Exception {
 		OBODoc obodoc = parseOBOFile("caro.obo");
 		if (useSystemOut) {
 			System.out.println("F:" + obodoc);

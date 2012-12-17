@@ -30,6 +30,7 @@ import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
+import org.obolibrary.oboformat.parser.OBOFormatParserException;
 
 /**
  * 
@@ -70,7 +71,7 @@ public class OBOFormatWriter {
 		set.add( OboFormatTag.TAG_RANGE.getTag());
 		set.add( OboFormatTag.TAG_INVERSE_OF.getTag());
 		set.add( OboFormatTag.TAG_TRANSITIVE_OVER.getTag());
-		set.add( OboFormatTag.TAG_HOLDS_OVER_CHAIN.getTag());
+		// set.add( OboFormatTag.TAG_HOLDS_OVER_CHAIN.getTag()); // removed to be compatible with OBO-Edit
 		set.add( OboFormatTag.TAG_EQUIVALENT_TO_CHAIN.getTag());
 		set.add( OboFormatTag.TAG_DISJOINT_OVER.getTag());
 
@@ -79,7 +80,7 @@ public class OBOFormatWriter {
 
 	}
 
-	public void write(String fn, BufferedWriter writer) throws IOException{
+	public void write(String fn, BufferedWriter writer) throws IOException, OBOFormatParserException {
 		if(fn.startsWith("http:")){
 			write(new URL(fn), writer);
 		}else{
@@ -88,7 +89,7 @@ public class OBOFormatWriter {
 		}
 	}
 
-	public void write(URL url, BufferedWriter writer) throws IOException{
+	public void write(URL url, BufferedWriter writer) throws IOException, OBOFormatParserException {
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(url.openStream()));
 
@@ -98,7 +99,7 @@ public class OBOFormatWriter {
 
 
 
-	public void write(BufferedReader reader, BufferedWriter writer) throws IOException{
+	public void write(BufferedReader reader, BufferedWriter writer) throws IOException, OBOFormatParserException {
 		OBOFormatParser parser = new OBOFormatParser();
 		OBODoc doc = parser.parse(reader);
 
@@ -200,6 +201,8 @@ public class OBOFormatWriter {
 					writeHeaderDate(clause, writer);
 				}else if(tag.equals(OboFormatTag.TAG_PROPERTY_VALUE.getTag())) {
 					writePropertyValue(clause, writer);
+				}else if(tag.equals(OboFormatTag.TAG_IDSPACE.getTag())) {
+					writeIdSpace(clause, writer);
 				}else
 					write(clause, writer, nameProvider);
 			}
@@ -287,13 +290,21 @@ public class OBOFormatWriter {
 
 	private void writeXRefClause(Clause clause, BufferedWriter writer) throws IOException {
 		Xref xref = clause.getValue(Xref.class);
-		//System.out.println("girdi:"+xref);
 		if (xref != null) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(clause.getTag());
 			sb.append(": ");
 			if (xref.getIdref() != null) {
-				sb.append(escapeOboString(xref.getIdref(), EscapeMode.xref));
+				String idref = xref.getIdref();
+				int colonPos = idref.indexOf(':');
+				if (colonPos > 0) {
+					sb.append(escapeOboString(idref.substring(0, colonPos), EscapeMode.xref));
+					sb.append(':');
+					sb.append(escapeOboString(idref.substring(colonPos + 1), EscapeMode.xref));
+				}
+				else {
+					sb.append(escapeOboString(idref, EscapeMode.xref));
+				}
 				String annotation = xref.getAnnotation();
 				if (annotation != null) {
 					sb.append(" \"");
@@ -322,6 +333,7 @@ public class OBOFormatWriter {
 			if (i==1) { sb.append('"'); }
 			if (valuesIterator.hasNext()) { sb.append(' '); }
 		}
+		appendQualifiers(sb, clause);
 		writeLine(sb, writer);
 	}
 	
@@ -340,6 +352,32 @@ public class OBOFormatWriter {
 			LOG.warn("Unknown datatype ('"+value.getClass().getName()+"') for value in clause: "+clause);
 			sb.append(value.toString());
 		}
+		writeLine(sb, writer);
+	}
+	
+	private void writeIdSpace(Clause cl, BufferedWriter writer) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(cl.getTag());
+		sb.append(": ");
+		
+		Collection<Object> values = cl.getValues();
+		int i = 0;
+		Iterator<Object> iterator = values.iterator();
+		while (iterator.hasNext() && i < 3) {
+			String value = iterator.next().toString(); // TODO replace toString() method
+			if (i == 2) {
+				sb.append('"');
+				sb.append(escapeOboString(value, EscapeMode.quotes));
+				sb.append('"');
+			}
+			else {
+				sb.append(escapeOboString(value, EscapeMode.simple));
+				sb.append(' ');
+			}
+			
+			i++;
+		}
+		appendQualifiers(sb, cl);
 		writeLine(sb, writer);
 	}
 
@@ -369,7 +407,7 @@ public class OBOFormatWriter {
 				OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clause.getTag())){
 			sb.append(" []");
 		}
-
+		appendQualifiers(sb, clause);
 		writeLine(sb, writer);
 	}
 
@@ -381,7 +419,16 @@ public class OBOFormatWriter {
 		Iterator<Xref> xrefsIterator = sortedXrefs.iterator();
 		while (xrefsIterator.hasNext()) {
 			final Xref current = xrefsIterator.next();
-			sb.append(escapeOboString(current.getIdref(), EscapeMode.xrefList));
+			String idref = current.getIdref();
+			int colonPos = idref.indexOf(':');
+			if (colonPos > 0) {
+				sb.append(escapeOboString(idref.substring(0, colonPos), EscapeMode.xrefList));
+				sb.append(':');
+				sb.append(escapeOboString(idref.substring(colonPos + 1), EscapeMode.xrefList));
+			}
+			else {
+				sb.append(escapeOboString(idref, EscapeMode.xrefList));
+			}
 			String annotation = current.getAnnotation();
 			if (annotation != null) {
 				sb.append(' ');
@@ -490,7 +537,7 @@ public class OBOFormatWriter {
 			}
 			EscapeMode mode = EscapeMode.most;
 			if (OboFormatTag.TAG_COMMENT.getTag().equals(clause.getTag())) {
-				mode = EscapeMode.simple;
+				mode = EscapeMode.parenthesis;
 			}
 			sb.append(escapeOboString(value, mode));
 			if (valuesIterator.hasNext()) {
@@ -569,7 +616,7 @@ public class OBOFormatWriter {
 		most, // all except xref and xrefList
 		parenthesis, // simple + parenthesis
 		quotes, // simple + quotes
-		xref, // simple + comma
+		xref, // simple + comma + colon
 		xrefList, // xref + closing brackets
 		simple // newline and backslash
 	}
@@ -596,13 +643,18 @@ public class OBOFormatWriter {
 				modfied = true;
 				sb.append("\\{");
 			}
-			else if (c == '}' && (mode == EscapeMode.most || mode == EscapeMode.parenthesis)) {
-				modfied = true;
-				sb.append("\\}");
-			}
+			// removed for compatibility with OBO-Edit
+//			else if (c == '}' && (mode == EscapeMode.most || mode == EscapeMode.parenthesis)) {
+//				modfied = true;
+//				sb.append("\\}");
+//			}
 			else if (c == ',' && (mode == EscapeMode.xref || mode == EscapeMode.xrefList)) {
 				modfied = true;
 				sb.append("\\,");
+			}
+			else if (c == ':' && (mode == EscapeMode.xref || mode == EscapeMode.xrefList)) {
+				modfied = true;
+				sb.append("\\:");
 			}
 			else if (c == ']' && mode == EscapeMode.xrefList) {
 				modfied = true;

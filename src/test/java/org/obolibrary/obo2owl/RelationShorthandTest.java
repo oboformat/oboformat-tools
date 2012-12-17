@@ -2,7 +2,6 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -21,8 +20,6 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
@@ -39,7 +36,7 @@ public class RelationShorthandTest extends OboFormatTestBasics  {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 
 		// PARSE TEST FILE, CONVERT TO OWL, AND WRITE TO OWL FILE 
 		OWLOntology ontology = convert(parseOBOFile("relation_shorthand_test.obo"), "x.owl");

@@ -1,6 +1,5 @@
 package org.obolibrary.obo2owl;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -10,8 +9,6 @@ import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 /**
  * @author cjm
@@ -26,7 +23,7 @@ public class SynonymTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 		// PARSE TEST FILE
 		OWLOntology ontology =convert(parseOBOFile("synonym_test.obo"));
 		

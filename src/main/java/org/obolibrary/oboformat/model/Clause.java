@@ -201,6 +201,12 @@ public class Clause {
 				else if (other.getValue().equals(Boolean.TRUE) && getValue().equals("true")) {
 					// special case - OK					
 				}
+				else if (getValue().equals(Boolean.FALSE) && other.getValue().equals("false")) {
+					// special case - OK
+				}
+				else if (other.getValue().equals(Boolean.FALSE) && getValue().equals("false")) {
+					// special case - OK					
+				}
 				else {
 					return false;
 				}

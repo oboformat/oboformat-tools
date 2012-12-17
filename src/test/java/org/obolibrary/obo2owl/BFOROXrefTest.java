@@ -2,12 +2,10 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
 import org.junit.Test;
-import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
@@ -18,13 +16,11 @@ import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class BFOROXrefTest extends OboFormatTestBasics {
 
 	@Test
-	public void testRelationXrefConversion() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testRelationXrefConversion() throws Exception {
 		OWLOntology owlOnt = convertOBOFile("rel_xref_test.obo");
 
 		// test initial conversion
@@ -83,7 +79,7 @@ public class BFOROXrefTest extends OboFormatTestBasics {
 
 	}
 	
-	private OWLOntology convertOBOFile(String fn) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	private OWLOntology convertOBOFile(String fn) throws Exception {
 		return convert(parseOBOFile(fn), fn);
 	}
 }

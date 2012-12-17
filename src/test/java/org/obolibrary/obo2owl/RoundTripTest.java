@@ -26,12 +26,12 @@ public class RoundTripTest extends OboFormatTestBasics {
 		Logger.getRootLogger().setLevel(Level.ERROR);
 	}
 
-	public List<Diff> roundTripOBOURL(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
+	public List<Diff> roundTripOBOURL(String fn, boolean isExpectRoundtrip) throws Exception {
 		OBODoc obodoc = parseOBOURL(fn);
 		return roundTripOBODoc(obodoc, isExpectRoundtrip);
 	}
 
-	public List<Diff> roundTripOBOFile(String fn, boolean isExpectRoundtrip) throws IOException, OWLOntologyCreationException {
+	public List<Diff> roundTripOBOFile(String fn, boolean isExpectRoundtrip) throws Exception {
 		OBODoc obodoc = parseOBOFile(fn);
 		return roundTripOBODoc(obodoc, isExpectRoundtrip);
 	}

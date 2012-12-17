@@ -3,8 +3,6 @@ package org.obolibrary.obo2owl;
 import static junit.framework.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collection;
 
 import org.apache.log4j.Level;
@@ -17,9 +15,7 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
@@ -40,7 +36,7 @@ public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, URISyntaxException {
+	public void testConvert() throws Exception {
 
 		// PARSE TEST FILE
 		OBODoc obodoc = parseOBOFile("import_test_main.obo");

@@ -2,14 +2,12 @@ package org.obolibrary.macro;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -20,8 +18,6 @@ import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 public class ExpandExpressionTest extends OboFormatTestBasics {
@@ -32,7 +28,7 @@ public class ExpandExpressionTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testExpand() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testExpand() throws Exception {
 		
 		OWLOntology ontology = convert(parseOBOFile("no_overlap.obo"));
 

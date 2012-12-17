@@ -2,7 +2,8 @@ package org.obolibrary.obo2owl;
 
 import static junit.framework.Assert.*;
 
-import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -16,8 +17,6 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 /**
@@ -34,7 +33,7 @@ public class GCIQualifierTest extends OboFormatTestBasics  {
 	}
 
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
+	public void testConvert() throws Exception {
 
 		// PARSE TEST FILE, CONVERT TO OWL, AND WRITE TO OWL FILE 
 		OWLOntology ontology = convert(parseOBOFile("gci_qualifier_test.obo"), "x.owl");
@@ -55,16 +54,15 @@ public class GCIQualifierTest extends OboFormatTestBasics  {
 		OBODoc obodoc = convert(ontology);
 
 		// test that relation IDs are converted back to symbolic form
-		if (true) {
-			Frame tf = obodoc.getTermFrame("X:1");
-			Clause c1 = tf.getClause(OboFormatTag.TAG_IS_A);
-			Clause c2 = tf.getClause(OboFormatTag.TAG_RELATIONSHIP);
-			System.out.println("c1="+c1);
-			System.out.println("c2="+c2);
-			//Object v1 = c1.getValue();
-			Object r = c2.getValue2();
-			Object v2 = c2.getValue2();
-		}
+		Frame tf = obodoc.getTermFrame("X:1");
+		Collection<Clause> clauses = tf.getClauses(OboFormatTag.TAG_RELATIONSHIP);
+		assertEquals(2, clauses.size());
+		Iterator<Clause> iterator = clauses.iterator();
+
+		Clause c1 = iterator.next();
+		Clause c2 = iterator.next();
+		System.out.println("c1="+c1);
+		System.out.println("c2="+c2);
 
 	}
 

@@ -3,9 +3,8 @@ package org.obolibrary.obo2owl;
 import static junit.framework.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collection;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -14,8 +13,6 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 /**
  * @author cjm
@@ -35,7 +32,7 @@ public class UnmappableExpressionsTest extends OboFormatTestBasics {
 	}
 	
 	@Test
-	public void testConvert() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, URISyntaxException {
+	public void testConvert() throws Exception {
 		OBODoc obodoc = convert(parseOWLFile("nesting.owl"));
 		for (Frame f : obodoc.getTermFrames()) {
 			System.out.println(f);
