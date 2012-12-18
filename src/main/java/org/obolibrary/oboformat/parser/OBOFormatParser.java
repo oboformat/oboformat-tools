@@ -1152,7 +1152,7 @@ public class OBOFormatParser {
 			String def = getParseUntilAdv("\"");
 			cl.setValue(def);
 			parseZeroOrMoreWs();
-			parseXrefList(cl, false);
+			parseXrefList(cl, true);
 		}
 		else {
 			error("Definitions should always be a quoted string.");
