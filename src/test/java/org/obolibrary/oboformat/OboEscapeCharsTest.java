@@ -24,7 +24,7 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 		OBODoc obodoc = parseOBOFile("escape_chars_test.obo");
 		
 		Collection<Frame> frames = obodoc.getTermFrames();
-		assertEquals(2, frames.size());
+		assertEquals(3, frames.size());
 		Iterator<Frame> iterator = frames.iterator();
 		Frame f1 = iterator.next();
 		assertEquals("GO:0033942", f1.getId());
@@ -56,5 +56,8 @@ public class OboEscapeCharsTest extends OboFormatTestBasics {
 			System.out.println(diff);
 		}
 		assertEquals("Expected no diffs.", 0, diffs.size());
+		
+		String original = readResource("escape_chars_test.obo");
+		assertEquals(original, oboToString);
 	}
 }
