@@ -21,6 +21,7 @@ import org.obolibrary.oboformat.TagTest;
 import org.obolibrary.oboformat.TrailingQualifierTest;
 import org.obolibrary.oboformat.XrefExpanderTest;
 import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
+import org.obolibrary.oboformat.writer.TypeDefCommentsTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -83,6 +84,7 @@ import org.obolibrary.oboformat.writer.OBOFormatWriterTest;
 	IdSpaceTest.class,
 	TrailingQualifierTest.class,
 	CurlyBracesInCommentsTest.class,
+	TypeDefCommentsTest.class,
 	
 	// macro expansion
 	ExpandSynapsedToTest.class,
