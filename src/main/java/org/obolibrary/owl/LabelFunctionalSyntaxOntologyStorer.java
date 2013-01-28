@@ -20,6 +20,9 @@ import org.semanticweb.owlapi.util.DefaultPrefixManager;
  */
 public class LabelFunctionalSyntaxOntologyStorer extends AbstractOWLOntologyStorer {
 
+	// generated
+	private static final long serialVersionUID = -6143049869068925168L;
+
 	public boolean canStoreOntology(OWLOntologyFormat ontologyFormat) {
 		return ontologyFormat instanceof LabelFunctionalFormat;
 	}
@@ -29,7 +32,7 @@ public class LabelFunctionalSyntaxOntologyStorer extends AbstractOWLOntologyStor
 			OWLOntology ontology, Writer writer, OWLOntologyFormat format)
 			throws OWLOntologyStorageException {
 		try {
-			OWLObjectRenderer renderer = new OWLObjectRenderer(manager, ontology, writer);    
+			OWLObjectRenderer renderer = new OWLObjectRenderer(ontology, writer);    
 			renderer.setPrefixManager(new LabelPrefixManager(ontology));
 			ontology.accept(renderer);
 			writer.flush();
@@ -39,8 +42,17 @@ public class LabelFunctionalSyntaxOntologyStorer extends AbstractOWLOntologyStor
 
 	}
 
+	@Override
+	protected void storeOntology(OWLOntology ontology, Writer writer,
+			OWLOntologyFormat format) throws OWLOntologyStorageException {
+		storeOntology(ontology.getOWLOntologyManager(), ontology, writer, format);
+	}
+
 	static class LabelPrefixManager extends DefaultPrefixManager {
 
+		// generated
+		private static final long serialVersionUID = 3814624420610086487L;
+		
 		private final OWLOntology ontology;
 
 		LabelPrefixManager(OWLOntology ontology) {
