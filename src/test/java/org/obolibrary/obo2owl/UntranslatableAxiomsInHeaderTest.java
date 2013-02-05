@@ -18,6 +18,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
  */
 public class UntranslatableAxiomsInHeaderTest extends OboFormatTestBasics {
 
+	public static boolean USE_SYSTEM_OUT = false;
+	
 	@Test
 	public void testUntranslatableAxioms() throws Exception {
 		final OWLOntology original = parseOWLFile("untranslatable_axioms.owl");
@@ -26,7 +28,43 @@ public class UntranslatableAxiomsInHeaderTest extends OboFormatTestBasics {
 		
 		OBODoc obo = owl2Obo.convert(original);
 		
-		writeOBO(obo, "untranslatable_axioms.obo");
+		String oboString = renderOboToString(obo);
+		if (USE_SYSTEM_OUT) {
+			System.out.println("----------------");
+			System.out.println(oboString);
+			System.out.println("----------------");
+		}
+		
+		Frame headerFrame = obo.getHeaderFrame();
+		String owlAxiomString = headerFrame.getTagValue(OboFormatTag.TAG_OWL_AXIOMS, String.class);
+		assertNotNull(owlAxiomString);
+		
+		Obo2Owl obo2Owl = new Obo2Owl();
+		
+		OWLOntology converted = obo2Owl.convert(obo);
+		
+		Set<OWLEquivalentClassesAxiom> originalEqAxioms = original.getAxioms(AxiomType.EQUIVALENT_CLASSES);
+		Set<OWLEquivalentClassesAxiom> convertedEqAxioms = converted.getAxioms(AxiomType.EQUIVALENT_CLASSES);
+		
+		assertEquals(originalEqAxioms.size(), convertedEqAxioms.size());
+		assertTrue(originalEqAxioms.containsAll(convertedEqAxioms));
+		assertTrue(convertedEqAxioms.containsAll(originalEqAxioms));
+	}
+	
+	@Test
+	public void testUntranslatableAxioms2() throws Exception {
+		final OWLOntology original = parseOWLFile("untranslatable_axioms2.owl");
+		
+		Owl2Obo owl2Obo = new Owl2Obo();
+		
+		OBODoc obo = owl2Obo.convert(original);
+		
+		String oboString = renderOboToString(obo);
+		if (USE_SYSTEM_OUT) {
+			System.out.println("----------------");
+			System.out.println(oboString);
+			System.out.println("----------------");
+		}
 		
 		Frame headerFrame = obo.getHeaderFrame();
 		String owlAxiomString = headerFrame.getTagValue(OboFormatTag.TAG_OWL_AXIOMS, String.class);

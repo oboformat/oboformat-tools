@@ -1251,6 +1251,10 @@ public class Owl2Obo {
 
 
 		}
+		else {
+			isUntranslateable = true;
+			error(ax);
+		}
 
 		// Only add clauses if the *entire* equivalence axiom can be translated
 		if (!isUntranslateable) {
