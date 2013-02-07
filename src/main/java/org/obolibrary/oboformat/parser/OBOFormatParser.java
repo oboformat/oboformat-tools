@@ -966,9 +966,10 @@ public class OBOFormatParser {
 		if (s.consume("\"")) {
 			String desc = getParseUntilAdv("\"");
 			cl.addValue(desc);
+			// TODO: handle edge case where line ends with trailing whitespace and no scope
 			if (s.peekCharIs(' ')) {
 				parseOneOrMoreWs();
-				parseIdRef(cl, true);
+				parseIdRef(cl, true); // TODO - verify that this is a valid scope
 			}
 			
 		}
