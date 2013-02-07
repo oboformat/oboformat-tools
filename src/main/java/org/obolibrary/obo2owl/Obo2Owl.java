@@ -466,7 +466,7 @@ public class Obo2Owl {
 					OWLAnnotationProperty ap = trTagToAnnotationProp(OboFormatTag.TAG_NAME.getTag());
 					add(fac.getOWLAnnotationAssertionAxiom(ap, childIRI, trLiteral( values[1] )));
 
-					if(values.length>2){
+					if(values.length>2 && values[2].toString().length() > 0){
 						ap = trTagToAnnotationProp(OboFormatTag.TAG_SCOPE.getTag());
 						add (fac.getOWLAnnotationAssertionAxiom(ap, childIRI, 
 								trTagToAnnotationProp( values[2].toString() ).getIRI()
