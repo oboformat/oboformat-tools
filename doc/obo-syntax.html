@@ -1301,7 +1301,7 @@ intersection_of(Rel-IDM TargetClass-IDM QualifiersN+M)
        <span class="name">T</span>(rel(Rel-IDM TargetClass-IDM Qualifiers)))</td>
 </tr>
 <tr>
-<td valign="top" style="white-space: pre;">union_of(UnionClass1 QualifiersN)
+<td valign="top" style="white-space: pre;">union_of(UnionClass1 Qualifiers1)
 ... 
 union_of(UnionClassN QualifiersN) 
 </td>
@@ -2235,6 +2235,12 @@ Note that the relationship type (i.e. ObjectProperty) is irrelevant here.
 </div>
 <p>
 The ontology is a DAG if the transitive closure of E contains no cycles.
+</p>
+
+<p>
+Note that any ontology that contains an EquivalenceAxiom between two
+named classes is not a DAG, as an equivalence axiom is the same as a
+reciprocal SubClassOf pair.
 </p>
 
 <b>Rationale:</b> the original Gene Ontology paper described the GO as
