@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -596,22 +597,29 @@ public class Obo2Owl {
 		for (String t : termFrame.getTags()) {
 			//System.out.println("tag:"+tag);
 			Collection<Clause> clauses = termFrame.getClauses(t);
-
-			OboFormatTag tag = OBOFormatConstants.getTag(t);
-
-			if (tag == OboFormatTag.TAG_INTERSECTION_OF) {
-				add(trIntersectionOf(cls,clauses));
-			}
-			else if (tag == OboFormatTag.TAG_UNION_OF) {
-				add(trUnionOf(cls,clauses));
-			}
-			else {
-				for (Clause clause : clauses) {
-					add(trTermClause(cls,t,clause));
-				}
+			Set<OWLAxiom> axioms = trTermFrameClauses(cls, clauses, t);
+			if (axioms.isEmpty() == false) {
+				add(axioms);
 			}
 		}
 		return cls;
+	}
+
+	public Set<OWLAxiom> trTermFrameClauses(OWLClass cls, Collection<Clause> clauses, String t) {
+		OboFormatTag tag = OBOFormatConstants.getTag(t);
+		Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+		if (tag == OboFormatTag.TAG_INTERSECTION_OF) {
+			axioms.add(trIntersectionOf(cls,clauses));
+		}
+		else if (tag == OboFormatTag.TAG_UNION_OF) {
+			axioms.add(trUnionOf(cls,clauses));
+		}
+		else {
+			for (Clause clause : clauses) {
+				axioms.add(trTermClause(cls,t,clause));
+			}
+		}
+		return axioms;
 	}
 
 
@@ -827,19 +835,34 @@ public class Obo2Owl {
 	}
 
 
-	protected void add(OWLAxiom axiom) {
+	private void add(OWLAxiom axiom) {
 		if (axiom == null) {
 			LOG.error("no axiom");
 			return;
 		}
-		//System.out.println("adding:"+axiom);
-		AddAxiom addAx = new AddAxiom(owlOntology, axiom);
-		apply(addAx);
+		add(Collections.singleton(axiom));
+	}
+	
+	protected void add(Set<OWLAxiom> axioms) {
+		if (axioms == null || axioms.isEmpty()) {
+			LOG.error("no axiom");
+			return;
+		}
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>(axioms.size());
+		for (OWLAxiom axiom : axioms) {
+			AddAxiom addAx = new AddAxiom(owlOntology, axiom);
+			changes.add(addAx);
+		}
+		apply(changes);
 	}
 
-	protected void apply(OWLOntologyChange change) {
+	private void apply(OWLOntologyChange change) {
+		apply(Collections.singletonList(change));
+	}
+	
+	protected void apply(List<OWLOntologyChange> changes) {
 		try {
-			manager.applyChange(change);
+			manager.applyChanges(changes);
 		}
 		catch (Exception e) {			
 			LOG.error(e+"\nCOULD NOT TRANSLATE AXIOM");
@@ -1428,6 +1451,12 @@ public class Obo2Owl {
 		}
 
 		return ap;
+	}
+	
+	protected void addDeclaredAnnotationProperties(Collection<OWLAnnotationProperty> declaredProperties) {
+		if (declaredProperties != null) {
+			apToDeclare.addAll(declaredProperties);
+		}
 	}
 
 	private OWLAnnotationProperty trAnnotationProp(String relId) {
