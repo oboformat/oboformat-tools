@@ -530,7 +530,7 @@ the canonical prefixed ID pattern.
               An XrefList is a comma-separated list of zero or more
               Xrefs inside square brackets (these are manditory). Each
               Xref is a string of characters, optionally followed by a
-              auoted description. Note that commans in the xref need
+              auoted description. Note that commas in the xref need
               to be escaped. We include an extra production rule for
               when solitary Xrefs are provided (i.e. with the 'xref'
               tag) - in this case commas do not need to be escaped.
@@ -539,7 +539,8 @@ the canonical prefixed ID pattern.
 <p class="grammar" style="white-space: pre;">
 
 <span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefNoComma</span> } ] { <span class="nonterminal">ws</span> } ']'
-<span class="nonterminal">XrefNoComma</span> ::= { ( <span class="nonterminal">NonWsChar</span> - ',') }  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">XrefNoComma</span> ::= <span class="nonterminal">XrefChar</span> {  <span class="nonterminal">XrefChar</span> }  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">XrefChar</span> ::= (<span class="nonterminal">NonWsChar</span> - ',')
 <span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
 
 </p>
