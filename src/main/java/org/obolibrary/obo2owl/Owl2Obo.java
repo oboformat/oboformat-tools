@@ -1,5 +1,6 @@
 package org.obolibrary.obo2owl;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -907,7 +908,7 @@ public class Owl2Obo {
 					error("Untranslatable axiom due to unknown data type: "+annVal);
 					return false;
 				}
-				if (dataTypeIri.getStart().equals(Namespaces.XSD.toString())) {
+                if (Namespaces.XSD.inNamespace(dataTypeIri)) {
 					clause.addValue("xsd:"+dataTypeIri.getFragment());
 				} else if (dataTypeIri.isPlainLiteral()) {
 					clause.addValue("xsd:string");
@@ -1524,8 +1525,13 @@ public class Owl2Obo {
 		s= id.split("_");
 
 		if(s.length==2 && !id.contains("#") && !s[1].contains("_")){
-			String localId = java.net.URLDecoder.decode(s[1]);
-			return s[0] + ":" + localId;
+            String localId;
+            try {
+                localId = java.net.URLDecoder.decode(s[1], "UTF-8");
+                return s[0] + ":" + localId;
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("UTF-8 not supported, JRE corrupted?", e);
+            }
 		}
 		if(s.length > 2 && !id.contains("#")) {
 			if (s[s.length-1].replaceAll("[0-9]","").length() == 0) {
