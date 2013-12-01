@@ -14,8 +14,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -31,7 +32,7 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
  */
 public class OBOFormatParser {
 	
-	static final Logger LOG = Logger.getLogger(OBOFormatParser.class); 
+    static final Logger LOG = Logger.getLogger(OBOFormatParser.class.getName());
 	
 	// TODO use this to validate date strings for OboFormatTag.TAG_CREATION_DATE
     SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -67,10 +68,12 @@ public class OBOFormatParser {
 		
 		public String rest() {
 			prepare();
-			if (line == null)
-				return null;
-			if (pos >= line.length())
-				return "";
+			if (line == null) {
+                return null;
+            }
+			if (pos >= line.length()) {
+                return "";
+            }
 			return line.substring(pos);
 		}
 		
@@ -79,8 +82,9 @@ public class OBOFormatParser {
 		}
 		
 		public void prepare() {
-			if (line == null)
-				advanceLine();
+			if (line == null) {
+                advanceLine();
+            }
 		}
 		
 		public void advanceLine() {
@@ -89,7 +93,7 @@ public class OBOFormatParser {
 				lineNo++;
 				pos = 0;
 			} catch (IOException e) {
-				LOG.error("lineNo: "+lineNo);
+                LOG.log(Level.SEVERE, "lineNo: " + lineNo);
 				throw new Error("Error reading from input.", e);
 			}
 		}
@@ -124,8 +128,9 @@ public class OBOFormatParser {
 		
 		public boolean consume(String s) {
 			String r = rest();
-			if (r==null)
-				return false;
+			if (r==null) {
+                return false;
+            }
 			if (r.startsWith(s)) {
 				pos += s.length();
 				return true;
@@ -135,8 +140,9 @@ public class OBOFormatParser {
 
 		public int indexOf(char c) {
 			prepare();
-			if (line == null)
-				return -1;
+			if (line == null) {
+                return -1;
+            }
 			return line.substring(pos).indexOf(c);
 		}
 		
@@ -146,8 +152,9 @@ public class OBOFormatParser {
 		}
 
 		public boolean peekCharIs(char c) {
-			if (eol() || eof())
-				return false;
+			if (eol() || eof()) {
+                return false;
+            }
 			return peekChar() == c;
 		}
 
@@ -160,7 +167,7 @@ public class OBOFormatParser {
 	
 	public OBOFormatParser() {
 		super();
-		this.s = new MyStream();
+		s = new MyStream();
 	}
 	
 	public OBOFormatParser(MyStream s) {
@@ -169,15 +176,15 @@ public class OBOFormatParser {
 	}
 	
 	public void setReader(BufferedReader r) {
-		this.s.reader = r;
+		s.reader = r;
 	}
 
 	public void setFollowImports(boolean followImports){
-		this.followImport = followImports;
+		followImport = followImports;
 	}
 	
 	public boolean getFollowImports(){
-		return this.followImport;
+		return followImport;
 	}
 	
 	/**
@@ -189,8 +196,9 @@ public class OBOFormatParser {
 	 * @throws OBOFormatParserException
 	 */
 	public OBODoc parse(String fn) throws IOException, OBOFormatParserException {
-		if (fn.startsWith("http:"))
-			return parse(new URL(fn));
+		if (fn.startsWith("http:")) {
+            return parse(new URL(fn));
+        }
 		 return parse(new File(fn));
 	}
 	
@@ -203,7 +211,7 @@ public class OBOFormatParser {
 	 * @throws OBOFormatParserException
 	 */
 	public OBODoc parse(File file) throws IOException, OBOFormatParserException {
-		 this.location = file;
+		 location = file;
 		 BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), OBOFormatConstants.DEFAULT_CHARACTER_ENCODING));
 		 return parse(in);
 	}
@@ -217,7 +225,7 @@ public class OBOFormatParser {
 	 * @throws OBOFormatParserException
 	 */
 	public OBODoc parse(URL url) throws IOException, OBOFormatParserException {
-		this.location = url;
+		location = url;
 	    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), OBOFormatConstants.DEFAULT_CHARACTER_ENCODING));
 	    return parse(in);
 	}	
@@ -238,14 +246,14 @@ public class OBOFormatParser {
 	private String resolvePath(String path){
 		if(!(path.startsWith("http:") || path.startsWith("file:") || path.startsWith("https:"))){
 			//path is not absolue then guess it.
-			if(this.location != null){
+			if(location != null){
 				if(location instanceof URL){
-					URL url = (URL) this.location;
+					URL url = (URL) location;
 					String p = url.toString();
 					int index= p.lastIndexOf("/");
 					path = p.substring(0, index+1) + path;
 				}else{
-					File f = new File(this.location + "");
+					File f = new File(location + "");
 					f = new File(f.getParent(), path);
 					path= f.toURI().toString();
 				}
@@ -356,11 +364,13 @@ public class OBOFormatParser {
 					
 					if(c.getValues().size() >1){
 						String error = checkRelation(c.getValue(String.class), tag, f.getId(), doc);
-						if(error != null)
-							danglingReferences.add(error);
+						if(error != null) {
+                            danglingReferences.add(error);
+                        }
 						error =checkClassReference(c.getValue2(String.class), tag, f.getId(), doc);
-						if(error != null)
-							danglingReferences.add(error);
+						if(error != null) {
+                            danglingReferences.add(error);
+                        }
 					}else{
 						String error =checkClassReference(c.getValue(String.class), tag, f.getId(), doc);
 						if(error != null){
@@ -389,8 +399,9 @@ public class OBOFormatParser {
 						){
 					
 					String error= checkRelation(c.getValue(String.class),tag, f.getId(), doc);
-					if(error != null)
-						danglingReferences.add(error);
+					if(error != null) {
+                        danglingReferences.add(error);
+                    }
 				}else if(_tag == OboFormatTag.TAG_HOLDS_OVER_CHAIN
 								|| _tag == OboFormatTag.TAG_EQUIVALENT_TO_CHAIN
 								|| _tag == OboFormatTag.TAG_RELATIONSHIP
@@ -400,8 +411,9 @@ public class OBOFormatParser {
 						danglingReferences.add(error);
 					}
 					error =checkRelation(c.getValue2().toString(),tag, f.getId(), doc);
-					if(error != null)
-						danglingReferences.add(error);
+					if(error != null) {
+                        danglingReferences.add(error);
+                    }
 				}else if(_tag == OboFormatTag.TAG_DOMAIN 
 						||_tag == OboFormatTag.TAG_RANGE
 						){
@@ -451,8 +463,9 @@ public class OBOFormatParser {
 	 */
 	protected boolean parseHeaderClauseNl(Frame h) throws OBOFormatParserException {
 		parseZeroOrMoreWsOptCmtNl();
-		if (s.peekCharIs('[') || s.eof()) 
-			return false;
+		if (s.peekCharIs('[') || s.eof()) {
+            return false;
+        }
 
 		parseHeaderClause(h);
 		forceParseNlOrEof();
@@ -1202,7 +1215,7 @@ public class OBOFormatParser {
 	private boolean parseXref(Clause cl) {
 		parseZeroOrMoreWs();
 		String id = getParseUntil("\",]!{", true);
-		if (id != null && !(id.equals(""))) {
+		if (id != null && !id.equals("")) {
 			id = removeTrailingWS(id);
 			if (id.contains(" ")) {
 				warn("accepting bad xref with spaces:"+id);
@@ -1212,7 +1225,7 @@ public class OBOFormatParser {
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('"')) {
 				s.consume("\"");
-				xref.setAnnotation(this.getParseUntilAdv("\""));
+				xref.setAnnotation(getParseUntilAdv("\""));
 			}
 			return true;
 		}
@@ -1234,7 +1247,7 @@ public class OBOFormatParser {
 			parseZeroOrMoreWs();
 			if (s.peekCharIs('"')) {
 				s.consume("\"");
-				xref.setAnnotation(this.getParseUntilAdv("\""));
+				xref.setAnnotation(getParseUntilAdv("\""));
 			}
 			return true;
 		}
@@ -1464,8 +1477,9 @@ public class OBOFormatParser {
 			}
 			i++;
 		}
-		if (i==0)
-			return "";
+		if (i==0) {
+            return "";
+        }
 		String ret = r.substring(0, i);
 		if (hasEscapedChars) {
 			StringBuilder sb = new StringBuilder();
@@ -1538,6 +1552,6 @@ public class OBOFormatParser {
 		sb.append(message);
 		sb.append("  LINE:\n");
 		sb.append(s.line);
-		LOG.warn(sb);
+        LOG.log(Level.WARNING, sb.toString());
 	}
 }

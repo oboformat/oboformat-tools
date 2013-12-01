@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.semanticweb.owlapi.model.*;
 
@@ -19,7 +20,6 @@ import org.semanticweb.owlapi.model.*;
 abstract class AbstractMacroExpansionVisitor implements OWLClassExpressionVisitorEx<OWLClassExpression>, OWLDataVisitorEx<OWLDataRange>, OWLAxiomVisitorEx<OWLAxiom> {
 
 	final Logger log;
-	final boolean DEBUG;
 	final OWLDataFactory dataFactory;
 	
 	final Map<IRI,String> expandAssertionToMap;
@@ -28,8 +28,7 @@ abstract class AbstractMacroExpansionVisitor implements OWLClassExpressionVisito
 	AbstractMacroExpansionVisitor(OWLOntology inputOntology, Logger log) {
 		super();
 		this.log = log;
-		this.DEBUG = log.isDebugEnabled();
-		this.dataFactory = inputOntology.getOWLOntologyManager().getOWLDataFactory();
+		dataFactory = inputOntology.getOWLOntologyManager().getOWLDataFactory();
 		expandExpressionMap = new HashMap<IRI,String>();
 		expandAssertionToMap = new HashMap<IRI,String>();
 		
@@ -45,8 +44,9 @@ abstract class AbstractMacroExpansionVisitor implements OWLClassExpressionVisito
 				OWLAnnotationValue v = a.getValue();
 				if (v instanceof OWLLiteral) {
 					String str = ((OWLLiteral)v).getLiteral();
-					if(DEBUG)
-						log.debug("mapping "+p+" to "+str);
+					if(log.isLoggable(Level.WARNING)) {
+				        log.log(Level.WARNING, "mapping " + p + " to " + str);
+					}
 					expandExpressionMap.put(p.getIRI(), str);
 				}
 			}
@@ -57,10 +57,9 @@ abstract class AbstractMacroExpansionVisitor implements OWLClassExpressionVisito
 				OWLAnnotationValue v = a.getValue();
 				if (v instanceof OWLLiteral) {
 					String str = ((OWLLiteral)v).getLiteral();
-					
-					if(DEBUG)
-						log.debug("assertion mapping "+p+" to "+str);
-					
+					if(log.isLoggable(Level.WARNING)) {
+				        log.log(Level.WARNING, "assertion mapping " + p + " to " + str);
+					}
 					expandAssertionToMap.put(p.getIRI(), str);
 				}
 			}

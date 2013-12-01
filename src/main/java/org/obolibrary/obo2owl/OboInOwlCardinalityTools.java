@@ -7,10 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
-import org.obolibrary.obo2owl.Obo2Owl;
-import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.AddOntologyAnnotation;
@@ -31,7 +30,8 @@ import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
  */
 public class OboInOwlCardinalityTools {
 
-	private static final Logger LOGGER = Logger.getLogger(OboInOwlCardinalityTools.class);
+    private static final Logger LOGGER = Logger.getLogger(OboInOwlCardinalityTools.class
+            .getName());
 	
 	/**
 	 * Functor for resolving conflicts for an annotation property 
@@ -308,7 +308,10 @@ public class OboInOwlCardinalityTools {
 			checkAnnotationCardinality(ontology, reporter, null);
 		} catch (AnnotationCardinalityException e) {
 			// this will not happen as no handler is registered
-			LOGGER.error("Cardinality exception during report: This isn't supposed to happen.", e);
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Cardinality exception during report: This isn't supposed to happen.",
+                    e);
 		}
 	}
 	
@@ -324,7 +327,10 @@ public class OboInOwlCardinalityTools {
 				}
 				// take the first one in the collection
 				// (may be random)
-				LOGGER.warn("Fixing multiple "+tag+" tags for entity: "+entity.getIRI());
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.log(Level.WARNING, "Fixing multiple " + tag + " tags for entity: "
+                        + entity.getIRI());
+				}
 				return Collections.singletonList(annotations.iterator().next());
 			}
 			throw new AnnotationCardinalityException("Could not resolve conflict for property: "+property);
@@ -340,7 +346,10 @@ public class OboInOwlCardinalityTools {
 				}
 				// take the first one in the collection
 				// (may be random)
-				LOGGER.warn("Fixing multiple ontolgy annotations with, tag: "+tag);
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.log(Level.WARNING,
+                        "Fixing multiple ontolgy annotations with, tag: " + tag);
+                }
 				return Collections.singletonList(ontologyAnnotations.iterator().next());
 			}
 			throw new AnnotationCardinalityException("Could not resolve conflict for property: "+property);

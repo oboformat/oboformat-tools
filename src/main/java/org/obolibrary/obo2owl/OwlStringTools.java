@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.coode.owlapi.functionalparser.OWLFunctionalSyntaxOWLParser;
 import org.coode.owlapi.functionalrenderer.OWLFunctionalSyntaxRenderer;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.io.OWLParserException;
 import org.semanticweb.owlapi.io.OWLRendererException;
@@ -51,12 +50,12 @@ public class OwlStringTools {
 	 * 
 	 * @see #translate(String)
 	 */
-	public static String translate(Set<OWLAxiom> axioms) throws OwlStringException {
+    public static String translate(Set<OWLAxiom> axioms,
+            OWLOntologyManager translationManager) throws OwlStringException {
 		if (axioms == null || axioms.isEmpty()) {
 			return null;
 		}
 		try {
-			OWLOntologyManager translationManager = OWLManager.createOWLOntologyManager();
 			OWLOntology ontology = translationManager.createOntology();
 			translationManager.addAxioms(ontology, axioms);
 			OWLFunctionalSyntaxRenderer r = new OWLFunctionalSyntaxRenderer();
@@ -79,12 +78,12 @@ public class OwlStringTools {
 	 * 
 	 * @see #translate(Set)
 	 */
-	public static Set<OWLAxiom> translate(String axioms) throws OwlStringException {
+    public static Set<OWLAxiom> translate(String axioms,
+            OWLOntologyManager translationManager) throws OwlStringException {
 		if (axioms == null || axioms.isEmpty()) {
 			return null;
 		}
 		try {
-			OWLOntologyManager translationManager = OWLManager.createOWLOntologyManager();
 			OWLFunctionalSyntaxOWLParser p = new OWLFunctionalSyntaxOWLParser();
 			OWLOntologyDocumentSource documentSource = new StringDocumentSource(axioms);
 			OWLOntology ontology = translationManager.createOntology();

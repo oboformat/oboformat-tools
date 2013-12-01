@@ -19,8 +19,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Frame.FrameType;
@@ -39,7 +40,7 @@ import org.obolibrary.oboformat.parser.OBOFormatParserException;
  */
 public class OBOFormatWriter {
 
-	private static Logger LOG = Logger.getLogger(OBOFormatWriter.class);
+    private static Logger LOG = Logger.getLogger(OBOFormatWriter.class.getName());
 
 	private static HashSet<String> tagsInformative = buildTagsInformative();
 
@@ -186,8 +187,9 @@ public class OBOFormatWriter {
 		
 		for(String tag: tags){
 
-			if(tag.equals(OboFormatTag.TAG_FORMAT_VERSION.getTag()))
-				continue;
+			if(tag.equals(OboFormatTag.TAG_FORMAT_VERSION.getTag())) {
+                continue;
+            }
 
 			List<Clause> clauses = new ArrayList<Clause>(frame.getClauses(tag));
 			Collections.sort(clauses, ClauseComparator.instance);
@@ -203,8 +205,9 @@ public class OBOFormatWriter {
 					writePropertyValue(clause, writer);
 				}else if(tag.equals(OboFormatTag.TAG_IDSPACE.getTag())) {
 					writeIdSpace(clause, writer);
-				}else
-					write(clause, writer, nameProvider);
+				} else {
+                    write(clause, writer, nameProvider);
+                }
 			}
 		}
 
@@ -259,17 +262,17 @@ public class OBOFormatWriter {
 			for( Clause clause : clauses){
 				final String clauseTag = clause.getTag();
 				
-				if(OboFormatTag.TAG_ID.getTag().equals(clauseTag))
-					continue;
-				else if(OboFormatTag.TAG_DEF.getTag().equals(clauseTag))
-					writeDef(clause, writer);
-				else if(OboFormatTag.TAG_SYNONYM.getTag().equals(clauseTag))
-					writeSynonym(clause, writer);
-				else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clauseTag))
-					writePropertyValue(clause, writer);
-				else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clauseTag) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clauseTag))
-					writeClauseWithQuotedString(clause, writer);
-				else if (OboFormatTag.TAG_XREF.getTag().equals(clauseTag)){
+				if(OboFormatTag.TAG_ID.getTag().equals(clauseTag)) {
+                    continue;
+                } else if(OboFormatTag.TAG_DEF.getTag().equals(clauseTag)) {
+                    writeDef(clause, writer);
+                } else if(OboFormatTag.TAG_SYNONYM.getTag().equals(clauseTag)) {
+                    writeSynonym(clause, writer);
+                } else if(OboFormatTag.TAG_PROPERTY_VALUE.getTag().equals(clauseTag)) {
+                    writePropertyValue(clause, writer);
+                } else if(OboFormatTag.TAG_EXPAND_EXPRESSION_TO.getTag().equals(clauseTag) || OboFormatTag.TAG_EXPAND_ASSERTION_TO.getTag().equals(clauseTag)) {
+                    writeClauseWithQuotedString(clause, writer);
+                } else if (OboFormatTag.TAG_XREF.getTag().equals(clauseTag)){
 					
 					writeXRefClause(clause, writer);
 				}else if (OboFormatTag.TAG_NAMESPACE.getTag().equals(clauseTag)) {
@@ -279,9 +282,9 @@ public class OBOFormatWriter {
 							clause.getValue().equals(defaultOboNamespace) == false) {
 						write(clause, writer, nameProvider);
 					}
-				}
-				else
-					write(clause, writer, nameProvider);
+				} else {
+                    write(clause, writer, nameProvider);
+                }
 			}
 		}
 		writeEmptyLine(writer);
@@ -348,9 +351,12 @@ public class OBOFormatWriter {
 		} else if (value instanceof String) {
 			sb.append(value);
 		}
-		else {
-			LOG.warn("Unknown datatype ('"+value.getClass().getName()+"') for value in clause: "+clause);
+		else {        
+            if (LOG.isLoggable(Level.WARNING)) {
+            LOG.log(Level.WARNING, "Unknown datatype ('" + value.getClass().getName()
+                    + "') for value in clause: " + clause);
 			sb.append(value.toString());
+		    }
 		}
 		writeLine(sb, writer);
 	}
@@ -455,7 +461,10 @@ public class OBOFormatWriter {
 		Collection<?> cols = clause.getValues();
 
 		if(cols.size()<2){
-			LOG.warn("The " + OboFormatTag.TAG_PROPERTY_VALUE.getTag() + " has incorrect number of values: " + clause);
+            if (LOG.isLoggable(Level.WARNING)) {
+            LOG.log(Level.WARNING, "The " + OboFormatTag.TAG_PROPERTY_VALUE.getTag()
+                    + " has incorrect number of values: " + clause);
+			}
 			return;
 		}
 		
@@ -529,8 +538,9 @@ public class OBOFormatWriter {
 						// only print label if the label exists
 						// and the label is different from the id
 						// relationships: ID part_of LABEL part_of
-						if(idsLabel.length() > 0)
-							idsLabel.append(" ");
+						if(idsLabel.length() > 0) {
+                            idsLabel.append(" ");
+                        }
 						idsLabel.append(label);
 					}
 				}
@@ -578,7 +588,7 @@ public class OBOFormatWriter {
 			int colonPos = value.indexOf(':');
 			if (colonPos > 0) {
 				// check that the suffix after the colon contains only digits
-				if (value.length() > (colonPos + 1)) {
+				if (value.length() > colonPos + 1) {
 					result = true;
 					for (int i = colonPos; i < value.length(); i++) {
 						char c = value.charAt(i);
@@ -706,11 +716,13 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null)
-				i1 = 10000;
+			if(i1 == null) {
+                i1 = 10000;
+            }
 
-			if(i2 == null)
-				i2 = 10000;
+			if(i2 == null) {
+                i2 = 10000;
+            }
 
 			return i1.compareTo(i2);
 		}
@@ -761,11 +773,13 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null)
-				i1 = 10000;
+			if(i1 == null) {
+                i1 = 10000;
+            }
 
-			if(i2 == null)
-				i2 = 10000;
+			if(i2 == null) {
+                i2 = 10000;
+            }
 
 			return i1.compareTo(i2);
 		}
@@ -857,11 +871,13 @@ public class OBOFormatWriter {
 			Integer i1 = tagsPriorities.get(o1);
 			Integer i2 = tagsPriorities.get(o2);
 
-			if(i1 == null)
-				i1 = 10000;
+			if(i1 == null) {
+                i1 = 10000;
+            }
 
-			if(i2 == null)
-				i2 = 10000;
+			if(i2 == null) {
+                i2 = 10000;
+            }
 
 			return i1.compareTo(i2);
 		}

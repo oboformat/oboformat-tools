@@ -16,12 +16,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.obolibrary.obo2owl.Obo2OWLConstants.Obo2OWLVocabulary;
 import org.obolibrary.obo2owl.OwlStringTools.OwlStringException;
-import org.obolibrary.oboformat.model.*;
-import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.obolibrary.oboformat.model.Clause;
+import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.OBODoc;
+import org.obolibrary.oboformat.model.QualifierValue;
+import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
+import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -139,8 +144,9 @@ public class Obo2Owl {
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
 
-		if(DEBUG)
-			LOG.debug("saving to "+outputStream+" fmt="+format);
+		if(DEBUG) {
+            LOG.debug("saving to "+outputStream+" fmt="+format);
+        }
 
 		manager.saveOntology(ontology, format, outputStream);
 
@@ -157,17 +163,19 @@ public class Obo2Owl {
 	 * @throws OWLOntologyStorageException
 	 * @throws OBOFormatParserException 
 	 */
-	public static void convertURL(String iri, String outFile, String defaultOnt) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException, OBOFormatParserException {
-		Obo2Owl bridge = new Obo2Owl();
-		OWLOntologyManager manager = bridge.getManager();
+    public static void convertURL(String iri, String outFile, String defaultOnt,
+            OWLOntologyManager manager) throws IOException, OWLOntologyCreationException,
+            OWLOntologyStorageException, OBOFormatParserException {
+        Obo2Owl bridge = new Obo2Owl(manager);
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parse(new URL(iri));
 		obodoc.addDefaultOntologyHeader(defaultOnt);
 		OWLOntology ontology = bridge.convert(obodoc);
 		IRI outputStream = IRI.create(outFile);
 		OWLOntologyFormat format = new RDFXMLOntologyFormat();
-		if(DEBUG)
-			LOG.debug("saving to "+outputStream+" fmt="+format);
+		if(DEBUG) {
+            LOG.debug("saving to "+outputStream+" fmt="+format);
+        }
 		manager.saveOntology(ontology, format, outputStream);
 
 	}
@@ -267,10 +275,11 @@ public class Obo2Owl {
 	 */
 	public OWLOntology convert(OBODoc obodoc, boolean useFreshManager) throws OWLOntologyCreationException {
 		this.obodoc = obodoc;
-		if (useFreshManager)
-			init(OWLManager.createOWLOntologyManager());
-		else
-			init(manager);
+		if (useFreshManager) {
+            init(OWLManager.createOWLOntologyManager());
+        } else {
+            init(manager);
+        }
 		return tr();
 	}
 
@@ -347,7 +356,7 @@ public class Obo2Owl {
 
 			IRI importIRI = IRI.create(path);
 			manager.loadOntology(importIRI);
-			AddImport ai = new AddImport(this.owlOntology, fac.getOWLImportsDeclaration(importIRI));
+			AddImport ai = new AddImport(owlOntology, fac.getOWLImportsDeclaration(importIRI));
 			manager.applyChange(ai);
 		}
 
@@ -370,7 +379,7 @@ public class Obo2Owl {
 				OWLAnnotationValue v = ann.getValue();
 				if (v instanceof OWLLiteral) {
 					String rel = ((OWLLiteral)v).getLiteral();
-					pIRI  = this.oboIdToIRI(rel);
+					pIRI  = oboIdToIRI(rel);
 				}
 				else {
 					pIRI = (IRI) v;
@@ -406,8 +415,9 @@ public class Obo2Owl {
 	}
 
 	private  String getURI(String path){
-		if(path.startsWith("http://") || path.startsWith("file:"))
-			return  path;
+		if(path.startsWith("http://") || path.startsWith("file:")) {
+            return  path;
+        }
 
 		File f = new File(path);
 
@@ -454,11 +464,11 @@ public class Obo2Owl {
 					add(fac.getOWLAnnotationAssertionAxiom(ap, childAnnotProp.getIRI(), trLiteral(clause.getValue2())));
 				}
 			} else if (tag == OboFormatTag.TAG_SYNONYMTYPEDEF){
-				OWLAnnotationProperty parentAnnotProp = this.trTagToAnnotationProp(t);
+				OWLAnnotationProperty parentAnnotProp = trTagToAnnotationProp(t);
 
 				for(Clause clause: headerFrame.getClauses(t)){
 					Object values[] = clause.getValues().toArray();
-					OWLAnnotationProperty childAnnotProp = this.trAnnotationProp( values[0].toString() );
+					OWLAnnotationProperty childAnnotProp = trAnnotationProp( values[0].toString() );
 					IRI childIRI = childAnnotProp.getIRI();
 					
 					Set<OWLAnnotation> annotations = trAnnotations(clause);
@@ -522,7 +532,8 @@ public class Obo2Owl {
 				if (axiomStrings != null) {
 					try {
 						for (String axiomString : axiomStrings) {
-							Set<OWLAxiom> axioms = OwlStringTools.translate(axiomString);
+                            Set<OWLAxiom> axioms = OwlStringTools.translate(axiomString,
+                                    manager);
 							if (axioms != null) {
 								manager.addAxioms(owlOntology, axioms);
 							}
@@ -798,10 +809,11 @@ public class Obo2Owl {
 		//out.println(cls+" CL:"+clauses+" I:"+iSet+" E:"+eSet);
 		eSet.add(fac.getOWLObjectUnionOf(iSet));
 		// TODO - fix this
-		if (annotations == null || annotations.size() == 0)
-			return fac.getOWLEquivalentClassesAxiom(eSet);
-		else
-			return fac.getOWLEquivalentClassesAxiom(eSet, annotations);
+		if (annotations == null || annotations.size() == 0) {
+            return fac.getOWLEquivalentClassesAxiom(eSet);
+        } else {
+            return fac.getOWLEquivalentClassesAxiom(eSet, annotations);
+        }
 	}
 
 	private OWLAxiom trIntersectionOf(OWLClass cls, Collection<Clause> clauses) {
@@ -828,10 +840,11 @@ public class Obo2Owl {
 		//out.println(cls+" CL:"+clauses+" I:"+iSet+" E:"+eSet);
 		eSet.add(fac.getOWLObjectIntersectionOf(iSet));
 		// TODO - fix this
-		if (annotations == null || annotations.size() == 0)
-			return fac.getOWLEquivalentClassesAxiom(eSet);
-		else
-			return fac.getOWLEquivalentClassesAxiom(eSet, annotations);
+		if (annotations == null || annotations.size() == 0) {
+            return fac.getOWLEquivalentClassesAxiom(eSet);
+        } else {
+            return fac.getOWLEquivalentClassesAxiom(eSet, annotations);
+        }
 	}
 
 
@@ -1309,8 +1322,8 @@ public class Obo2Owl {
 		if (exact != null && exact > 0) {
 			ex = fac.getOWLObjectExactCardinality(exact,pe,ce);
 		}
-		else if ((exact != null && exact == 0) ||
-				(max != null && max == 0)) {
+		else if (exact != null && exact == 0 ||
+				max != null && max == 0) {
 			OWLObjectComplementOf ceCompl = fac.getOWLObjectComplementOf(ce);
 			ex = fac.getOWLObjectAllValuesFrom(pe,
 					ceCompl);
@@ -1525,8 +1538,9 @@ public class Obo2Owl {
 		// 5.9.3. Special Rules for Relations
 		if (!id.contains(":")) {
 			String xid = translateShorthandIdToExpandedId(id);
-			if (!xid.equals(id))
-				return oboIdToIRI(xid);
+			if (!xid.equals(id)) {
+                return oboIdToIRI(xid);
+            }
 		}
 
 		String[] idParts = id.split(":", 2);
@@ -1537,8 +1551,9 @@ public class Obo2Owl {
 			localId = idParts[1];
 			if(localId.contains("_")){
 				db += "#_"; // NonCanonical-Prefixed-ID
-			}else
-				db += "_";
+			} else {
+                db += "_";
+            }
 		}
 		else if (idParts.length == 0) {
 			db = getDefaultIDSpace()+"#"; 
@@ -1567,8 +1582,9 @@ public class Obo2Owl {
 			return null;
 		}
 
-		if (safeId.contains(" "))
-			safeId = safeId.replace(" ", "_");
+		if (safeId.contains(" ")) {
+            safeId = safeId.replace(" ", "_");
+        }
 		IRI iri = null;
 		try {
 			iri = IRI.create(uriPrefix + safeId);
@@ -1583,11 +1599,13 @@ public class Obo2Owl {
 
 	// 5.9.3. Special Rules for Relations
 	private String translateShorthandIdToExpandedId(String id) {
-		if (id.contains(":"))
-			return id;
+		if (id.contains(":")) {
+            return id;
+        }
 		Frame tdf = obodoc.getTypedefFrame(id);
-		if (tdf == null)
-			return id;
+		if (tdf == null) {
+            return id;
+        }
 		Collection<Xref> xrefs = tdf.getTagValues(OboFormatTag.TAG_XREF, Xref.class);
 		String matchingExpandedId = null;
 		for (Xref xref : xrefs) {
@@ -1596,22 +1614,24 @@ public class Obo2Owl {
 			if (xref != null) {
 				String xid = xref.getIdref();
 				//System.err.println(" ID:"+id+" xid:"+xid);
-				if (xid.equals(id))
-					continue;
+				if (xid.equals(id)) {
+                    continue;
+                }
 				if (matchingExpandedId == null) {
 					matchingExpandedId = xid;
 				}
 				else {
 					// RO and BFO take precedence over others
-					if ((xid.startsWith("RO") ||
-							xid.startsWith("BFO"))) {
+					if (xid.startsWith("RO") ||
+							xid.startsWith("BFO")) {
 						matchingExpandedId = xid;
 					}
 				}
 			}
 		}
-		if (matchingExpandedId == null)
-			return id;
+		if (matchingExpandedId == null) {
+            return id;
+        }
 		//System.err.println("  ID:"+id+" matching:"+matchingExpandedId);
 		return matchingExpandedId;
 	}

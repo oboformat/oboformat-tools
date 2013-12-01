@@ -1,17 +1,17 @@
 package org.obolibrary.macro;
 
-import org.apache.log4j.Logger;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.coode.owlapi.manchesterowlsyntax.OntologyAxiomPair;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.expression.ParserException;
 import org.semanticweb.owlapi.model.*;
 
-import java.util.Set;
-
 public class MacroExpansionGCIVisitor {
 
-	private static final Logger log = Logger.getLogger(MacroExpansionGCIVisitor.class);
-	private static final boolean DEBUG = log.isDebugEnabled();
+    private static final Logger log = Logger.getLogger(MacroExpansionGCIVisitor.class
+            .getName());
 	
 	private OWLOntology inputOntology;
 	private OWLOntologyManager outputManager;
@@ -20,25 +20,26 @@ public class MacroExpansionGCIVisitor {
 	private ManchesterSyntaxTool manchesterSyntaxTool;
 	private GCIVisitor visitor;
 	
-	public MacroExpansionGCIVisitor(OWLOntology inputOntology) {
+    public MacroExpansionGCIVisitor(OWLOntology inputOntology,
+            OWLOntologyManager outputManager) {
 		super();
 		this.inputOntology = inputOntology;
-		this.visitor = new GCIVisitor(inputOntology);
-		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
+		visitor = new GCIVisitor(inputOntology);
+		manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 		
-		outputManager = OWLManager.createOWLOntologyManager();
+        this.outputManager = outputManager;
 		
 		try{
 			outputOntology = outputManager.createOntology(inputOntology.getOntologyID());
 		}catch(Exception ex){
-			log.error(ex.getMessage(), ex);
+            log.log(Level.SEVERE, ex.getMessage(), ex);
 		}
 
 	}
 
 	private void output(OWLAxiom axiom){
 		if (axiom == null) {
-			log.error("no axiom");
+            log.log(Level.SEVERE, "no axiom");
 			return;
 		}
 		//System.out.println("adding:"+axiom);
@@ -47,7 +48,7 @@ public class MacroExpansionGCIVisitor {
 			outputManager.applyChange(addAx);
 		}
 		catch (Exception e) {			
-			log.error("COULD NOT TRANSLATE AXIOM", e);
+            log.log(Level.SEVERE, "COULD NOT TRANSLATE AXIOM", e);
 		}
 		
 	}
@@ -77,14 +78,16 @@ public class MacroExpansionGCIVisitor {
 		
 		String expandTo = visitor.expandAssertionToMap.get(prop.getIRI());
 		if(expandTo != null){
-			if(DEBUG)
-				log.debug("Template to Expand" + expandTo);
+            if (log.isLoggable(Level.FINE)) {
+                log.log(Level.SEVERE, "Template to Expand" + expandTo);
+            }
 			
 			expandTo = expandTo.replaceAll("\\?X", manchesterSyntaxTool.getId((IRI) ax.getSubject()));
 			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId((IRI) ax.getValue()));
 
-			if(DEBUG)
-				log.debug("Expanding " + expandTo);
+            if (log.isLoggable(Level.FINE)) {
+                log.log(Level.SEVERE, "Expanding " + expandTo);
+            }
 		
 			try{
 				Set<OntologyAxiomPair> setAxp =  manchesterSyntaxTool.parseManchesterExpressionFrames(expandTo);
@@ -93,7 +96,7 @@ public class MacroExpansionGCIVisitor {
 				}
 				
 			}catch(Exception ex){
-				log.error(ex.getMessage(), ex);
+                log.log(Level.SEVERE, ex.getMessage(), ex);
 			}
 		}
 	}
@@ -110,7 +113,7 @@ public class MacroExpansionGCIVisitor {
 			if (gciRHS != null) {
 				OWLClassExpression gciLHS = dataFactory.getOWLObjectSomeValuesFrom(p, filler);
 				OWLEquivalentClassesAxiom ax = 
-					this.dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
+					dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
 				output(ax);
 			}
 			return gciRHS;
@@ -123,7 +126,7 @@ public class MacroExpansionGCIVisitor {
 			if (gciRHS != null) {
 				OWLClassExpression gciLHS = dataFactory.getOWLObjectHasValue(p, filler);
 				OWLEquivalentClassesAxiom ax = 
-						this.dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
+						dataFactory.getOWLEquivalentClassesAxiom(gciLHS, gciRHS);
 				output(ax);
 			}
 			return gciRHS;
@@ -161,7 +164,7 @@ public class MacroExpansionGCIVisitor {
 					try {
 						result = manchesterSyntaxTool.parseManchesterExpression(exStr);
 					} catch (ParserException e) {
-						log.error(e.getMessage(), e);
+                        log.log(Level.SEVERE, e.getMessage(), e);
 					}
 				}
 			}

@@ -3,8 +3,9 @@ package org.obolibrary.macro;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.coode.owlapi.manchesterowlsyntax.OntologyAxiomPair;
 import org.obolibrary.obo2owl.Obo2Owl;
@@ -44,8 +45,8 @@ import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
  */
 public class ManchesterSyntaxTool {
 
-	private static final Logger log = Logger.getLogger(ManchesterSyntaxTool.class);
-	private static final boolean DEBUG = log.isDebugEnabled();
+    private static final Logger log = Logger.getLogger(ManchesterSyntaxTool.class
+            .getName());
 
 	private IRIShortFormProvider iriShortFormProvider;
 	private OWLDataFactory dataFactory;
@@ -88,7 +89,7 @@ public class ManchesterSyntaxTool {
 	public ManchesterSyntaxTool(OWLOntology inputOntology, Collection<OWLOntology> auxiliaryOntologies, boolean resolveEntities) {
 		super();
 		OWLOntologyManager manager = inputOntology.getOWLOntologyManager();
-		this.dataFactory = manager.getOWLDataFactory();
+		dataFactory = manager.getOWLDataFactory();
 
 		Set<OWLOntology> ontologies;
 		if (auxiliaryOntologies != null && !auxiliaryOntologies.isEmpty()) {
@@ -120,7 +121,8 @@ public class ManchesterSyntaxTool {
 		final ShortFormEntityChecker defaultInstance = new ShortFormEntityChecker(
 				bidirectionalShortFormProvider);
 		if (resolveEntities) {
-			entityChecker = new AdvancedEntityChecker(defaultInstance, ontologies);
+            entityChecker = new AdvancedEntityChecker(defaultInstance, ontologies,
+                    inputOntology.getOWLOntologyManager());
 		}
 		else {
 			entityChecker = defaultInstance;
@@ -167,8 +169,9 @@ public class ManchesterSyntaxTool {
 
 		parser.setOWLEntityChecker(entityChecker);
 
-		if(DEBUG)
-			log.debug("parsing:"+expression);
+        if (log.isLoggable(Level.WARNING)) {
+            log.log(Level.WARNING, "parsing:" + expression);
+        }
 		return parser;
 	}
 
@@ -218,15 +221,18 @@ public class ManchesterSyntaxTool {
 
 		private final OWLEntityChecker defaultInstance;
 		private final Set<OWLOntology> ontologies;
+        private OWLOntologyManager manager;
 
 		/**
 		 * @param defaultInstance
 		 * @param ontologies
 		 */
-		AdvancedEntityChecker(OWLEntityChecker defaultInstance, Set<OWLOntology> ontologies) {
+        AdvancedEntityChecker(OWLEntityChecker defaultInstance,
+                Set<OWLOntology> ontologies, OWLOntologyManager manager) {
 			super();
 			this.defaultInstance = defaultInstance;
 			this.ontologies = ontologies;
+            this.manager = manager;
 		}
 
 		public OWLClass getOWLClass(String name) {
@@ -298,7 +304,7 @@ public class ManchesterSyntaxTool {
 		}
 
 		IRI getIRIByIdentifier(String id) {
-			Obo2Owl b = new Obo2Owl();
+            Obo2Owl b = new Obo2Owl(manager);
 			b.setObodoc(new OBODoc());
 			return b.oboIdToIRI(id);
 		}

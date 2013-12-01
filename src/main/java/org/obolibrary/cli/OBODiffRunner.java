@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
 import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.macro.MacroExpansionVisitor;
@@ -24,7 +25,6 @@ import org.obolibrary.oboformat.diff.OBODocDiffer;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
@@ -46,7 +46,7 @@ import org.semanticweb.owlapi.model.SetOntologyID;
  */
 public class OBODiffRunner {
 
-	private static Logger logger = Logger.getLogger(OBODiffRunner.class);
+    private static Logger logger = Logger.getLogger(OBODiffRunner.class.getName());
 
 
 	public static void main(String[] args) throws Exception {
@@ -60,25 +60,27 @@ public class OBODiffRunner {
 
 		String buildDir = config.buildDir.getValue();
 		if (config.ontsToDownload.getValue().size() > 0 && buildDir == null) {
-			logger.error("must specify dir with -b DIR");
+            logger.log(Level.SEVERE, "must specify dir with -b DIR");
 			System.exit(1);
 		}
 
 		if (config.outFile.isEmpty() && config.outputdir.isEmpty()) {
-			logger.error("must specify at least one fo the following: outFile OR outputdir");
+            logger.log(Level.SEVERE,
+                    "must specify at least one fo the following: outFile OR outputdir");
 			usage();
 			System.exit(1);
 		}
 
 		// If the -b option is set, then build ALL ontologies in the specified directory
 		if (buildDir != null) {
-			buildAllOboOwlFiles(buildDir, config, logger);
+            buildAllOboOwlFiles(buildDir, config, logger, null);
 		}
-
-		runConversion(config, logger);
+        // XXX a manager needs to be injected
+        runConversion(config, logger, null);
 	}
 
-	protected static void runConversion(OBORunnerConfiguration config, Logger logger) throws Exception {
+    protected static void runConversion(OBORunnerConfiguration config, Logger logger,
+            OWLOntologyManager manager) throws Exception {
 
 		String outFile = config.outFile.getValue();
 		List<OBODoc> obodocs = new Vector<OBODoc>();
@@ -92,7 +94,6 @@ public class OBODiffRunner {
 				obodocs.add(obodoc);
 			}
 			else {
-				OWLOntologyManager manager = OWLManager.createOWLOntologyManager(); // persist?
 				OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(iri));
 
 				String version = config.version.getValue();
@@ -122,7 +123,8 @@ public class OBODiffRunner {
 	}
 
 	private static OWLOntology handleMacroExpansion(OBORunnerConfiguration config, OWLOntology ontology, 
-			String gciFile, String outputFile, String ontologyId) throws OWLOntologyStorageException {
+ String gciFile, String outputFile, String ontologyId,
+            OWLOntologyManager outputManager) throws OWLOntologyStorageException {
 
 		if (!config.isExpandMacros.getValue()) {
 			return ontology;
@@ -131,8 +133,8 @@ public class OBODiffRunner {
 		ExpandMacrosModeOptions option = config.expandMacrosMode.getValue();
 		if (option == ExpandMacrosModeOptions.GCI) {
 			// create GCI ontology
-			MacroExpansionGCIVisitor mevGCI = 
-				new MacroExpansionGCIVisitor(ontology);
+            MacroExpansionGCIVisitor mevGCI = new MacroExpansionGCIVisitor(ontology,
+                    outputManager);
 			OWLOntology gciOntology = mevGCI.createGCIOntology();
 
 			if (gciOntology.isEmpty()) {
@@ -202,8 +204,9 @@ public class OBODiffRunner {
 	}
 
 	private static String getURI(String path){
-		if(path.startsWith("http://") || path.startsWith("file:///"))
+		if(path.startsWith("http://") || path.startsWith("file:///")) {
 			return  path;
+        }
 
 		File f = new File(path);
 
@@ -219,7 +222,7 @@ public class OBODiffRunner {
 		long tm = Runtime.getRuntime().totalMemory();
 		long fm = Runtime.getRuntime().freeMemory();
 		long mem = tm-fm;
-		System.out.println("Memory total:"+tm+" free:"+fm+" diff:"+mem+" (bytes) diff:"+(mem/1000000)+" (mb)");
+		System.out.println("Memory total:"+tm+" free:"+fm+" diff:"+mem+" (bytes) diff:"+mem/1000000+" (mb)");
 	}
 
 
@@ -232,17 +235,20 @@ public class OBODiffRunner {
 	 * @param logger 
 	 * @throws IOException
 	 */
-	protected static void buildAllOboOwlFiles(String dir, OBORunnerConfiguration config, Logger logger) throws IOException {
+    protected static void buildAllOboOwlFiles(String dir, OBORunnerConfiguration config,
+            Logger logger, OWLOntologyManager manager) throws IOException {
 		Map<String, String> ontmap = getOntDownloadMap();
 		Vector<String> fails = new Vector<String>();
 		Set<String> ontsToDownload = config.ontsToDownload.getValue();
 		Set<String> omitOntsToDownload = config.omitOntsToDownload.getValue();
 
 		for (String ont : ontmap.keySet()) {
-			if (ontsToDownload.size() > 0 && !ontsToDownload.contains(ont))
+			if (ontsToDownload.size() > 0 && !ontsToDownload.contains(ont)) {
 				continue;
-			if (omitOntsToDownload.size() > 0 && omitOntsToDownload.contains(ont))
+            }
+			if (omitOntsToDownload.size() > 0 && omitOntsToDownload.contains(ont)) {
 				continue;
+            }
 			if (ontmap.containsKey(ont)) {
 				//if (ontmap.get("format"))
 				try {
@@ -251,11 +257,12 @@ public class OBODiffRunner {
 					String ontId = ont.toLowerCase();
 					logger.info("converting: "+ont+" from: "+url+" using default ont:"+ontId);
 					if (url == null) {
-						logger.warn("no url for "+ont);
+                        logger.log(Level.WARNING, "no url for " + ont);
 						fails.add(ont);
 						continue;
 					}
-					Obo2Owl.convertURL(url,getURI(dir+"/"+ontId+".owl"),ontId);
+                    Obo2Owl.convertURL(url, getURI(dir + "/" + ontId + ".owl"), ontId,
+                            manager);
 					long totalTime = System.nanoTime() - initTime;
 					showMemory(); // useless
 
@@ -263,21 +270,22 @@ public class OBODiffRunner {
 							+ (totalTime / 1000000d) + " ms");
 
 				}catch (Error e) {
-					logger.warn(e.getMessage(), e);
+                    logger.log(Level.WARNING, e.getMessage(), e);
 					fails.add(ont);
 				}catch (Exception e) {
-					logger.warn(e.getMessage(), e);
+                    logger.log(Level.WARNING, e.getMessage(), e);
 					fails.add(ont);
 				}
 			}
 			else {
 				fails.add(ont);
-				logger.warn("did not convert: "+ont);
+                logger.log(Level.WARNING, "did not convert: " + ont);
 			}
 		}
 		logger.info("DONE!");
-		for (String fail : fails)
-			logger.warn("FAIL:"+fail);
+		for (String fail : fails) {
+            logger.log(Level.WARNING, "FAIL:" + fail);
+        }
 	}
 
 	/**
@@ -304,8 +312,9 @@ public class OBODiffRunner {
 		String ns = null;
 		while ( true ) {
 			line = in.readLine();
-			if (line == null)
+			if (line == null) {
 				break;
+            }
 			if (line.length() == 0) {
 				ns = null;
 				continue;
@@ -329,16 +338,18 @@ public class OBODiffRunner {
 				}
 			}
 			else if (tag.equals("is_obsolete")) {
-				if (urlmap.containsKey(ns))
+				if (urlmap.containsKey(ns)) {
 					urlmap.remove(ns);
+                }
 				ns = null;
 			}
 			else if (tag.equals("format")) {
 				// danger or circularity, just for testing now
 				//if (!parts[1].equals("obo"))
 				//	urlmap.put(ns, "http://purl.org/obo/obo/"+ns+".obo");
-				if (!parts[1].equals("obo"))
+				if (!parts[1].equals("obo")) {
 					urlmap.remove(ns);
+			}
 			}
 
 		}

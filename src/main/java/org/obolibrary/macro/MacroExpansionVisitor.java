@@ -1,13 +1,13 @@
 package org.obolibrary.macro;
 
-import org.apache.log4j.Logger;
-import org.coode.owlapi.manchesterowlsyntax.OntologyAxiomPair;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.expression.ParserException;
-import org.semanticweb.owlapi.model.*;
-
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.coode.owlapi.manchesterowlsyntax.OntologyAxiomPair;
+import org.semanticweb.owlapi.expression.ParserException;
+import org.semanticweb.owlapi.model.*;
 
 /**
  * @author cjm
@@ -16,8 +16,8 @@ import java.util.Set;
  */
 public class MacroExpansionVisitor {
 
-	private static final Logger log = Logger.getLogger(MacroExpansionVisitor.class);
-	private static final boolean DEBUG = log.isDebugEnabled();
+    private static final Logger log = Logger.getLogger(MacroExpansionVisitor.class
+            .getName());
 	
 	private OWLOntology inputOntology;
 	private OWLOntologyManager manager;
@@ -28,8 +28,8 @@ public class MacroExpansionVisitor {
 	public MacroExpansionVisitor(OWLOntology inputOntology) {
 		super();
 		this.inputOntology = inputOntology;
-		this.visitor = new Visitor(inputOntology);
-		this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
+		visitor = new Visitor(inputOntology);
+		manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 		manager = inputOntology.getOWLOntologyManager();
 	}
 
@@ -94,17 +94,19 @@ public class MacroExpansionVisitor {
 				// we do this by creating a new MST - this is not particularly efficient, a better
 				// way might be to first scan the ontology for all annotation axioms that will be expanded,
 				// then add the declarations at this point
-				this.manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
+				manchesterSyntaxTool = new ManchesterSyntaxTool(inputOntology);
 			}
 			
-			if(DEBUG)
-				log.debug("Template to Expand" + expandTo);
+            if (log.isLoggable(Level.WARNING)) {
+                log.log(Level.WARNING, "Template to Expand" + expandTo);
+            }
 			
 			expandTo = expandTo.replaceAll("\\?X", manchesterSyntaxTool.getId((IRI)ax.getSubject()));
 			expandTo = expandTo.replaceAll("\\?Y", manchesterSyntaxTool.getId(axValIRI));
 
-			if(DEBUG)
-				log.debug("Expanding " + expandTo);
+            if (log.isLoggable(Level.WARNING)) {
+                log.log(Level.WARNING, "Expanding " + expandTo);
+            }
 			
 			try{
 				Set<OntologyAxiomPair> setAxp =  manchesterSyntaxTool.parseManchesterExpressionFrames(expandTo);
@@ -114,7 +116,7 @@ public class MacroExpansionVisitor {
 				}
 				
 			}catch(Exception ex){
-				log.error(ex.getMessage(), ex);
+                log.log(Level.SEVERE, ex.getMessage(), ex);
 			}
 			//TODO: 
 		}
@@ -174,7 +176,7 @@ public class MacroExpansionVisitor {
 					try {
 						result = manchesterSyntaxTool.parseManchesterExpression(exStr);
 					} catch (ParserException e) {
-						log.error(e.getMessage(), e);
+                        log.log(Level.SEVERE, e.getMessage(), e);
 					}
 				}
 			}

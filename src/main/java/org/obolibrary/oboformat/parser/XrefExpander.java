@@ -5,19 +5,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
+import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.model.FrameMergeException;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.model.Xref;
-import org.obolibrary.oboformat.model.Frame.FrameType;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 
 public class XrefExpander {
 
-	private static Logger LOG = Logger.getLogger(XrefExpander.class);
+    private static Logger LOG = Logger.getLogger(XrefExpander.class.getName());
 
 	OBODoc sourceOBODoc;
 	OBODoc targetOBODoc;
@@ -62,7 +63,8 @@ public class XrefExpander {
 			String [] parts;
 			String v = c.getValue(String.class);
 			if (v == null) {
-				LOG.error("problem with header clause in xref expansion: "+c);
+                LOG.log(Level.SEVERE, "problem with header clause in xref expansion: "
+                        + c);
 				continue;
 			}
 			parts = v.split("\\s");
@@ -131,8 +133,9 @@ public class XrefExpander {
 	}
 
 	public OBODoc getTargetDoc(String idSpace) {
-		if (targetOBODoc != null)
-			return targetOBODoc;
+		if (targetOBODoc != null) {
+            return targetOBODoc;
+        }
 		return targetDocMap.get(idSpace);
 	}
 

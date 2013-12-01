@@ -2,15 +2,13 @@ package org.obolibrary.cli;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.obolibrary.gui.GuiMainFrame;
 
 /**
@@ -18,7 +16,7 @@ import org.obolibrary.gui.GuiMainFrame;
  */
 public class OBORunnerGui extends OBORunner {
 
-	private final static Logger logger = Logger.getLogger(OBORunnerGui.class);
+    private final static Logger logger = Logger.getLogger(OBORunnerGui.class.getName());
 	
 	// SimpleDateFormat is NOT thread safe
 	// encapsulate as thread local
@@ -32,34 +30,8 @@ public class OBORunnerGui extends OBORunner {
 	
 	public static void main(String[] args) {
 		
-		Logger rootLogger = Logger.getRootLogger();
 		final BlockingQueue<String> logQueue =  new ArrayBlockingQueue<String>(100000);
 		
-		rootLogger.addAppender(new AppenderSkeleton() {
-			
-			public boolean requiresLayout() {
-				return false;
-			}
-			
-			public void close() {
-				// do nothing
-			}
-			
-			@Override
-			protected void append(LoggingEvent event) {
-				try {
-					StringBuilder sb = new StringBuilder();
-					sb.append(df.get().format(new Date(event.timeStamp)));
-					sb.append(' ');
-					sb.append(event.getLevel());
-					sb.append(' ');
-					sb.append(event.getRenderedMessage());
-					logQueue.put(sb.toString());
-				} catch (InterruptedException e) {
-					logger.fatal("Interruped during wait for writing to the message panel.", e);
-				}
-			}
-		});
 		
 		OBORunnerConfiguration config = OBORunnerConfigCLIReader.readConfig(args);
 		if (config.showHelp.getValue()) {
@@ -91,20 +63,21 @@ public class OBORunnerGui extends OBORunner {
 				@Override
 				public void run() {
 					try {
+                        // XXX a manager needs to be injected
 						String buildDir = config.buildDir.getValue();
 						if (buildDir != null) {
-							buildAllOboOwlFiles(buildDir, config, logger);
+                            buildAllOboOwlFiles(buildDir, config, logger, null);
 						}
-						runConversion(config, logger);
+                        runConversion(config, logger, null, null);
 						logger.info("Finished ontology conversion.");
 						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, "Finished ontology conversion.");
 					} catch (Exception e) {
 						String message = "Internal error: "+ e.getMessage();
-						logger.error(message, e);
+                        logger.log(Level.SEVERE, message, e);
 						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, message, "Error", JOptionPane.ERROR_MESSAGE);
 					} catch (Throwable e) {
 						String message = "Internal error: "+ e.getMessage();
-						logger.fatal(message, e);
+                        logger.log(Level.SEVERE, message, e);
 						JOptionPane.showMessageDialog(GuiMainFrameWorker.this, message, "FatalError", JOptionPane.ERROR_MESSAGE);
 					}
 					finally {

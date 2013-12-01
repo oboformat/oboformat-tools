@@ -1,11 +1,14 @@
 package org.obolibrary.cli;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.obolibrary.cli.OBORunnerConfiguration.Variable;
 
 public class OBORunnerConfigCLIReader {
 
-	private static final Logger logger = Logger.getLogger(OBORunnerConfigCLIReader.class);
+    private static final Logger logger = Logger.getLogger(OBORunnerConfigCLIReader.class
+            .getName());
 	
 	public static OBORunnerConfiguration readConfig(String[] args)
 	{
@@ -27,7 +30,7 @@ outer:		for (Variable<?> variable : variables) {
 							}
 							boolean success = variable.setValue(value);
 							if (!success) {
-								logger.warn(variable.getSetValueFailure());
+                                logger.log(Level.WARNING, variable.getSetValueFailure());
 							}
 							break outer;
 						}
@@ -41,7 +44,7 @@ outer:		for (Variable<?> variable : variables) {
 					}
 					boolean success = variable.setValue(value);
 					if (!success) {
-						logger.warn(variable.getSetValueFailure());
+                        logger.log(Level.WARNING, variable.getSetValueFailure());
 					}
 					break outer;
 				}

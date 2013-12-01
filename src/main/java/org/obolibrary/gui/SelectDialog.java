@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-
-import org.apache.log4j.Logger;
 
 /**
  * Wrapper for the native {@link FileDialog}. Allow convenient use of
@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class SelectDialog {
 	
-	private final static Logger LOGGER = Logger.getLogger(SelectDialog.class);
+    private final static Logger LOGGER = Logger.getLogger(SelectDialog.class.getName());
 	public final static boolean LOAD = false;
 	public final static boolean SAVE = true;
 	
@@ -59,7 +59,8 @@ public abstract class SelectDialog {
 			try {
 				return selected.getCanonicalPath();
 			} catch (IOException e) {
-				LOGGER.error("Unable to get canonical path for file: "+selected.getAbsolutePath(), e);
+                LOGGER.log(Level.SEVERE, "Unable to get canonical path for file: "
+                        + selected.getAbsolutePath(), e);
 			}
 		}
 		return null;
@@ -262,7 +263,7 @@ public abstract class SelectDialog {
 			super();
 			this.description = description;
 			if (suffixes != null) {
-				this.extensions = new HashSet<String>(Arrays.asList(suffixes));
+				extensions = new HashSet<String>(Arrays.asList(suffixes));
 			}
 			else {
 				extensions = null;
@@ -327,7 +328,7 @@ public abstract class SelectDialog {
 	private static boolean isUnix(){
 		String os = System.getProperty("os.name").toLowerCase();
 		//linux or unix
-	    return (os.indexOf( "nix") >=0 || os.indexOf( "nux") >=0);
+	    return os.indexOf( "nix") >=0 || os.indexOf( "nux") >=0;
  
 	}
 }

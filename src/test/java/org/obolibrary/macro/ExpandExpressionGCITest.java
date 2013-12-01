@@ -8,8 +8,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -33,7 +33,8 @@ public class ExpandExpressionGCITest extends OboFormatTestBasics {
 
 		OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
 		
-		MacroExpansionGCIVisitor mev = new MacroExpansionGCIVisitor(ontology);
+        MacroExpansionGCIVisitor mev = new MacroExpansionGCIVisitor(ontology,
+                OWLManager.createOWLOntologyManager());
 		OWLOntology gciOntology = mev.createGCIOntology();
 		int axiomCount = gciOntology.getAxiomCount();
 		assertTrue(axiomCount > 0);

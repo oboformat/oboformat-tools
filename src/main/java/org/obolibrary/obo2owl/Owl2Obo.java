@@ -82,7 +82,7 @@ public class Owl2Obo {
 
 	private static Logger LOG = Logger.getLogger(Owl2Obo.class);
 
-	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+    OWLOntologyManager manager = null;
 	OWLOntology owlOntology;
 	OWLDataFactory fac;
 	OBODoc obodoc;
@@ -96,19 +96,23 @@ public class Owl2Obo {
 	private boolean strictConversion;
 	private boolean discardUntranslatable = false;
 
-	private void init() {
+    private void init(OWLOntologyManager managerToUse) {
 		idSpaceMap = new HashMap<String, String>();
 		// legacy:
 		idSpaceMap.put("http://www.obofoundry.org/ro/ro.owl#", "OBO_REL");
 		untranslatableAxioms = new HashSet<OWLAxiom>();
-		manager = OWLManager.createOWLOntologyManager();
+        manager = managerToUse;
 		fac = manager.getOWLDataFactory();
 		apToDeclare = new HashSet<OWLAnnotationProperty>();
 	}
 
-	public Owl2Obo(){
-		init();
-	}
+    public Owl2Obo() {
+        init(OWLManager.createOWLOntologyManager());
+    }
+
+    public Owl2Obo(OWLOntologyManager m) {
+        init(m);
+    }
 
 	private static HashMap<String, String>  initAnnotationPropertyMap() {
 		HashMap<String, String> map = new HashMap<String, String>();
@@ -121,11 +125,11 @@ public class Owl2Obo {
 	}
 
 	public void setStrictConversion(boolean b){
-		this.strictConversion = b;
+		strictConversion = b;
 	}
 
 	public boolean getStrictConversion(){
-		return this.strictConversion;
+		return strictConversion;
 	}
 
 	/**
@@ -159,12 +163,13 @@ public class Owl2Obo {
 	}
 
 	public OBODoc convert(OWLOntology ont) throws OWLOntologyCreationException {
-		this.owlOntology = ont;
-		if(ont != null)
-			this.ontologyId = getOntologyId(ont);
-		else
-			this.ontologyId = "TODO";
-		init();
+		owlOntology = ont;
+		if(ont != null) {
+            ontologyId = getOntologyId(ont);
+        } else {
+            ontologyId = "TODO";
+        }
+        init(ont.getOWLOntologyManager());
 		return tr();
 	}
 
@@ -231,7 +236,8 @@ public class Owl2Obo {
 		}
 		if (untranslatableAxioms.isEmpty() == false && discardUntranslatable == false) {
 			try {
-				String axiomString = OwlStringTools.translate(untranslatableAxioms);
+                String axiomString = OwlStringTools.translate(untranslatableAxioms,
+                        manager);
 				if (axiomString != null) {
 					Frame headerFrame = obodoc.getHeaderFrame();
 					if (headerFrame == null) {
@@ -257,7 +263,7 @@ public class Owl2Obo {
 					viewRel = ((OWLLiteral)v).getLiteral();
 				}
 				else {
-					viewRel = this.getIdentifierUsingBaseOntology((IRI)v);
+					viewRel = getIdentifierUsingBaseOntology((IRI)v);
 				}
 				break;
 			}
@@ -304,7 +310,7 @@ public class Owl2Obo {
 	private void add(Frame f) {
 		if (f != null) {
 			try {
-				this.obodoc.addFrame(f);
+				obodoc.addFrame(f);
 			} catch (Exception ex) {
 				LOG.error(ex.getMessage(), ex);
 			}
@@ -313,8 +319,9 @@ public class Owl2Obo {
 
 
 	private boolean trObjectProperty(OWLObjectProperty prop, String tag, String value, Set<OWLAnnotation> annotations){
-		if(prop == null || value == null)
-			return false;
+		if(prop == null || value == null) {
+            return false;
+        }
 
 		Frame f = getTypedefFrame(prop);
 		Clause clause;
@@ -339,8 +346,9 @@ public class Owl2Obo {
 	}
 
 	private boolean trObjectProperty(OWLObjectProperty prop, String tag, Boolean value, Set<OWLAnnotation> annotations){
-		if(prop == null || value == null)
-			return false;
+		if(prop == null || value == null) {
+            return false;
+        }
 
 		Frame f = getTypedefFrame(prop);
 		Clause clause = new Clause(tag);
@@ -366,8 +374,9 @@ public class Owl2Obo {
 				}
 				if(first){
 					first = false;
-					if(ex instanceof OWLObjectProperty)
-						prop = (OWLObjectProperty)ex;
+					if(ex instanceof OWLObjectProperty) {
+                        prop = (OWLObjectProperty)ex;
+                    }
 				}else{
 					disjointFrom = this.getIdentifier(ex); //getIdentifier(ex);
 				}
@@ -456,8 +465,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_TRANSITIVE.getTag(), Boolean.TRUE, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -470,8 +480,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_REFLEXIVE.getTag(), Boolean.TRUE, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -480,8 +491,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_INVERSE_FUNCTIONAL.getTag(), Boolean.TRUE, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -490,8 +502,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop2 = ax.getSecondProperty();
 
 		if(prop1 instanceof OWLObjectProperty && prop2 instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2), ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop1, OboFormatTag.TAG_INVERSE_OF.getTag(), this.getIdentifier(prop2), ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -542,8 +555,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_SYMMETRIC.getTag(), Boolean.TRUE, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -553,8 +567,9 @@ public class Owl2Obo {
 		OWLObjectPropertyExpression prop = ax.getProperty();
 
 		if(prop instanceof OWLObjectProperty){
-			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty((OWLObjectProperty)prop, OboFormatTag.TAG_IS_FUNCTIONAL.getTag(), Boolean.TRUE, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -579,8 +594,9 @@ public class Owl2Obo {
 		String range = this.getIdentifier(owlRange); //getIdentifier(ax.getRange());
 
 		if(range != null){
-			if( trObjectProperty(prop, OboFormatTag.TAG_RANGE.getTag(), range, ax.getAnnotations()) )
-				return;
+			if( trObjectProperty(prop, OboFormatTag.TAG_RANGE.getTag(), range, ax.getAnnotations()) ) {
+                return;
+            }
 		}
 		error(ax);
 	}
@@ -662,8 +678,9 @@ public class Owl2Obo {
 				String tg = owlObjectToTag(axiom.getProperty());
 				if(OboFormatTag.TAG_COMMENT.getTag().equals(tg)){
 					comment = ((OWLLiteral)axiom.getValue()).getLiteral();
-					if (comment != null)
-						break;
+					if (comment != null) {
+                        break;
+                    }
 				}
 			}
 
@@ -690,7 +707,7 @@ public class Owl2Obo {
 				return;
 			}
 
-			Frame f = getTypedefFrame((OWLObjectProperty) sub);
+			Frame f = getTypedefFrame(sub);
 			Clause clause = new Clause(OboFormatTag.TAG_IS_A, supId);
 			f.addClause(clause);
 
@@ -1014,7 +1031,7 @@ public class Owl2Obo {
 
 	private void tr(OWLOntology ontology) {
 		Frame f = new Frame(FrameType.HEADER);
-		this.obodoc.setHeaderFrame(f);
+		obodoc.setHeaderFrame(f);
 
 		for(IRI iri: ontology.getDirectImportsDocuments()){
 
@@ -1027,14 +1044,14 @@ public class Owl2Obo {
 		}
 
 
-		String id = getOntologyId(this.owlOntology);
+		String id = getOntologyId(owlOntology);
 
 		Clause c = new Clause();
 		c.setTag(OboFormatTag.TAG_ONTOLOGY.getTag());
 		c.setValue(id);
 		f.addClause(c);
 		
-		String vid = getDataVersion(this.owlOntology);
+		String vid = getDataVersion(owlOntology);
 		if (vid != null) {
 			Clause c2 = new Clause();
 			c2.setTag(OboFormatTag.TAG_DATA_VERSION.getTag());
@@ -1218,8 +1235,9 @@ public class Owl2Obo {
 					Clause c = new Clause();
 					c.setTag(OboFormatTag.TAG_INTERSECTION_OF.getTag());
 
-					if(r != null)
-						c.addValue(r);
+					if(r != null) {
+                        c.addValue(r);
+                    }
 
 					c.addValue(cls2);
 					equivalenceAxiomClauses.add(c);
@@ -1304,10 +1322,11 @@ public class Owl2Obo {
 			return;
 		}
 
-		Set<OWLAnnotationAssertionAxiom> set  = entity.getAnnotationAssertionAxioms(this.owlOntology);
+		Set<OWLAnnotationAssertionAxiom> set  = entity.getAnnotationAssertionAxioms(owlOntology);
 
-		if(set.isEmpty())
-			return;
+		if(set.isEmpty()) {
+            return;
+        }
 
 		Frame f = null;
 		if (entity instanceof OWLClass) {
@@ -1337,7 +1356,7 @@ public class Owl2Obo {
 
 	public String getIdentifier(OWLObject obj) {
 		try {
-			return getIdentifierFromObject(obj, this.owlOntology);
+			return getIdentifierFromObject(obj, owlOntology);
 		} catch (UntranslatableAxiomException e) {
 			error(e.getMessage());
 		}
@@ -1415,10 +1434,12 @@ public class Owl2Obo {
 			}
 		}
 
-		if(obj instanceof OWLEntity)
-			return getIdentifier(((OWLEntity)obj).getIRI(), ont);
-		if(obj instanceof IRI)
-			return getIdentifier((IRI)obj, ont);
+		if(obj instanceof OWLEntity) {
+            return getIdentifier(((OWLEntity)obj).getIRI(), ont);
+        }
+		if(obj instanceof IRI) {
+            return getIdentifier((IRI)obj, ont);
+        }
 
 		return null;
 	}
@@ -1434,13 +1455,14 @@ public class Owl2Obo {
 	}
 	
 	private String getIdentifierUsingBaseOntology(IRI iriId) {
-		return getIdentifier(iriId, this.owlOntology);
+		return getIdentifier(iriId, owlOntology);
 	}
 	
 	public static String getIdentifier(IRI iriId, OWLOntology baseOntology) {
 
-		if(iriId == null)
-			return null;
+		if(iriId == null) {
+            return null;
+        }
 
 		String iri = iriId.toString();
 
@@ -1460,8 +1482,9 @@ public class Owl2Obo {
 		if(indexSlash>-1){
 			prefixURI = iri.substring(0, indexSlash+1);
 			id = iri.substring(indexSlash+1);
-		}else
-			id = iri;
+		} else {
+            id = iri;
+        }
 
 		String s[]= id.split("#_");
 
@@ -1530,14 +1553,15 @@ public class Owl2Obo {
 	public static String owlObjectToTag(OWLObject obj){
 
 		IRI iriObj = null;
-		if((obj instanceof OWLNamedObject)){
+		if(obj instanceof OWLNamedObject){
 			iriObj =((OWLNamedObject) obj).getIRI();
 		}else if(obj instanceof IRI){
 			iriObj = (IRI)obj;
 		}
 
-		if(iriObj == null)
-			return null;
+		if(iriObj == null) {
+            return null;
+        }
 
 		String iri = iriObj.toString();
 
@@ -1572,7 +1596,7 @@ public class Owl2Obo {
 
 	private Frame getTermFrame(OWLClass entity) {
 		String id = getIdentifierUsingBaseOntology(entity.getIRI());
-		Frame f = this.obodoc.getTermFrame(id);
+		Frame f = obodoc.getTermFrame(id);
 		if (f == null) {
 			f = new Frame(FrameType.TERM);
 			f.setId(id);
@@ -1585,7 +1609,7 @@ public class Owl2Obo {
 
 	private Frame getTypedefFrame(OWLEntity entity){
 		String id = this.getIdentifier(entity);
-		Frame f = this.obodoc.getTypedefFrame(id);
+		Frame f = obodoc.getTypedefFrame(id);
 		if (f == null) {
 			f = new Frame(FrameType.TYPEDEF);
 			f.setId(id);
@@ -1700,8 +1724,9 @@ public class Owl2Obo {
 				OWLObjectProperty p = null;
 				OWLClass filler = null;
 				for (OWLClassExpression x : xs) {
-					if (x instanceof OWLClass)
-						c = (OWLClass) x;
+					if (x instanceof OWLClass) {
+                        c = (OWLClass) x;
+                    }
 					if (x instanceof OWLObjectSomeValuesFrom) {
 						r = (OWLObjectSomeValuesFrom)x;
 						if (r.getProperty() instanceof OWLObjectProperty) {
@@ -1973,8 +1998,9 @@ public class Owl2Obo {
 
 	private void error(String message) {
 		LOG.warn(message);
-		if(strictConversion)
-			throw new RuntimeException("The conversion is halted: "+message);
+		if(strictConversion) {
+            throw new RuntimeException("The conversion is halted: "+message);
+        }
 	}
 
 }
