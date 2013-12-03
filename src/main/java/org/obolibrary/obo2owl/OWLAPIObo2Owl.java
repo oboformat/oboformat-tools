@@ -108,7 +108,8 @@ public class OWLAPIObo2Owl {
      * 
      * @param iri
      * @param outFile
-     * @param manager manager to use
+     * @param manager
+     *            manager to use
      * @throws IOException
      * @throws OWLOntologyCreationException
      * @throws OWLOntologyStorageException
@@ -116,7 +117,7 @@ public class OWLAPIObo2Owl {
     public static void convertURL(String iri, String outFile, OWLOntologyManager manager)
             throws IOException, OWLOntologyCreationException,
             OWLOntologyStorageException, OBOFormatParserException {
-        Obo2Owl bridge = new Obo2Owl(manager);
+        OWLAPIObo2Owl bridge = new OWLAPIObo2Owl(manager);
         OBOFormatParser p = new OBOFormatParser();
         OBODoc obodoc = p.parse(new URL(iri));
         OWLOntology ontology = bridge.convert(obodoc);
@@ -145,7 +146,7 @@ public class OWLAPIObo2Owl {
     public static void convertURL(String iri, String outFile, String defaultOnt,
             OWLOntologyManager manager) throws IOException, OWLOntologyCreationException,
             OWLOntologyStorageException, OBOFormatParserException {
-        Obo2Owl bridge = new Obo2Owl(manager);
+        OWLAPIObo2Owl bridge = new OWLAPIObo2Owl(manager);
         OBOFormatParser p = new OBOFormatParser();
         OBODoc obodoc = p.parse(new URL(iri));
         obodoc.addDefaultOntologyHeader(defaultOnt);

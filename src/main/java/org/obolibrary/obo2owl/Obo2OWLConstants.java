@@ -68,7 +68,7 @@ public class Obo2OWLConstants {
 		Obo2OWLVocabulary(String namespce, String shortName, String label, String mappedTag){
 			iri = IRI.create(namespce + shortName);
 			this.shortName = shortName;
-			namespace = namespce;
+			this.namespace = namespce;
 			this.label = label;
 			this.mappedTag = mappedTag;
 		}
@@ -86,11 +86,11 @@ public class Obo2OWLConstants {
 		}
 		
 		public String getLabel(){
-			return label;
+			return this.label;
 		}
 		
 		public String getMappedTag(){
-			return mappedTag;
+					return mappedTag;
 		}
 
         /** @param e
@@ -103,7 +103,8 @@ public class Obo2OWLConstants {
                 return false;
             }
             return iri.equals(e.getIRI());
-        }
+
+		}
 	}
 	
 	private static Hashtable<String, Obo2OWLVocabulary> tagsToVocab;
