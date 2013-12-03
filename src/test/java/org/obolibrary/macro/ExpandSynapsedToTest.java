@@ -3,9 +3,11 @@ package org.obolibrary.macro;
 import static junit.framework.Assert.assertTrue;
 
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
@@ -17,7 +19,10 @@ public class ExpandSynapsedToTest extends OboFormatTestBasics {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ALL);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.ALL);
+        }
 	}
 	
 	@Test

@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
@@ -23,7 +25,10 @@ public class RoundTripTest extends OboFormatTestBasics {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.SEVERE);
+        }
 	}
 
 	public List<Diff> roundTripOBOURL(String fn, boolean isExpectRoundtrip) throws Exception {

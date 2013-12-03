@@ -1,6 +1,6 @@
 package org.obolibrary.obo2owl;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,9 +8,11 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
@@ -35,7 +37,10 @@ public class EquivalentToTest extends OboFormatTestBasics {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ERROR);		
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.SEVERE);
+        }
 	}
 	
 	@Test

@@ -6,9 +6,11 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
@@ -33,7 +35,10 @@ public class RoundTripOWLROTest extends RoundTripTest {
 	 */
 	@Test
 	public void testRoundTrip() throws Exception {
-		Logger.getRootLogger().setLevel(Level.DEBUG);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.WARNING);
+        }
 		
 		OWLOntology oo1 = parseOWLFile("ro.owl");
 		OBODoc oboDoc1 = convert(oo1);

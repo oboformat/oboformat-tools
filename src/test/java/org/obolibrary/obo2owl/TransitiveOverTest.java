@@ -4,9 +4,11 @@ import static junit.framework.Assert.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
@@ -27,7 +29,10 @@ public class TransitiveOverTest extends RoundTripTest  {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.SEVERE);
+        }
 	}
 	
 	@Test

@@ -1,7 +1,10 @@
 package org.obolibrary.obo2owl;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.junit.Test;
 
 public class RoundTripUberonTest extends RoundTripTest {
@@ -20,7 +23,10 @@ public class RoundTripUberonTest extends RoundTripTest {
 	 */
 	@Test
 	public void testRoundTripUberonEditVersion() throws Exception {
-		Logger.getRootLogger().setLevel(Level.WARN);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.WARNING);
+        }
 		roundTripOBOURL("https://github.com/cmungall/uberon/blob/master/uberon_edit.obo?raw=true", true);		
 	}
 	

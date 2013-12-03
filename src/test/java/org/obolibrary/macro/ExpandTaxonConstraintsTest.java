@@ -1,9 +1,12 @@
 package org.obolibrary.macro;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.obo2owl.RoundTripTest;
@@ -31,7 +34,10 @@ public class ExpandTaxonConstraintsTest extends RoundTripTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ALL);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.ALL);
+        }
 	}
 	
 	@Test
@@ -45,7 +51,7 @@ public class ExpandTaxonConstraintsTest extends RoundTripTest {
 	
 		int n=0;
 		for (OWLDisjointClassesAxiom dca : outputOntology.getAxioms(AxiomType.DISJOINT_CLASSES)) {
-			Logger.getRootLogger().info(dca);
+            Logger.getAnonymousLogger().log(Level.INFO, dca.toString());
 			n++;
 		}
 		System.out.println("Disjoint class axioms: "+n);

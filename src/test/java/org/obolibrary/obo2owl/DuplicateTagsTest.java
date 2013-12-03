@@ -1,12 +1,14 @@
 package org.obolibrary.obo2owl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
@@ -16,7 +18,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 public class DuplicateTagsTest extends OboFormatTestBasics {
 	
 	static {
-		Logger.getRootLogger().setLevel(Level.INFO);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.INFO);
+        }
 	}
 
 	@Test

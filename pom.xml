@@ -44,8 +44,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -121,7 +121,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.11</version>
 				<configuration>
-					<argLine>-Xmx1024M</argLine>
+					<argLine>-Xmx1024M -Djava.util.logging.config.file=oboformatlogging.properties</argLine>
 					<excludes>
 						<exclude>**/CHEBITest.java</exclude>
 						<exclude>**/RoundTripFlyAnatomyTest.java</exclude>
@@ -154,32 +154,9 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.15</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>mail</artifactId>
-					<groupId>javax.mail</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jms</artifactId>
-					<groupId>javax.jms</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jmxtools</artifactId>
-					<groupId>com.sun.jdmk</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jmxri</artifactId>
-					<groupId>com.sun.jmx</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
-			<version>3.4.8</version>
+			<version>3.4.10-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

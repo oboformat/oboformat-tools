@@ -1,12 +1,14 @@
 package org.obolibrary.obo2owl;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -17,7 +19,10 @@ public class Owl2OboTest extends OboFormatTestBasics {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.SEVERE);
+        }
 	}
 	
 	@Test
@@ -39,50 +44,50 @@ public class Owl2OboTest extends OboFormatTestBasics {
 
 		convert(ontology);
 
-		String ontId = Owl2Obo.getOntologyId(ontology);
+		String ontId = OWLAPIOwl2Obo.getOntologyId(ontology);
 
 		assertTrue("test".equals(ontId));
 
 		IRI iri = IRI.create("http://purl.obolibrary.org/obo/OBI_0000306");
-		String id = Owl2Obo.getIdentifier(iri);
+		String id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("OBI:0000306".endsWith(id));
 
 		if (false) {
 			// TODO
 
 			iri = 	IRI.create("http://purl.org/obo/owl/NCBITaxon#NCBITaxon_5794");
-			id = Owl2Obo.getIdentifier(iri);
+			id = OWLAPIOwl2Obo.getIdentifier(iri);
 			System.out.println("tax id = "+id);
 			assertTrue("http://purl.org/obo/owl/NCBITaxon#NCBITaxon_5794".equals(id));
 		}
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/IAO_0000119");
-		id = Owl2Obo.getIdentifier(iri);
+		id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("IAO:0000119".equals(id));
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/caro_part_of");
-		id = Owl2Obo.getIdentifier(iri);
+		id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("http://purl.obolibrary.org/obo/caro_part_of".equals(id));
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/MyOnt#_part_of");
-		id = Owl2Obo.getIdentifier(iri);
+		id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("MyOnt:part_of".equals(id));
 
 
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/MyOnt#termid");
-		id = Owl2Obo.getIdentifier(iri);
+		id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("termid".equals(id));
 		
 		// unprefixed IDs from different ontology
 		iri = 	IRI.create("http://purl.obolibrary.org/obo/MyOnt#termid");
-		id = Owl2Obo.getIdentifier(iri, ontology);
+		id = OWLAPIOwl2Obo.getIdentifier(iri, ontology);
 		System.out.println(id);
 		//assertTrue("http://purl.obolibrary.org/obo/MyOnt#termid".equals(id));
 
 
 
 		iri =   IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty");
-		id = Owl2Obo.getIdentifier(iri);
+		id = OWLAPIOwl2Obo.getIdentifier(iri);
 		assertTrue("owl:topObjectProperty".equals(id));		
 
 	}

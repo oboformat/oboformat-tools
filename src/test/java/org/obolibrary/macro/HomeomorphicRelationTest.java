@@ -1,9 +1,12 @@
 package org.obolibrary.macro;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,7 +20,10 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
 
 	@BeforeClass
 	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ALL);
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.ALL);
+        }
 	}
 	
 	@Test
