@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLEntity;
 
 /**
  * 
@@ -67,7 +68,7 @@ public class Obo2OWLConstants {
 		Obo2OWLVocabulary(String namespce, String shortName, String label, String mappedTag){
 			iri = IRI.create(namespce + shortName);
 			this.shortName = shortName;
-			this.namespace = namespce;
+			namespace = namespce;
 			this.label = label;
 			this.mappedTag = mappedTag;
 		}
@@ -85,12 +86,24 @@ public class Obo2OWLConstants {
 		}
 		
 		public String getLabel(){
-			return this.label;
+			return label;
 		}
 		
 		public String getMappedTag(){
-			return this.mappedTag;
+			return mappedTag;
 		}
+
+        /** @param e
+         *            entity to check
+         * @return true if e has the same iri as the enum value, false if e is
+         *         null or has a different iri */
+        public boolean sameIRI(OWLEntity e) {
+            // if a null value is passed in, then no match
+            if (e == null) {
+                return false;
+            }
+            return iri.equals(e.getIRI());
+        }
 	}
 	
 	private static Hashtable<String, Obo2OWLVocabulary> tagsToVocab;
