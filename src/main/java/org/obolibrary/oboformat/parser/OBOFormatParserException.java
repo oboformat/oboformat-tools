@@ -1,6 +1,5 @@
 package org.obolibrary.oboformat.parser;
 
-
 /** The Class OBOFormatParserException. */
 public class OBOFormatParserException extends OBOFormatException {
     // generated

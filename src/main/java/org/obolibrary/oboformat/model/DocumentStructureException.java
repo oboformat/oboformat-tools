@@ -2,7 +2,6 @@ package org.obolibrary.oboformat.model;
 
 import java.io.IOException;
 
-
 /** The Class DocumentStructureException. */
 public class DocumentStructureException extends IOException {
     // generated

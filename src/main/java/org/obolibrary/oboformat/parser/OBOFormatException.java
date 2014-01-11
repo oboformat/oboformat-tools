@@ -2,7 +2,6 @@ package org.obolibrary.oboformat.parser;
 
 import org.semanticweb.owlapi.io.OWLParserException;
 
-
 /** The Class OBOFormatException. */
 public class OBOFormatException extends OWLParserException {
     // generated

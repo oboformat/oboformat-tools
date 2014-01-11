@@ -1,6 +1,5 @@
 package org.obolibrary.oboformat.parser;
 
-
 /** The Class InvalidXrefMapException. */
 public class InvalidXrefMapException extends OBOFormatException {
     // generated

@@ -10,8 +10,8 @@ import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
-import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
+import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 
 public class TagTest extends OboFormatTestBasics {
@@ -141,8 +141,7 @@ public class TagTest extends OboFormatTestBasics {
 		p.setReader(br);
 		
 		try {
-			Clause cl = new Clause();
-			p.parseTermFrameClause(cl);
+            Clause cl = p.parseTermFrameClause();
 			return cl;
 		} catch (OBOFormatParserException e) {
 			fail(e.getMessage());
