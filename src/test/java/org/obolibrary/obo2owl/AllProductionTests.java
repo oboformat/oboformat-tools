@@ -67,6 +67,7 @@ import org.obolibrary.oboformat.writer.TypeDefCommentsTest;
 	
 	// owl2obo
 	UntranslatableAxiomsInHeaderTest.class,
+	Owl2OboAnnotationPropertyTest.class,
 	
 	// oboformat tests
 	CAROTest.class,
