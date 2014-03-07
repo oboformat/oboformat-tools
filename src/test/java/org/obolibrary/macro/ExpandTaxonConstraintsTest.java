@@ -29,36 +29,31 @@ relationship: never_in_taxon NCBITaxon:554915 {id="GOTAX:0000504", source="PMID:
 	
  * 
  */
-
 public class ExpandTaxonConstraintsTest extends RoundTripTest {
 
-	@BeforeClass
-	public static void beforeClass() {
+    @BeforeClass
+    public static void beforeClass() {
         Logger log = LogManager.getLogManager().getLogger("");
         for (Handler h : log.getHandlers()) {
             h.setLevel(Level.ALL);
         }
-	}
-	
-	@Test
-	public void testExpand() throws Exception {
-		OWLOntology ontology = convert(parseOBOFile("taxon_constraints.obo"));
+    }
 
-		OWLDataFactory df = ontology.getOWLOntologyManager().getOWLDataFactory();
-	
-		MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
-		OWLOntology outputOntology = mev.expandAll();
-	
-		int n=0;
-		for (OWLDisjointClassesAxiom dca : outputOntology.getAxioms(AxiomType.DISJOINT_CLASSES)) {
+    @Test
+    public void testExpand() throws Exception {
+        OWLOntology ontology = convert(parseOBOFile("taxon_constraints.obo"));
+        OWLDataFactory df = ontology.getOWLOntologyManager()
+                .getOWLDataFactory();
+        MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
+        OWLOntology outputOntology = mev.expandAll();
+        int n = 0;
+        for (OWLDisjointClassesAxiom dca : outputOntology
+                .getAxioms(AxiomType.DISJOINT_CLASSES)) {
             Logger.getAnonymousLogger().log(Level.INFO, dca.toString());
-			n++;
-		}
-		System.out.println("Disjoint class axioms: "+n);
-		assertTrue(n > 0);
-		
-		//writeOWL(ontology, "expanded-taxon-constraints.owl");
-
-		
-	}
+            n++;
+        }
+        System.out.println("Disjoint class axioms: " + n);
+        assertTrue(n > 0);
+        // writeOWL(ontology, "expanded-taxon-constraints.owl");
+    }
 }

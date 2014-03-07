@@ -8,10 +8,9 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 public class RoundTripSynonymtypedefTest extends RoundTripTest {
 
-	@Test
-	public void testRoundTripST() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		//roundTripOBOFile("synonymtypedef_test.obo", true);		
-	}
-	
-	
+    @Test
+    public void testRoundTripST() throws IOException,
+            OWLOntologyCreationException, OWLOntologyStorageException {
+        // roundTripOBOFile("synonymtypedef_test.obo", true);
+    }
 }

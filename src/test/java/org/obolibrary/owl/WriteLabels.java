@@ -9,16 +9,17 @@ import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
- * Example for how-to use the LabelFunctionalSyntax to serialize an ontology. 
+ * Example for how-to use the LabelFunctionalSyntax to serialize an ontology.
  */
 public class WriteLabels {
 
-	public static void main(String[] args) throws Exception {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-	    manager.addOntologyStorer(new LabelFunctionalSyntaxOntologyStorer());
-	    OWLOntology ontology = manager.loadOntology(IRI.create("http://purl.obolibrary.org/obo/tao.owl"));
-	    OWLOntologyFormat format = new LabelFunctionalFormat();
-	    manager.saveOntology(ontology, format, IRI.create(new File("out/tao-labels.ofn")));
-	}
-
+    public static void main(String[] args) throws Exception {
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        manager.addOntologyStorer(new LabelFunctionalSyntaxOntologyStorer());
+        OWLOntology ontology = manager.loadOntology(IRI
+                .create("http://purl.obolibrary.org/obo/tao.owl"));
+        OWLOntologyFormat format = new LabelFunctionalFormat();
+        manager.saveOntology(ontology, format,
+                IRI.create(new File("out/tao-labels.ofn")));
+    }
 }

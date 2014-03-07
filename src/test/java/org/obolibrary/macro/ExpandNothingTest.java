@@ -17,28 +17,26 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 public class ExpandNothingTest extends OboFormatTestBasics {
 
-	@BeforeClass
-	public static void beforeClass() {
+    @BeforeClass
+    public static void beforeClass() {
         Logger log = LogManager.getLogManager().getLogger("");
         for (Handler h : log.getHandlers()) {
             h.setLevel(Level.ALL);
         }
-	}
-	
-	@Test
-	public void testExpand() throws Exception {
-		OWLOntology ontology = convert(parseOBOFile("nothing_expansion_test.obo"));
+    }
 
+    @Test
+    public void testExpand() throws Exception {
+        OWLOntology ontology = convert(parseOBOFile("nothing_expansion_test.obo"));
         MacroExpansionGCIVisitor mev = new MacroExpansionGCIVisitor(ontology,
                 OWLManager.createOWLOntologyManager());
-		OWLOntology gciOntology = mev.createGCIOntology();
-		int axiomCount = gciOntology.getAxiomCount();
-		assertTrue(axiomCount > 0);
-		
-		Set<OWLAxiom> axioms = gciOntology.getAxioms();
-		for (OWLAxiom axiom : axioms) {
-			System.out.println(axiom);
-			// TODO - do actual tests
-		}
-	}
+        OWLOntology gciOntology = mev.createGCIOntology();
+        int axiomCount = gciOntology.getAxiomCount();
+        assertTrue(axiomCount > 0);
+        Set<OWLAxiom> axioms = gciOntology.getAxioms();
+        for (OWLAxiom axiom : axioms) {
+            System.out.println(axiom);
+            // TODO - do actual tests
+        }
+    }
 }

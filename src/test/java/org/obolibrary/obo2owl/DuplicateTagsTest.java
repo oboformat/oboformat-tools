@@ -16,35 +16,29 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 public class DuplicateTagsTest extends OboFormatTestBasics {
-	
-	static {
+
+    static {
         Logger log = LogManager.getLogManager().getLogger("");
         for (Handler h : log.getHandlers()) {
             h.setLevel(Level.INFO);
         }
-	}
+    }
 
-	@Test
-	public void test() throws Exception {
-		
-		OWLOntology owl = parseOWLFile("duplicate-def.ofn");
-		final List<Clause> duplicates = new ArrayList<Clause>(); 
-		
-		Owl2Obo owl2Obo = new Owl2Obo() {
+    @Test
+    public void test() throws Exception {
+        OWLOntology owl = parseOWLFile("duplicate-def.ofn");
+        final List<Clause> duplicates = new ArrayList<Clause>();
+        Owl2Obo owl2Obo = new Owl2Obo() {
 
-			@Override
-			protected boolean handleDuplicateClause(Frame frame, Clause clause) {
-				duplicates.add(clause);
-				return super.handleDuplicateClause(frame, clause);
-			}
-			
-		};
-		OBODoc convert = owl2Obo.convert(owl);
-		
-		assertEquals(1, duplicates.size());
-		
-		// test that no exception is thrown during write.
-		renderOboToString(convert);
-	}
-
+            @Override
+            protected boolean handleDuplicateClause(Frame frame, Clause clause) {
+                duplicates.add(clause);
+                return super.handleDuplicateClause(frame, clause);
+            }
+        };
+        OBODoc convert = owl2Obo.convert(owl);
+        assertEquals(1, duplicates.size());
+        // test that no exception is thrown during write.
+        renderOboToString(convert);
+    }
 }
