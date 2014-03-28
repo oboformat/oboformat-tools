@@ -838,7 +838,14 @@ public class Owl2Obo {
 		for(OWLAnnotation aan: qualifiers){
 			String propId = owlObjectToTag(aan.getProperty());
 			if(OboFormatTag.TAG_XREF.getTag().equals(propId)){
-				String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
+				OWLAnnotationValue v = aan.getValue();
+				String xrefValue;
+				if (v instanceof IRI) {
+					xrefValue = ((IRI) v).toString();
+				}
+				else {
+					xrefValue = ((OWLLiteral) v).getLiteral();
+				}
 				Xref xref = new Xref(xrefValue);
 				clause.addXref(xref);
 				unprocessedQualifiers.remove(aan);
