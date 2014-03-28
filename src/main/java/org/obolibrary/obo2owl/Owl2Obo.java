@@ -714,21 +714,27 @@ public class Owl2Obo {
 	private boolean tr(OWLAnnotationProperty prop, OWLAnnotationValue annVal, Set<OWLAnnotation> qualifiers, Frame frame) {
 
 		String tagString = owlObjectToTag(prop);
+
+		OboFormatTag tag = null;
+		if (tagString != null)
+			tag = OBOFormatConstants.getTag(tagString);
 		
-		if (tagString == null) {
-			// still unknown render as property value
+		if (tag == null) {
+			// annotation property does not correspond to a mapping to a tag in the OBO syntax -
+			// use the property_value tag
+
 			return trGenericPropertyValue(prop, annVal, qualifiers, frame);
 		}
 
 		String value = getValue(annVal, tagString);
-		OboFormatTag tag = OBOFormatConstants.getTag(tagString);
 		if(tag == null){
+			// TODO - check - is this ever called? 
 			Clause clause = new Clause(OboFormatTag.TAG_PROPERTY_VALUE);
 			String propId = this.getIdentifier(prop);
 			addQualifiers(clause, qualifiers);
 			if (propId.equals("shorthand") == false) {
 				clause.addValue(propId);
-				clause.addValue(value);
+				clause.addValue(value); // TODO - xsd types
 				frame.addClause(clause);
 			}
 		}
@@ -758,7 +764,15 @@ public class Owl2Obo {
 				for(OWLAnnotation aan: qualifiers){
 					String propId = owlObjectToTag(aan.getProperty());
 					if("xref".equals(propId)){
-						String xrefValue = ((OWLLiteral) aan.getValue()).getLiteral();
+						OWLAnnotationValue v = aan.getValue();
+						String xrefValue;
+						if (v instanceof IRI) {
+							xrefValue = ((IRI) v).toString();
+						}
+						else {
+							xrefValue = ((OWLLiteral) v).getLiteral();
+						}
+						
 						Xref xref = new Xref(xrefValue);
 						clause.addXref(xref);
 						unprocessedQualifiers.remove(aan);
