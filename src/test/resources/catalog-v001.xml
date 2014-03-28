@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
-        <uri id="Automatically generated entry, Timestamp=1326403071687" name="http://purl.obolibrary.org/obo/CARO.owl" uri="caro_2_merged.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1326403071687" name="http://purl.obolibrary.org/obo/FUNCARO.owl" uri="dangling_restriction_test.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1326403071687" name="http://purl.obolibrary.org/obo/ro.owl" uri="ro.owl"/>
-        <uri id="Automatically generated entry, Timestamp=1326403071687" name="http://purl.obolibrary.org/obo/uberon.owl" uri="dangling_owl2_obo_test.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/CARO.owl" uri="caro_2_merged.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/FUNCARO.owl" uri="dangling_restriction_test.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/obi.owl" uri="obi.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/ro.owl" uri="ro.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="duplicate:http://purl.obolibrary.org/obo/test.owl" uri="synonymtypedef_test.obo.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="duplicate:http://purl.obolibrary.org/obo/test.owl" uri="test.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/test1.owl" uri="untranslatable_axioms2.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/uberon.owl" uri="dangling_owl2_obo_test.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1372815686661" name="http://purl.obolibrary.org/obo/ut.owl" uri="untranslatable_axioms.owl"/>
     </group>
 </catalog>

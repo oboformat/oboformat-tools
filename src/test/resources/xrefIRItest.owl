@@ -68,7 +68,14 @@
         <oboInOwl:id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">FOO:1</oboInOwl:id>
         <oboInOwl:hasDbXref rdf:resource="http://en.wikipedia.org/wiki/Foo"/>
         <obo:IAO_0000115 rdf:datatype="http://www.w3.org/2001/XMLSchema#string">foo foo foo</obo:IAO_0000115>
+        <oboInOwl:hasExactSynonym rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bar bar</oboInOwl:hasExactSynonym>
     </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedTarget rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bar bar</owl:annotatedTarget>
+        <oboInOwl:hasDbXref rdf:resource="http://www.ncbi.nlm.nih.gov/pubmed/1234"/>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/FOO_1"/>
+        <owl:annotatedProperty rdf:resource="http://www.geneontology.org/formats/oboInOwl#hasExactSynonym"/>
+    </owl:Axiom>
     <owl:Axiom>
         <oboInOwl:hasDbXref rdf:resource="http://www.ncbi.nlm.nih.gov/pubmed/1234"/>
         <owl:annotatedTarget rdf:datatype="http://www.w3.org/2001/XMLSchema#string">foo foo foo</owl:annotatedTarget>
