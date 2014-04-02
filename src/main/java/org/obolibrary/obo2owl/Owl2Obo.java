@@ -719,7 +719,7 @@ public class Owl2Obo {
 		if (tagString != null)
 			tag = OBOFormatConstants.getTag(tagString);
 		
-		if (tag == null) {
+		if (tagString == null) {
 			// annotation property does not correspond to a mapping to a tag in the OBO syntax -
 			// use the property_value tag
 
