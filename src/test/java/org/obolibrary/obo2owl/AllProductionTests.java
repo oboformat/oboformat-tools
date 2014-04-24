@@ -56,6 +56,7 @@ import org.obolibrary.oboformat.writer.TypeDefCommentsTest;
 	RoundTripTrailingQualifiers.class,
 	RoundTripCardinality.class,
 	RoundTripOBITest.class,
+	RoundTripRelationshipVsProperty.class,
 	//SBOTest.class,
 	SubsetTest.class,
 	SynonymTest.class,
