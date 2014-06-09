@@ -718,7 +718,7 @@ public class OWLAPIOwl2Obo {
             tag = OBOFormatConstants.getTag(tagString);
         }
         if (tag == null) {
-            if (annVal instanceof IRI) {
+            if (annVal instanceof IRI && FrameType.TERM.equals(frame.getType())) {
                 if (isMetadataTag(prop)) {
                     String propId = this.getIdentifier(prop);
                     if (propId != null) {
