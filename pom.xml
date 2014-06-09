@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bbop</groupId>
 	<artifactId>oboformat</artifactId>
-	<version>0.5.5-SNAPSHOT</version>
+	<version>0.5.5</version>
 	<packaging>jar</packaging>
 	<name>oboformat</name>
 	<url>http://code.google.com/p/oboformat/</url>
@@ -156,7 +156,7 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-apibinding</artifactId>
-			<version>3.4.10-SNAPSHOT</version>
+			<version>3.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
