@@ -1,6 +1,6 @@
 package org.obolibrary.obo2owl;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.Collection;

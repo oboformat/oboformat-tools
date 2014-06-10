@@ -1,6 +1,6 @@
 package org.obolibrary.macro;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;

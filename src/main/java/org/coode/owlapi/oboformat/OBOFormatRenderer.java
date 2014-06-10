@@ -10,7 +10,6 @@ import org.obolibrary.obo2owl.OWLAPIOwl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.io.OWLRenderer;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -19,8 +18,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 public class OBOFormatRenderer implements OWLRenderer {
 
     @Override
-    public void setOWLOntologyManager(OWLOntologyManager owlOntologyManager)
-            throws OWLException {}
+    public void setOWLOntologyManager(OWLOntologyManager owlOntologyManager) {}
 
     @Override
     public void render(OWLOntology ontology, OutputStream os)

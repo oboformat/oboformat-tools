@@ -1,6 +1,6 @@
 package org.obolibrary.obo2owl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,8 +15,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import org.obolibrary.obo2owl.Obo2Owl;
-import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
@@ -102,15 +100,13 @@ public class OboFormatTestBasics {
     }
 
     protected OWLOntology convert(OBODoc obodoc, String filename)
-            throws OWLOntologyCreationException, OWLOntologyStorageException,
-            IOException {
+            throws OWLOntologyCreationException, OWLOntologyStorageException {
         OWLOntology ontology = convert(obodoc);
         writeOWL(ontology, filename);
         return ontology;
     }
 
-    protected OBODoc convert(OWLOntology ontology)
-            throws OWLOntologyCreationException {
+    protected OBODoc convert(OWLOntology ontology) {
         Owl2Obo bridge = new Owl2Obo();
         OBODoc doc = bridge.convert(ontology);
         return doc;

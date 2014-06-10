@@ -20,7 +20,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyLoaderConfiguration;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.UnloadableImportException;
 
 /** oboformat parser */
 public class OBOFormatOWLAPIParser implements OWLParser {
@@ -42,8 +41,7 @@ public class OBOFormatOWLAPIParser implements OWLParser {
 
     @Override
     public OWLOntologyFormat parse(IRI documentIRI, OWLOntology ontology)
-            throws OWLParserException, IOException, OWLOntologyChangeException,
-            UnloadableImportException {
+            throws OWLParserException, IOException, OWLOntologyChangeException {
         try {
             parse(documentIRI, null, ontology);
         } catch (OBOFormatParserException e) {
@@ -58,7 +56,7 @@ public class OBOFormatOWLAPIParser implements OWLParser {
     @Override
     public OWLOntologyFormat parse(OWLOntologyDocumentSource documentSource,
             OWLOntology ontology) throws OWLParserException, IOException,
-            OWLOntologyChangeException, UnloadableImportException {
+            OWLOntologyChangeException {
         try {
             parse(null, documentSource, ontology);
         } catch (OBOFormatParserException e) {
@@ -73,8 +71,7 @@ public class OBOFormatOWLAPIParser implements OWLParser {
     @Override
     public OWLOntologyFormat parse(OWLOntologyDocumentSource documentSource,
             OWLOntology ontology, OWLOntologyLoaderConfiguration configuration)
-            throws OWLParserException, IOException, OWLOntologyChangeException,
-            UnloadableImportException {
+            throws OWLParserException, IOException, OWLOntologyChangeException {
         try {
             parse(null, documentSource, ontology);
         } catch (OBOFormatParserException e) {

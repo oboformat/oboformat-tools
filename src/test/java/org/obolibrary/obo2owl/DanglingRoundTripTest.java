@@ -1,9 +1,8 @@
 package org.obolibrary.obo2owl;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.OBODoc;
