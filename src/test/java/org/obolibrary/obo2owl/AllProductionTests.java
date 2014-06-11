@@ -3,6 +3,7 @@ package org.obolibrary.obo2owl;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+@SuppressWarnings("javadoc")
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         // obo2owl tests

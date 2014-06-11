@@ -23,6 +23,7 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
  */
 public class ExportLabelsAsOWL {
 
+    @SuppressWarnings("javadoc")
     public static void main(String[] args) throws Exception {
         // *** obo to owl ***
         // create a parser object and get an OBO Document (first arg)

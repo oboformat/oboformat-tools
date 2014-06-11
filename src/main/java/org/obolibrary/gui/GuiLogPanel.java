@@ -25,6 +25,7 @@ public class GuiLogPanel extends SizedJPanel {
     private final BlockingQueue<String> logQueue;
     private Thread thread = new Thread() {
 
+        @Override
         public void run() {
             while (true) {
                 appendToLogPanel();

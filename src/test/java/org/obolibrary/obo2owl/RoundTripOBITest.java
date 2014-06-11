@@ -12,6 +12,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+@SuppressWarnings("javadoc")
 public class RoundTripOBITest extends RoundTripTest {
 
     @Test

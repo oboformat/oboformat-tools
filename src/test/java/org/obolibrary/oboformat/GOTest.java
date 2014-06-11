@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.OBODoc;
 
+@SuppressWarnings("javadoc")
 public class GOTest extends OboFormatTestBasics {
 
     @Test

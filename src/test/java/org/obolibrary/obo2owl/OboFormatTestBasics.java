@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+@SuppressWarnings("javadoc")
 public class OboFormatTestBasics {
 
     private final static File systemTempDir = new File(
@@ -100,15 +101,13 @@ public class OboFormatTestBasics {
     }
 
     protected OWLOntology convert(OBODoc obodoc, String filename)
-            throws OWLOntologyCreationException, OWLOntologyStorageException,
-            IOException {
+            throws OWLOntologyCreationException, OWLOntologyStorageException {
         OWLOntology ontology = convert(obodoc);
         writeOWL(ontology, filename);
         return ontology;
     }
 
-    protected OBODoc convert(OWLOntology ontology)
-            throws OWLOntologyCreationException {
+    protected OBODoc convert(OWLOntology ontology) {
         Owl2Obo bridge = new Owl2Obo();
         OBODoc doc = bridge.convert(ontology);
         return doc;

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
+@SuppressWarnings("javadoc")
 public class RoundTripUberonTest extends RoundTripTest {
 
     /**

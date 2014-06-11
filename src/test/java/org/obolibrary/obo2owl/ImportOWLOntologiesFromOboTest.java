@@ -27,6 +27,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
  * 
  * @author cjm
  */
+@SuppressWarnings("javadoc")
 public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
 
     private static final boolean useSystemOut = false;

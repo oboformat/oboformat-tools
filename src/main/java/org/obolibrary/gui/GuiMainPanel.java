@@ -1,7 +1,6 @@
 package org.obolibrary.gui;
 
-import static org.obolibrary.gui.GuiTools.addRowGap;
-import static org.obolibrary.gui.GuiTools.createTextField;
+import static org.obolibrary.gui.GuiTools.*;
 
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -97,6 +96,7 @@ public class GuiMainPanel extends SizedJPanel {
         // add listener for adding a file to the list model
         fileDialogAddButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.show();
                 String selected = dialog.getSelectedCanonicalPath();
@@ -126,6 +126,7 @@ public class GuiMainPanel extends SizedJPanel {
         // add listener for selecting an output file name
         fileButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 fileDialog.show();
                 String selected = fileDialog.getSelectedCanonicalPath();
@@ -158,6 +159,7 @@ public class GuiMainPanel extends SizedJPanel {
         obo2owlButton.setSelected(isObo2Owl);
         obo2owlButton.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 GuiAdvancedDirectionSpecificPanel panel = frame
                         .getSpecificAdvancedPanel();

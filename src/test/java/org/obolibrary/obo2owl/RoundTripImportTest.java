@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
+@SuppressWarnings("javadoc")
 public class RoundTripImportTest extends RoundTripTest {
 
     @Test

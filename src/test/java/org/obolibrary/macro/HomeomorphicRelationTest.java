@@ -16,6 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+@SuppressWarnings("javadoc")
 public class HomeomorphicRelationTest extends OboFormatTestBasics {
 
     @BeforeClass
@@ -36,6 +37,7 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
         return convert(parseOBOFile(fn), fn);
     }
 
+    @Override
     protected OWLOntology convert(OBODoc obodoc, String fn)
             throws OWLOntologyCreationException, OWLOntologyStorageException {
         OWLOntology ontology = convert(obodoc);

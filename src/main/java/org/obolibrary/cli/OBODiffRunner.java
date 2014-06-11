@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
 import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.macro.MacroExpansionVisitor;
-import org.obolibrary.obo2owl.Obo2Owl;
+import org.obolibrary.obo2owl.OWLAPIObo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.diff.Diff;
 import org.obolibrary.oboformat.diff.OBODocDiffer;
@@ -212,9 +212,15 @@ public class OBODiffRunner {
      * metadata file
      * 
      * @param dir
+     *        folder
      * @param config
+     *        configuration
      * @param logger
+     *        logger
+     * @param manager
+     *        ontology manager
      * @throws IOException
+     *         if the ontology files cannot be open
      */
     protected static void buildAllOboOwlFiles(String dir,
             OBORunnerConfiguration config, Logger logger,
@@ -244,7 +250,7 @@ public class OBODiffRunner {
                         fails.add(ont);
                         continue;
                     }
-                    Obo2Owl.convertURL(url, getURI(dir + "/" + ontId + ".owl"),
+                    OWLAPIObo2Owl.convertURL(url, getURI(dir + "/" + ontId + ".owl"),
                             ontId, manager);
                     long totalTime = System.nanoTime() - initTime;
                     showMemory(); // useless
@@ -340,7 +346,7 @@ public class OBODiffRunner {
     private static void addVersion(OWLOntology ontology, String version,
             OWLOntologyManager manager) {
         OWLDataFactory fac = manager.getOWLDataFactory();
-        OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(Obo2Owl
+        OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(OWLAPIObo2Owl
                 .trTagToIRI(OboFormatTag.TAG_REMARK.getTag()));
         OWLAnnotation ann = fac
                 .getOWLAnnotation(ap, fac.getOWLLiteral(version));

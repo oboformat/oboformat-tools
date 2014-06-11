@@ -9,6 +9,7 @@ import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyFormat;
 
+@SuppressWarnings("javadoc")
 public class OBORunnerConfigCLIReaderTest {
 
     @Test

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+@SuppressWarnings("javadoc")
 public class FlyXPTest extends OboFormatTestBasics {
 
     @Test

@@ -2,6 +2,7 @@ package org.obolibrary.obo2owl;
 
 import org.junit.Test;
 
+@SuppressWarnings("javadoc")
 public class RoundTripPROTest extends RoundTripTest {
 
     @Test

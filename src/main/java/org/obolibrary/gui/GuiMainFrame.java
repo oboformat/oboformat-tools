@@ -64,8 +64,8 @@ public class GuiMainFrame extends JFrame {
     private void initialize() {
         this.setSize(800, 500);
         // put the all panel in a scrollpane
-        this.setContentPane(new JScrollPane(getAllPanel()));
-        this.setTitle("OBOFormatConverter");
+        setContentPane(new JScrollPane(getAllPanel()));
+        setTitle("OBOFormatConverter");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
@@ -115,6 +115,7 @@ public class GuiMainFrame extends JFrame {
         runButton = new JButton("Run Conversion");
         runButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 // update config
                 // continue only if the return value is true
@@ -123,6 +124,7 @@ public class GuiMainFrame extends JFrame {
                     tabbedPane.setSelectedComponent(logPanel);
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             // do work
                             executeConversion(config);

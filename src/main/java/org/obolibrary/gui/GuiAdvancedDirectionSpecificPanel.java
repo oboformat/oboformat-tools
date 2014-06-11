@@ -1,7 +1,6 @@
 package org.obolibrary.gui;
 
-import static org.obolibrary.gui.GuiTools.addRowGap;
-import static org.obolibrary.gui.GuiTools.createTextField;
+import static org.obolibrary.gui.GuiTools.*;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -45,11 +44,17 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
      * direction with the given default values.
      * 
      * @param allowDanglingDefault
+     *        initial value for allow dangling
      * @param expandMacrosDefault
+     *        initial value for expand macros
      * @param followImports
+     *        initial value for follow imports
      * @param defaultOntologyConfigValue
+     *        initial value for default ontology config
      * @param isObo2Owl
+     *        initial value for obo2owl
      * @param strictConversion
+     *        initial value for strict conversion
      */
     public GuiAdvancedDirectionSpecificPanel(boolean allowDanglingDefault,
             boolean expandMacrosDefault, boolean followImports,
@@ -100,6 +105,7 @@ public class GuiAdvancedDirectionSpecificPanel extends SizedJPanel {
      * Layout for the ontology format buttons.
      * 
      * @param pos
+     *        position helper
      */
     private void createOntologyFormatPanel(GBHelper pos) {
         JLabel label = new JLabel("OWL Format");

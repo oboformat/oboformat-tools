@@ -11,6 +11,7 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+@SuppressWarnings("javadoc")
 public class Owl2OboAnnotationPropertyTest extends OboFormatTestBasics {
 
     @Test

@@ -1,7 +1,6 @@
 package org.obolibrary.gui;
 
-import static org.obolibrary.gui.GuiTools.addRowGap;
-import static org.obolibrary.gui.GuiTools.createTextField;
+import static org.obolibrary.gui.GuiTools.*;
 
 import java.awt.Frame;
 import java.awt.GridBagLayout;
@@ -112,6 +111,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
         JButton selectButton = new JButton("Select");
         selectButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.show();
                 String selected = dialog.getSelectedCanonicalPath();
@@ -140,6 +140,7 @@ public class GuiAdvancedPanel extends SizedJPanel {
         final JScrollPane scrollPane = new JScrollPane(ontologyList);
         checkBox.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = checkBox.isSelected();
                 ontologyList.setEditable(selected);

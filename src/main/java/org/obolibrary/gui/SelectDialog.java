@@ -219,6 +219,7 @@ public abstract class SelectDialog {
             dialog.setDirectory(defaultFolder);
             dialog.setFilenameFilter(new FilenameFilter() {
 
+                @Override
                 public boolean accept(File dir, String name) {
                     // only show directories
                     return false;
@@ -280,10 +281,12 @@ public abstract class SelectDialog {
             }
         }
 
+        @Override
         public String getDescription() {
             return description;
         }
 
+        @Override
         public boolean accept(File f) {
             if (extensions == null) {
                 return true;
@@ -301,7 +304,7 @@ public abstract class SelectDialog {
             }
             return false;
         }
-    };
+    }
 
     /**
      * {@link FilenameFilter} for a given list of suffixes. If the list is
@@ -319,6 +322,7 @@ public abstract class SelectDialog {
             }
         }
 
+        @Override
         public boolean accept(File dir, String fileName) {
             if (extensions == null) {
                 return true;
@@ -332,7 +336,7 @@ public abstract class SelectDialog {
             }
             return false;
         }
-    };
+    }
 
     private static boolean isUnix() {
         String os = System.getProperty("os.name").toLowerCase();
