@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
 import org.obolibrary.macro.MacroExpansionGCIVisitor;
 import org.obolibrary.macro.MacroExpansionVisitor;
+import org.obolibrary.obo2owl.OWLAPIObo2Owl;
+import org.obolibrary.obo2owl.OWLAPIOwl2Obo;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.model.OBODoc;
@@ -108,7 +110,7 @@ public class OBORunner {
                 }
                 String gciFile = outFile;
                 String outputFile = outFile;
-                String ontologyId = Owl2Obo.getOntologyId(ontology);
+                String ontologyId = OWLAPIOwl2Obo.getOntologyId(ontology);
                 if (outputFile == null) {
                     gciFile = new File(config.outputdir.getValue(), ontologyId
                             + "-aux.owl").getAbsolutePath();
@@ -144,7 +146,7 @@ public class OBORunner {
                 OBODoc doc = bridge.convert(ontology);
                 String outputFilePath = outFile;
                 if (outFile == null) {
-                    outputFilePath = Owl2Obo.getOntologyId(ontology) + ".obo";
+                    outputFilePath = OWLAPIOwl2Obo.getOntologyId(ontology) + ".obo";
                 }
                 logger.info("saving to " + outputFilePath);
                 FileOutputStream os = new FileOutputStream(new File(
@@ -344,7 +346,7 @@ public class OBORunner {
                         fails.add(ont);
                         continue;
                     }
-                    Obo2Owl.convertURL(url, getURI(dir + "/" + ontId + ".owl"),
+                    OWLAPIObo2Owl.convertURL(url, getURI(dir + "/" + ontId + ".owl"),
                             ontId, manager);
                     long totalTime = System.nanoTime() - initTime;
                     showMemory(); // useless
@@ -412,11 +414,11 @@ public class OBORunner {
             if (tag.equals("namespace")) {
                 ns = parts[1];
             } else if (tag.equals("download")) {
-                if (parts[1] != "") {
+                if (!parts[1].isEmpty()) {
                     urlmap.put(ns, parts[1]);
                 }
             } else if (tag.equals("source")) {
-                if (parts[1] != "" && !urlmap.containsKey(ns)) {
+                if (!parts[1].isEmpty() && !urlmap.containsKey(ns)) {
                     urlmap.put(ns, parts[1]);
                 }
             } else if (tag.equals("is_obsolete")) {
@@ -440,7 +442,7 @@ public class OBORunner {
     private static void addVersion(OWLOntology ontology, String version,
             OWLOntologyManager manager) {
         OWLDataFactory fac = manager.getOWLDataFactory();
-        OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(Obo2Owl
+        OWLAnnotationProperty ap = fac.getOWLAnnotationProperty(OWLAPIObo2Owl
                 .trTagToIRI(OboFormatTag.TAG_REMARK.getTag()));
         OWLAnnotation ann = fac
                 .getOWLAnnotation(ap, fac.getOWLLiteral(version));

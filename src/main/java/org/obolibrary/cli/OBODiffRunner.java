@@ -322,7 +322,7 @@ public class OBODiffRunner {
                     urlmap.put(ns, parts[1]);
                 }
             } else if (tag.equals("source")) {
-                if (parts[1] != "" && !urlmap.containsKey(ns)) {
+                if (!parts[1].isEmpty() && !urlmap.containsKey(ns)) {
                     urlmap.put(ns, parts[1]);
                 }
             } else if (tag.equals("is_obsolete")) {
