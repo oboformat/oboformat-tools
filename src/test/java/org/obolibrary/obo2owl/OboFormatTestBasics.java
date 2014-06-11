@@ -100,13 +100,15 @@ public class OboFormatTestBasics {
     }
 
     protected OWLOntology convert(OBODoc obodoc, String filename)
-            throws OWLOntologyCreationException, OWLOntologyStorageException {
+            throws OWLOntologyCreationException, OWLOntologyStorageException,
+            IOException {
         OWLOntology ontology = convert(obodoc);
         writeOWL(ontology, filename);
         return ontology;
     }
 
-    protected OBODoc convert(OWLOntology ontology) {
+    protected OBODoc convert(OWLOntology ontology)
+            throws OWLOntologyCreationException {
         Owl2Obo bridge = new Owl2Obo();
         OBODoc doc = bridge.convert(ontology);
         return doc;

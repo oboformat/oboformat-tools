@@ -9,11 +9,11 @@ public class SBOTest extends OboFormatTestBasics {
 
     @Test
     public void testConvertXPs() throws Exception {
-        OWLOntology owlOnt = convertOBOFile("http://www.ebi.ac.uk/sbo/exports/Main/SBO_OBO.obo");
+        OWLOntology owlOnt = convertOBOFile("SBO_OBO.obo");
         assertNotNull(owlOnt);
     }
 
     private OWLOntology convertOBOFile(String fn) throws Exception {
-        return convert(parseOBOURL(fn), "cell");
+        return convert(parseOBOFile(fn), "cell");
     }
 }
