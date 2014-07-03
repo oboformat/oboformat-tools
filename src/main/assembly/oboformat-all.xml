@@ -28,5 +28,8 @@
 		<file>
 			<source>${project.build.outputDirectory}/log4j.properties</source>
 		</file>
+		<file>
+			<source>${project.build.outputDirectory}/oboformatlogging.properties</source>
+		</file>
 	</files>
 </assembly>
