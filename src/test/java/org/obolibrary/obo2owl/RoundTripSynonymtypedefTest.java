@@ -1,17 +1,12 @@
 package org.obolibrary.obo2owl;
 
-import java.io.IOException;
-
 import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+@SuppressWarnings("javadoc")
 public class RoundTripSynonymtypedefTest extends RoundTripTest {
 
-	@Test
-	public void testRoundTripST() throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		//roundTripOBOFile("synonymtypedef_test.obo", true);		
-	}
-	
-	
+    @Test
+    public void testRoundTripST() {
+        // roundTripOBOFile("synonymtypedef_test.obo", true);
+    }
 }

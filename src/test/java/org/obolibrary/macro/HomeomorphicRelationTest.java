@@ -1,9 +1,12 @@
 package org.obolibrary.macro;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,32 +16,34 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+@SuppressWarnings("javadoc")
 public class HomeomorphicRelationTest extends OboFormatTestBasics {
 
-	@BeforeClass
-	public static void beforeClass() {
-		Logger.getRootLogger().setLevel(Level.ALL);
-	}
-	
-	@Test
-	public void testExpand() throws Exception {
-		OWLOntology owlOnt = convertOBOFile("homrel.obo");
-		assertNotNull(owlOnt);
-	}
-	
-	private OWLOntology convertOBOFile(String fn) throws Exception {
-		return convert(parseOBOFile(fn), fn);
-	}
+    @BeforeClass
+    public static void beforeClass() {
+        Logger log = LogManager.getLogManager().getLogger("");
+        for (Handler h : log.getHandlers()) {
+            h.setLevel(Level.ALL);
+        }
+    }
 
-	protected OWLOntology convert(OBODoc obodoc, String fn) throws OWLOntologyCreationException, OWLOntologyStorageException {
-		OWLOntology ontology = convert(obodoc);
+    @Test
+    public void testExpand() throws Exception {
+        OWLOntology owlOnt = convertOBOFile("homrel.obo");
+        assertNotNull(owlOnt);
+    }
 
-		MacroExpansionVisitor mev = 
-			new MacroExpansionVisitor(ontology);
-		OWLOntology outputOntology = mev.expandAll();
-		
-		writeOWL(ontology, fn, new ManchesterOWLSyntaxOntologyFormat());
-		return outputOntology;
-	}
+    private OWLOntology convertOBOFile(String fn) throws Exception {
+        return convert(parseOBOFile(fn), fn);
+    }
 
+    @Override
+    protected OWLOntology convert(OBODoc obodoc, String fn)
+            throws OWLOntologyCreationException, OWLOntologyStorageException {
+        OWLOntology ontology = convert(obodoc);
+        MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
+        OWLOntology outputOntology = mev.expandAll();
+        writeOWL(ontology, fn, new ManchesterOWLSyntaxOntologyFormat());
+        return outputOntology;
+    }
 }

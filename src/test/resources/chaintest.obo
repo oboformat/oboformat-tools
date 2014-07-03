@@ -1,9 +1,0 @@
-[Typedef]
-id: directly_preceded_by
-holds_over_chain: has_start end_of
-
-[Typedef]
-id: has_start
-
-[Typedef]
-id: end_of
