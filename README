@@ -1,21 +1,29 @@
 ABOUT
 
-This is a java implementation of
+This is a wrapper for the Java (OWL-API) implementation of
 
 * A parser for OBOF1.4 syntax
 * An implementation of the OBOF1.4 mapping to OWL (uses the OWLAPI)
 
+Originally the project was a stand-alone Java project on googlecode.
+The main code to load, write and convert OBO to OWL is now part of 
+the OWL-API (version 3.5.x and later).
+
 GETTING THE CODE
 
-For now there are no releases; get the code via svn:
+  git clone https://github.com/oboformat/oboformat-tools.git
 
-  svn checkout http://oboformat.googlecode.com/svn/trunk/ oboformat-read-only
+BUILDING THE PROJECT
+
+  mvn clean package
+  
+  This maven command will create/update the required jar files to run the converter.. 
 
 RUNNING THE CONVERTER ON THE COMMAND LINE:
 
 You may find it helpful to add the bin dir to your path:
 
-  export PATH="$PATH:$HOME/oboformat-read-only/bin"
+  export PATH="$PATH:$HOME/oboformat-tools/bin"
 
 Convert a file like this:
 
@@ -37,9 +45,9 @@ Alternative syntaxes like this:
  
  	bin\obolib-obo2owl.bat -o test_resources\caro.owl test_resources\caro.obo  
 
-LIMITATIONS
+ISSUE TRACKER
 
-See
+See github issue tracker for the project
 
-http://code.google.com/p/oboformat/issues/list
+https://github.com/oboformat/oboformat-tools
 
