@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bbop</groupId>
-	<artifactId>oboformat</artifactId>
+	<artifactId>oboformat-tools</artifactId>
 	<version>0.6.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>oboformat</name>
+	<name>oboformat-tools</name>
 	<url>http://code.google.com/p/oboformat/</url>
-	<description>A java library for converting obo format documents to OWL, and for converting (a subset of) OWL to obo format.</description>
+	<description>Wrapper using the OWLAPI for handling oboformat, and converting (a subset of) OWL to obo format.</description>
 	<inceptionYear>2010</inceptionYear>
 	<scm>
 		<url>https://oboformat.googlecode.com/svn/trunk/</url>
