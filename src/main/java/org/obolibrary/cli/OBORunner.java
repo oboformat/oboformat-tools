@@ -32,8 +32,8 @@ import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.obolibrary.owl.LabelFunctionalFormat;
-import org.obolibrary.owl.LabelFunctionalSyntaxOntologyStorer;
+import org.obolibrary.owl.LabelFunctionalSyntaxStorer;
+import org.semanticweb.owlapi.formats.LabelFunctionalDocumentFormat;
 import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
@@ -125,8 +125,8 @@ public class OBORunner {
                         + " via " + format);
                 manager.saveOntology(ontology, format, outputStream);
                 if (config.writeLabelOWL.getValue()) {
-                    manager.addOntologyStorer(new LabelFunctionalSyntaxOntologyStorer());
-                    OWLOntologyFormat labelFormat = new LabelFunctionalFormat();
+                    manager.addOntologyStorer(new LabelFunctionalSyntaxStorer());
+                    OWLOntologyFormat labelFormat = new LabelFunctionalDocumentFormat();
                     IRI labelFile = IRI.create(new File(config.outputdir
                             .getValue(), ontologyId + ".ofn")
                             .getCanonicalFile());
@@ -226,7 +226,7 @@ public class OBORunner {
         if (option == ExpandMacrosModeOptions.GCI) {
             // create GCI ontology
             MacroExpansionGCIVisitor mevGCI = new MacroExpansionGCIVisitor(
-                    ontology, outputManager);
+                    ontology, outputManager, false);
             OWLOntology gciOntology = mevGCI.createGCIOntology();
             if (gciOntology.isEmpty()) {
                 // no macros expanded, do nothing

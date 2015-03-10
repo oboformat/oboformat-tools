@@ -103,10 +103,9 @@ public class OBODiffRunner {
         if (obodocs.size() > 2) {
             System.err.println("Max 2 docs!");
         }
-        OBODocDiffer dd = new OBODocDiffer();
         OBODoc obodoc1 = obodocs.get(0);
         OBODoc obodoc2 = obodocs.get(1);
-        List<Diff> diffs = dd.getDiffs(obodoc1, obodoc2);
+        List<Diff> diffs = OBODocDiffer.getDiffs(obodoc1, obodoc2);
         for (Diff diff : diffs) {
             System.out.println("MDiff=" + diff);
         }
@@ -124,7 +123,7 @@ public class OBODiffRunner {
         if (option == ExpandMacrosModeOptions.GCI) {
             // create GCI ontology
             MacroExpansionGCIVisitor mevGCI = new MacroExpansionGCIVisitor(
-                    ontology, outputManager);
+                    ontology, outputManager, false);
             OWLOntology gciOntology = mevGCI.createGCIOntology();
             if (gciOntology.isEmpty()) {
                 // no macros expanded, do nothing
