@@ -23,8 +23,7 @@ public class RoundTripOBITest extends RoundTripTest {
                 new Clause(OboFormatTag.TAG_FORMAT_VERSION, "1.2"));
         String oboString = renderOboToString(oboDoc);
         OBODoc parsedOboDoc = parseOboToString(oboString);
-        OBODocDiffer dd = new OBODocDiffer();
-        List<Diff> diffs = dd.getDiffs(oboDoc, parsedOboDoc);
+        List<Diff> diffs = OBODocDiffer.getDiffs(oboDoc, parsedOboDoc);
         for (Diff diff : diffs) {
             System.out.println(diff);
         }

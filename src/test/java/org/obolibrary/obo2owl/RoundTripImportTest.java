@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 @SuppressWarnings("javadoc")
@@ -33,7 +34,7 @@ public class RoundTripImportTest extends RoundTripTest {
                         "src/test/resources/import_test_imported.owl")));
         Obo2Owl bridge = new Obo2Owl();
         System.out.println("M=" + bridge.getManager());
-        bridge.getManager().addIRIMapper(iriMapper);
+        bridge.getManager().getIRIMappers().add(iriMapper);
         Collection<Clause> importClauses = obodoc.getHeaderFrame().getClauses(
                 OboFormatTag.TAG_IMPORT);
         assertEquals(1, importClauses.size());
@@ -41,10 +42,10 @@ public class RoundTripImportTest extends RoundTripTest {
         OWLOntology ontology = bridge.convert(obodoc);
         assertEquals(1, ontology.getImportsDeclarations().size());
         for (OWLSubClassOfAxiom a : ontology.getAxioms(AxiomType.SUBCLASS_OF,
-                true)) {
+                Imports.INCLUDED)) {
             System.out.println("A=" + a);
         }
-        assertEquals(2, ontology.getAxioms(AxiomType.SUBCLASS_OF, true).size());
+        assertEquals(2, ontology.getAxioms(AxiomType.SUBCLASS_OF, Imports.INCLUDED).size());
         // Convert back to obo
         OBODoc obodoc2 = convert(ontology);
         Collection<Clause> importClauses2 = obodoc2.getHeaderFrame()
@@ -65,8 +66,7 @@ public class RoundTripImportTest extends RoundTripTest {
             e.printStackTrace();
             fail("No IOExceptions allowed");
         }
-        OBODocDiffer dd = new OBODocDiffer();
-        List<Diff> diffs = dd.getDiffs(obodoc, obodoc2);
+        List<Diff> diffs = OBODocDiffer.getDiffs(obodoc, obodoc2);
         for (Diff diff : diffs) {
             System.out.println(diff);
         }

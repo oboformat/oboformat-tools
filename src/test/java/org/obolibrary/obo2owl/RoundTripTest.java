@@ -60,8 +60,7 @@ public class RoundTripTest extends OboFormatTestBasics {
             e.printStackTrace();
             fail("No IOExceptions allowed");
         }
-        OBODocDiffer dd = new OBODocDiffer();
-        List<Diff> diffs = dd.getDiffs(obodoc, obodoc2);
+        List<Diff> diffs = OBODocDiffer.getDiffs(obodoc, obodoc2);
         if (isExpectRoundtrip) {
             for (Diff diff : diffs) {
                 System.out.println(diff);

@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 
 @SuppressWarnings("javadoc")
 public class OBORunnerConfigCLIReaderTest {
@@ -39,8 +39,8 @@ public class OBORunnerConfigCLIReaderTest {
                 .readConfig(new String[] { "-o", "obi", "--to", "RDF" });
         assertTrue(config.isOboToOwl.getValue());
         assertEquals("obi", config.outFile.getValue());
-        OWLOntologyFormat format = config.format.getValue();
-        assertEquals(RDFXMLOntologyFormat.class.getName(), format.getClass()
+        OWLDocumentFormat format = config.format.getValue();
+        assertEquals(RDFXMLDocumentFormat.class.getName(), format.getClass()
                 .getName());
         assertFalse(config.isExpandMacros.getValue());
         assertEquals(ExpandMacrosModeOptions.GCI,

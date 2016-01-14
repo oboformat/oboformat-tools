@@ -1,0 +1,18 @@
+language: java
+
+jdk:
+  # - openjdk7 # only Java 8 or newer supported
+  - oraclejdk8
+
+# install
+before_install:
+ - free -m
+ - du -hs *
+ - ls -la
+
+
+# run tests
+# Warning: travis fails, when log output >4M
+script:
+  - mvn test
+

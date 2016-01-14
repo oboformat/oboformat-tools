@@ -2,7 +2,6 @@ package org.obolibrary.cli;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -14,9 +13,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.obolibrary.cli.OBORunnerConfiguration.ExpandMacrosModeOptions;
-import org.obolibrary.macro.MacroExpansionGCIVisitor;
-import org.obolibrary.macro.MacroExpansionVisitor;
 import org.obolibrary.obo2owl.OWLAPIObo2Owl;
 import org.obolibrary.obo2owl.Owl2Obo;
 import org.obolibrary.oboformat.diff.Diff;
@@ -25,20 +21,13 @@ import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.semanticweb.owlapi.model.AddAxiom;
-import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-import org.semanticweb.owlapi.model.SetOntologyID;
 
 /**
  * command line access to obo2owl
@@ -109,65 +98,6 @@ public class OBODiffRunner {
         for (Diff diff : diffs) {
             System.out.println("MDiff=" + diff);
         }
-    }
-
-    private static OWLOntology handleMacroExpansion(
-            OBORunnerConfiguration config, OWLOntology ontology,
-            String gciFile, String outputFile, String ontologyId,
-            OWLOntologyManager outputManager)
-            throws OWLOntologyStorageException {
-        if (!config.isExpandMacros.getValue()) {
-            return ontology;
-        }
-        ExpandMacrosModeOptions option = config.expandMacrosMode.getValue();
-        if (option == ExpandMacrosModeOptions.GCI) {
-            // create GCI ontology
-            MacroExpansionGCIVisitor mevGCI = new MacroExpansionGCIVisitor(
-                    ontology, outputManager, false);
-            OWLOntology gciOntology = mevGCI.createGCIOntology();
-            if (gciOntology.isEmpty()) {
-                // no macros expanded, do nothing
-                return ontology;
-            }
-            // add import
-            OWLOntologyManager manager = gciOntology.getOWLOntologyManager();
-            OWLImportsDeclaration importDeclaration = manager
-                    .getOWLDataFactory().getOWLImportsDeclaration(
-                            IRI.create(new File(outputFile).getName()));
-            OWLOntologyChange change = new AddImport(gciOntology,
-                    importDeclaration);
-            manager.applyChange(change);
-            // create output file name
-            File file = new File(gciFile);
-            if (gciFile.equals(outputFile)) {
-                String name = file.getName();
-                String lowerCaseName = name.toLowerCase();
-                int pos = lowerCaseName.lastIndexOf(".owl");
-                if (pos > 0) {
-                    name = name.substring(0, pos) + "-aux"
-                            + name.substring(pos);
-                } else {
-                    name += "-aux.owl";
-                }
-                gciFile = new File(file.getParentFile(), name)
-                        .getAbsolutePath();
-            }
-            // set ontology ID
-            OWLOntologyID id = new OWLOntologyID(
-                    IRI.create(ontologyId + "-aux"));
-            change = new SetOntologyID(gciOntology, id);
-            manager.applyChange(change);
-            // write to file
-            IRI gciIRI = IRI.create(new File(gciFile));
-            OWLOntologyFormat format = config.format.getValue();
-            logger.info("saving gci for " + ontologyId + " to " + gciIRI
-                    + " via " + format);
-            manager.saveOntology(gciOntology, format, gciIRI);
-        } else {
-            MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
-            ontology = mev.expandAll();
-        }
-        return ontology;
     }
 
     private static void usage() {
@@ -284,11 +214,6 @@ public class OBODiffRunner {
                 "http://obo.cvs.sourceforge.net/viewvc/*checkout*/obo/obo/website/cgi-bin/ontologies.txt"));
     }
 
-    private static Map<String, String> getOntDownloadMap(String fn)
-            throws IOException {
-        return getOntDownloadMap(new BufferedReader(new FileReader(fn)));
-    }
-
     private static Map<String, String> getOntDownloadMap(URL url)
             throws IOException {
         return getOntDownloadMap(new BufferedReader(new InputStreamReader(
@@ -350,7 +275,7 @@ public class OBODiffRunner {
         OWLAnnotation ann = fac
                 .getOWLAnnotation(ap, fac.getOWLLiteral(version));
         OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontology
-                .getOntologyID().getOntologyIRI(), ann);
+				.getOntologyID().getOntologyIRI().get(), ann);
         manager.applyChange(new AddAxiom(ontology, ax));
     }
 }

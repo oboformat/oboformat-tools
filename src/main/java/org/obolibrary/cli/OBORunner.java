@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -32,9 +31,9 @@ import org.obolibrary.oboformat.parser.OBOFormatDanglingReferenceException;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
-import org.obolibrary.owl.LabelFunctionalSyntaxStorer;
+import org.obolibrary.owl.LabelFunctionalSyntaxStorerFactory;
 import org.semanticweb.owlapi.formats.LabelFunctionalDocumentFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
@@ -42,15 +41,17 @@ import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.SetOntologyID;
+
+import com.google.common.base.Optional;
 
 /**
  * command line access to obo2owl
@@ -120,13 +121,13 @@ public class OBORunner {
                 ontology = handleMacroExpansion(config, ontology, gciFile,
                         outputFile, ontologyId, outputManager);
                 IRI outputStream = IRI.create(new File(outputFile));
-                OWLOntologyFormat format = config.format.getValue();
+                OWLDocumentFormat format = config.format.getValue();
                 logger.info("saving to " + ontologyId + "," + outputStream
                         + " via " + format);
                 manager.saveOntology(ontology, format, outputStream);
                 if (config.writeLabelOWL.getValue()) {
-                    manager.addOntologyStorer(new LabelFunctionalSyntaxStorer());
-                    OWLOntologyFormat labelFormat = new LabelFunctionalDocumentFormat();
+                    manager.getOntologyStorers().add(new LabelFunctionalSyntaxStorerFactory());
+                    OWLDocumentFormat labelFormat = new LabelFunctionalDocumentFormat();
                     IRI labelFile = IRI.create(new File(config.outputdir
                             .getValue(), ontologyId + ".ofn")
                             .getCanonicalFile());
@@ -208,7 +209,7 @@ public class OBORunner {
         // write temporary ontology to file
         final FileOutputStream outputStream = new FileOutputStream(new File(
                 path));
-        OWLOntologyFormat format = new RDFXMLOntologyFormat(); // TODO make this
+        OWLDocumentFormat format = new RDFXMLDocumentFormat(); // TODO make this
                                                                // configurable
         manager.saveOntology(ontology, format, outputStream);
         outputStream.close();
@@ -256,13 +257,13 @@ public class OBORunner {
                         .getAbsolutePath();
             }
             // set ontology ID
-            OWLOntologyID id = new OWLOntologyID(
-                    IRI.create(ontologyId + "-aux"));
+            OWLOntologyID id = new OWLOntologyID(Optional.of(
+                    IRI.create(ontologyId + "-aux")), Optional.<IRI>absent());
             change = new SetOntologyID(gciOntology, id);
             manager.applyChange(change);
             // write to file
             IRI gciIRI = IRI.create(new File(gciFile));
-            OWLOntologyFormat format = config.format.getValue();
+            OWLDocumentFormat format = config.format.getValue();
             logger.info("saving gci for " + ontologyId + " to " + gciIRI
                     + " via " + format);
             manager.saveOntology(gciOntology, format, gciIRI);
@@ -316,6 +317,7 @@ public class OBORunner {
      * @param dir
      * @param config
      * @param logger
+     * @param manager
      * @throws IOException
      */
     protected static void buildAllOboOwlFiles(String dir,
@@ -381,11 +383,6 @@ public class OBORunner {
                 "http://obo.cvs.sourceforge.net/viewvc/*checkout*/obo/obo/website/cgi-bin/ontologies.txt"));
     }
 
-    private static Map<String, String> getOntDownloadMap(String fn)
-            throws IOException {
-        return getOntDownloadMap(new BufferedReader(new FileReader(fn)));
-    }
-
     private static Map<String, String> getOntDownloadMap(URL url)
             throws IOException {
         return getOntDownloadMap(new BufferedReader(new InputStreamReader(
@@ -447,7 +444,7 @@ public class OBORunner {
         OWLAnnotation ann = fac
                 .getOWLAnnotation(ap, fac.getOWLLiteral(version));
         OWLAxiom ax = fac.getOWLAnnotationAssertionAxiom(ontology
-                .getOntologyID().getOntologyIRI(), ann);
+				.getOntologyID().getOntologyIRI().get(), ann);
         manager.applyChange(new AddAxiom(ontology, ax));
     }
 }

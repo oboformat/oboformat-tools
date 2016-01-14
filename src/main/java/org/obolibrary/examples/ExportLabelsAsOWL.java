@@ -6,12 +6,12 @@ import java.io.OutputStream;
 import org.obolibrary.obo2owl.Obo2Owl;
 import org.obolibrary.oboformat.model.OBODoc;
 import org.obolibrary.oboformat.parser.OBOFormatParser;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
@@ -61,7 +61,7 @@ public class ExportLabelsAsOWL {
                 }
             }
         }
-        OWLOntologyFormat format = new RDFXMLOntologyFormat();
+		OWLDocumentFormat format = new RDFXMLDocumentFormat();
         manager.saveOntology(ontology2, format, os);
     }
 }

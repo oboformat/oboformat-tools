@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
+import org.semanticweb.owlapi.formats.ManchesterSyntaxDocumentFormat;
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
+import org.semanticweb.owlapi.formats.RDFXMLDocumentFormat;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 
 public class OBORunnerConfiguration {
 
@@ -133,19 +133,19 @@ public class OBORunnerConfiguration {
             "Output Directory", ".", "--outdir");
     public final Variable<String> version = new StringParamterVariable(
             "OWL version", null, "--owlversion");
-    public final Variable<OWLOntologyFormat> format = new ParamterVariable<OWLOntologyFormat>(
-            "OWL ontology format", new RDFXMLOntologyFormat(), "-t", "--to") {
+	public final Variable<OWLDocumentFormat> format = new ParamterVariable<OWLDocumentFormat>(
+			"OWL ontology format", new RDFXMLDocumentFormat(), "-t", "--to") {
 
         private String failureMessage = null;
 
         @Override
         public boolean setValue(String to) {
             if (to.equals("owlxml")) {
-                this.value = new OWLXMLOntologyFormat();
+				value = new OWLXMLDocumentFormat();
             } else if (to.contains("manchester")) {
-                this.value = new ManchesterOWLSyntaxOntologyFormat();
+				value = new ManchesterSyntaxDocumentFormat();
             } else if (to.contains("RDF")) {
-                this.value = new RDFXMLOntologyFormat();
+				value = new RDFXMLDocumentFormat();
             } else {
                 failureMessage = "don't know format '" + to
                         + "' -- reverting to default: " + value;

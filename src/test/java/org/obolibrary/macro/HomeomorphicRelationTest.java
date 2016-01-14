@@ -1,17 +1,17 @@
 package org.obolibrary.macro;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import org.coode.owlapi.manchesterowlsyntax.ManchesterOWLSyntaxOntologyFormat;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.obolibrary.obo2owl.OboFormatTestBasics;
 import org.obolibrary.oboformat.model.OBODoc;
+import org.semanticweb.owlapi.formats.ManchesterSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -43,7 +43,7 @@ public class HomeomorphicRelationTest extends OboFormatTestBasics {
         OWLOntology ontology = convert(obodoc);
         MacroExpansionVisitor mev = new MacroExpansionVisitor(ontology);
         OWLOntology outputOntology = mev.expandAll();
-        writeOWL(ontology, fn, new ManchesterOWLSyntaxOntologyFormat());
+        writeOWL(ontology, fn, new ManchesterSyntaxDocumentFormat());
         return outputOntology;
     }
 }

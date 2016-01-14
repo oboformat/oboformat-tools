@@ -16,6 +16,8 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import com.google.common.base.Optional;
+
 public class Obo2Owl extends OWLAPIObo2Owl {
 
     /**
@@ -78,22 +80,22 @@ public class Obo2Owl extends OWLAPIObo2Owl {
         if (ontClause != null) {
             String ontOboId = (String) ontClause.getValue();
             defaultIDSpace = ontOboId;
-            IRI ontIRI;
+            Optional<IRI> ontIRI;
             if (ontOboId.contains(":")) {
-                ontIRI = IRI.create(ontOboId);
+                ontIRI = Optional.of(IRI.create(ontOboId));
             } else {
-                ontIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX
-                        + ontOboId + ".owl");
+                ontIRI = Optional.of(IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX
+                        + ontOboId + ".owl"));
             }
             Clause dvclause = hf.getClause(OboFormatTag.TAG_DATA_VERSION);
             if (dvclause != null) {
                 String dv = dvclause.getValue().toString();
-                IRI vIRI = IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX
-                        + ontOboId + "/" + dv + "/" + ontOboId + ".owl");
+                Optional<IRI> vIRI = Optional.of(IRI.create(Obo2OWLConstants.DEFAULT_IRI_PREFIX
+                        + ontOboId + "/" + dv + "/" + ontOboId + ".owl"));
                 OWLOntologyID oid = new OWLOntologyID(ontIRI, vIRI);
                 owlOntology = manager.createOntology(oid);
             } else {
-                owlOntology = manager.createOntology(ontIRI);
+                owlOntology = manager.createOntology(ontIRI.get());
             }
         } else {
             defaultIDSpace = "TEMP";

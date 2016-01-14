@@ -1,6 +1,8 @@
 package org.obolibrary.obo2owl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,17 +22,17 @@ import org.obolibrary.oboformat.parser.OBOFormatParser;
 import org.obolibrary.oboformat.parser.OBOFormatParserException;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyFormat;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
@@ -129,11 +131,11 @@ public class OboFormatTestBasics {
 
     protected File writeOWL(OWLOntology ontology, String filename)
             throws OWLOntologyStorageException {
-        return writeOWL(ontology, filename, new OWLXMLOntologyFormat());
+        return writeOWL(ontology, filename, new OWLXMLDocumentFormat());
     }
 
     protected File writeOWL(OWLOntology ontology, String filename,
-            OWLOntologyFormat format) throws OWLOntologyStorageException {
+            OWLDocumentFormat format) throws OWLOntologyStorageException {
         if (!filename.toLowerCase().endsWith(".owl")) {
             filename += ".owl";
         }
@@ -175,12 +177,12 @@ public class OboFormatTestBasics {
     protected static void renderOWL(OWLOntology owlOntology)
             throws OWLOntologyStorageException {
         OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
-        manager.saveOntology(owlOntology, new OWLXMLOntologyFormat(),
+        manager.saveOntology(owlOntology, new OWLXMLDocumentFormat(),
                 System.out);
     }
 
     protected static String renderOWL(OWLOntology owlOntology,
-            OWLOntologyFormat ontologyFormat)
+            OWLDocumentFormat ontologyFormat)
             throws OWLOntologyStorageException, IOException {
         OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
         ByteArrayOutputStream out = new ByteArrayOutputStream();

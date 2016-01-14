@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 /**
@@ -52,7 +53,7 @@ public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
         if (useSystemOut) {
             System.out.println("M=" + bridge.getManager());
         }
-        bridge.getManager().addIRIMapper(iriMapper);
+        bridge.getManager().getIRIMappers().add(iriMapper);
         Collection<Clause> importClauses = obodoc.getHeaderFrame().getClauses(
                 OboFormatTag.TAG_IMPORT);
         assertEquals(1, importClauses.size());
@@ -61,10 +62,10 @@ public class ImportOWLOntologiesFromOboTest extends OboFormatTestBasics {
         assertEquals(1, ontology.getImportsDeclarations().size());
         if (useSystemOut) {
             for (OWLSubClassOfAxiom a : ontology.getAxioms(
-                    AxiomType.SUBCLASS_OF, true)) {
+                    AxiomType.SUBCLASS_OF, Imports.INCLUDED)) {
                 System.out.println("A=" + a);
             }
         }
-        assertEquals(2, ontology.getAxioms(AxiomType.SUBCLASS_OF, true).size());
+        assertEquals(2, ontology.getAxioms(AxiomType.SUBCLASS_OF, Imports.INCLUDED).size());
     }
 }
