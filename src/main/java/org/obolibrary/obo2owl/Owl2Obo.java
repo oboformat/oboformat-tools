@@ -6,10 +6,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 public class Owl2Obo extends OWLAPIOwl2Obo {
 
     public Owl2Obo() {
-        super(OWLManager.createOWLOntologyManager());
+	this(OWLManager.createOWLOntologyManager());
     }
 
     public Owl2Obo(OWLOntologyManager m) {
         super(m);
+	setMuteUntranslatableAxioms(true);
     }
 }
